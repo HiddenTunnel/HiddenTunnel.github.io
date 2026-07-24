@@ -11,9 +11,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
 
-  <!-- Google Identity Services Library -->
-  
-
   <style>
     :root {
       --green: #5CFF72;
@@ -111,40 +108,6 @@
       margin-bottom: 28px;
     }
 
-    /* Form Styles */
-    .form-group {
-      margin-bottom: 18px;
-      text-align: left;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #aaa;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
-    }
-
-    .form-group input {
-      width: 100%;
-      padding: 14px 16px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 12px;
-      color: #fff;
-      font-size: 0.95rem;
-      outline: none;
-      transition: all 0.3s ease;
-    }
-
-    .form-group input:focus {
-      border-color: var(--green);
-      box-shadow: 0 0 12px rgba(92, 255, 114, 0.2);
-      background: rgba(255, 255, 255, 0.08);
-    }
-
     .btn-submit {
       width: 100%;
       padding: 14px;
@@ -185,14 +148,6 @@
       padding: 0 12px;
     }
 
-    /* Google Button Container */
-    .google-btn-container {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-    }
-
-    /* Redirect Text */
     .register-prompt {
       margin-top: 24px;
       font-size: 0.88rem;
@@ -225,24 +180,20 @@
     </a>
     <p class="subtitle">Enter your ID credentials to unlock the tunnel</p>
 
-    
-
     <div class="divider">
       <span>OR DIRECT</span>
     </div>
 
-    <!-- Official Google Auth Setup -->
-
     <button id="googleLoginBtn" class="btn-submit">
-    Continue with Google
-</button>
+      Continue with Google
+    </button>
 
     <div class="register-prompt">
       Don't have a tag yet? <a href="createaccount.html">Create Account</a>
     </div>
   </div>
 
-  <!-- Interactive Scripts -->
+  <!-- Interactive Visual Scripts -->
   <script>
     // Mouse Glow Track
     const glow = document.getElementById('mouse-glow');
@@ -298,78 +249,80 @@
       requestAnimationFrame(animateParticles);
     }
     animateParticles();
-
-    // Standard Form Login Handler
- 
-    // Google Sign-In Callback Handler
-
-    // Helper function to decode JWT Token
-    
   </script>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
-import {
-    getAuth,
-    GoogleAuthProvider,
-    signInWithPopup
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  <!-- Firebase Auth & Persistence Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+        getAuth,
+        GoogleAuthProvider,
+        signInWithPopup,
+        setPersistence,
+        browserLocalPersistence,
+        onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
-    authDomain: "urbannoir-13ce8.firebaseapp.com",
-    projectId: "urbannoir-13ce8",
-    storageBucket: "urbannoir-13ce8.firebasestorage.app",
-    messagingSenderId: "1059246827383",
-    appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
-    measurementId: "G-CEPWKZXQVF"
-};
+    import {
+      getFirestore,
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+    const firebaseConfig = {
+        apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+        authDomain: "urbannoir-13ce8.firebaseapp.com",
+        projectId: "urbannoir-13ce8",
+        storageBucket: "urbannoir-13ce8.firebasestorage.app",
+        messagingSenderId: "1059246827383",
+        appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
+        measurementId: "G-CEPWKZXQVF"
+    };
 
-const googleLoginBtn = document.getElementById("googleLoginBtn");
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
 
-googleLoginBtn.addEventListener("click", async () => {
-    try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
+    // 1️⃣ AUTO-REMEMBER: অটোমেটিক চেক করবে ব্রাউজারে আগে থেকেই লগইন সেভ আছে কিনা
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            localStorage.setItem("ug_current_user_id", user.uid);
+            
+            const snap = await getDoc(doc(db, "users", user.uid));
+            if (snap.exists()) {
+                window.location.href = "index.html";
+            }
+        }
+    });
 
-        localStorage.setItem("ug_current_user_id", user.uid);
+    const googleLoginBtn = document.getElementById("googleLoginBtn");
 
-        window.location.href = "createaccount.html";
-    } catch (error) {
-        console.error(error);
-        alert(error.message);
-    }
-});
-</script>
+    // 2️⃣ GOOGLE LOGIN WITH PERSISTENCE
+    googleLoginBtn.addEventListener("click", async () => {
+        try {
+            // ব্রাউজার বন্ধ করলেও যাতে সেশন ধরে রাখে
+            await setPersistence(auth, browserLocalPersistence);
+            
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+            localStorage.setItem("ug_current_user_id", user.uid);
 
-import {
-    getAuth,
-    GoogleAuthProvider,
-    signInWithPopup
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+            const snap = await getDoc(doc(db, "users", user.uid));
 
-const firebaseConfig = {
-    apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
-    authDomain: "urbannoir-13ce8.firebaseapp.com",
-    projectId: "urbannoir-13ce8",
-    storageBucket: "urbannoir-13ce8.firebasestorage.app",
-    messagingSenderId: "1059246827383",
-    appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
-    measurementId: "G-CEPWKZXQVF"
-};
+            if (snap.exists()) {
+                window.location.href = "index.html";
+            } else {
+                window.location.href = "createaccount.html";
+            }
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-
-</script>
-
+        } catch (error) {
+            console.error("Login Error:", error);
+            alert(error.message);
+        }
+    });
+  </script>
 
 </body>
 </html>

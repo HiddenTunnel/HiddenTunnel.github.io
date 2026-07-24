@@ -646,3 +646,121 @@ UNIVERSAL RESPONSIVE BREAKPOINTS
         width: 240px;
     }
 }
+
+/* Navigation Header */
+header {
+  width: 100%;
+  padding: 18px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(5, 5, 5, 0.75);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+nav {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.6rem;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: 1px;
+  transition: transform 0.3s ease;
+}
+
+.logo span {
+  color: #5CFF72;
+}
+
+.desktop-nav {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+}
+
+.desktop-nav li a {
+  color: #aaa;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.desktop-nav li a:hover,
+.desktop-nav li a.active {
+  color: #5CFF72;
+  background: rgba(92, 255, 114, 0.08);
+  transform: translateY(-2px);
+}
+
+.nav-btn .join {
+  background: #5CFF72;
+  color: #050505;
+  padding: 9px 20px;
+  border-radius: 30px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(92, 255, 114, 0.3);
+  display: inline-block;
+}
+
+/* Mobile Bottom Navigation */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(18, 18, 18, 0.95);
+  backdrop-filter: blur(15px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 0;
+  z-index: 1000;
+}
+
+.mobile-bottom-nav a {
+  color: #888;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.mobile-bottom-nav a .nav-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.mobile-bottom-nav a.active {
+  color: #5CFF72;
+}
+
+@media (max-width: 768px) {
+  .desktop-nav { display: none; }
+  .mobile-bottom-nav { display: flex; }
+}

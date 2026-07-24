@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 450" width="100%" height="100%">
+  <defs>
+    <!-- Heavy Neon Glow & Spray Dispersion -->
+    <filter id="graffitiGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Spray Paint Fill Gradient -->
+    <linearGradient id="sprayGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="40%" stop-color="#E0E0E0" />
+      <stop offset="100%" stop-color="#888888" />
+    </linearGradient>
+
+    <!-- Acid Green Spray Fill -->
+    <linearGradient id="greenSpray" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B2FF59" />
+      <stop offset="50%" stop-color="#5CFF72" />
+      <stop offset="100%" stop-color="#00B32C" />
+    </linearGradient>
+  </defs>
+
+  <style>
+    /* Wildstyle Graffiti Font Aesthetics */
+    .graffiti-back-shadow { fill: #000; opacity: 0.9; }
+    .graffiti-outline-outer { fill: none; stroke: #FF7A00; stroke-width: 22px; stroke-linejoin: round; stroke-linecap: round; }
+    .graffiti-outline-inner { fill: none; stroke: #5CFF72; stroke-width: 12px; stroke-linejoin: round; stroke-linecap: round; }
+    .graffiti-base { font-family: 'Permanent Marker', 'Impact', sans-serif; font-weight: 900; text-transform: uppercase; }
+  </style>
+
+  <g transform="rotate(-3) translate(20, 40)">
+    
+    <!-- 1. SPRAY PAINT BACKDROP / AURA (Splatter effect) -->
+    <path d="M 80 180 Q 200 40 500 60 Q 850 30 920 180 Q 960 300 700 380 Q 300 420 80 320 Z" fill="#5CFF72" opacity="0.12" filter="url(#graffitiGlow)" />
+    
+    <!-- 2. GRAFFITI CROWN ACCENT ON TOP -->
+    <g transform="translate(140, -10) scale(0.85)" filter="url(#graffitiGlow)">
+      <path d="M 50 60 L 20 10 L 70 35 L 100 0 L 130 35 L 180 10 L 150 60 Z" fill="#FF7A00" stroke="#000" stroke-width="6" stroke-linejoin="round"/>
+      <circle cx="20" cy="10" r="6" fill="#5CFF72"/>
+      <circle cx="100" cy="0" r="6" fill="#5CFF72"/>
+      <circle cx="180" cy="10" r="6" fill="#5CFF72"/>
+    </g>
+
+    <!-- 3. HEAVY BLACK DROP SHADOW (3D Wall Depth) -->
+    <g transform="translate(12, 16)">
+      <!-- UNDERGROUND Shadow -->
+      <text x="50" y="150" class="graffiti-base" font-size="82" letter-spacing="4" fill="#000">UNDERGROUND</text>
+      <!-- TUNNEL Shadow -->
+      <text x="130" y="295" class="graffiti-base" font-size="140" letter-spacing="8" fill="#000">TUNNEL</text>
+    </g>
+
+    <!-- 4. OUTER ORANGE SPRAY STROKE (Ties both words into 1 piece) -->
+    <!-- UNDERGROUND Outer -->
+    <text x="50" y="150" class="graffiti-base graffiti-outline-outer" font-size="82" letter-spacing="4">UNDERGROUND</text>
+    <!-- TUNNEL Outer -->
+    <text x="130" y="295" class="graffiti-base graffiti-outline-outer" font-size="140" letter-spacing="8">TUNNEL</text>
+
+    <!-- 5. INNER NEON GREEN BORDER -->
+    <!-- UNDERGROUND Inner -->
+    <text x="50" y="150" class="graffiti-base graffiti-outline-inner" font-size="82" letter-spacing="4" filter="url(#graffitiGlow)">UNDERGROUND</text>
+    <!-- TUNNEL Inner -->
+    <text x="130" y="295" class="graffiti-base graffiti-outline-inner" font-size="140" letter-spacing="8" filter="url(#graffitiGlow)">TUNNEL</text>
+
+    <!-- 6. MAIN FILL FACES -->
+    <!-- UNDERGROUND (Textured Grey-White Wall Spray) -->
+    <text x="50" y="150" class="graffiti-base" font-size="82" letter-spacing="4" fill="url(#sprayGrad)" stroke="#000" stroke-width="4">UNDERGROUND</text>
+
+    <!-- TUNNEL (Acid Neon Green Fill) -->
+    <text x="130" y="295" class="graffiti-base" font-size="140" letter-spacing="8" fill="url(#greenSpray)" stroke="#000" stroke-width="6">TUNNEL</text>
+
+    <!-- 7. PAINT DRIPS (Hanging from bottom word) -->
+    <g fill="#5CFF72" filter="url(#graffitiGlow)">
+      <!-- Drip 1 -->
+      <path d="M 210 295 Q 212 340 208 360 Q 204 370 210 372 Q 216 370 214 360 Z" />
+      <circle cx="210" cy="382" r="4" />
+      <!-- Drip 2 -->
+      <path d="M 460 295 Q 463 350 458 385 Q 454 395 460 398 Q 466 395 463 385 Z" />
+      <circle cx="460" cy="410" r="5" />
+      <circle cx="460" cy="424" r="3" />
+      <!-- Drip 3 -->
+      <path d="M 720 295 Q 722 330 718 350 Q 714 358 719 360 Q 724 358 722 350 Z" />
+      <circle cx="719" cy="370" r="3.5" />
+    </g>
+
+    <!-- 8. STREET TAG ACCENTS (Arrow & Flashes) -->
+    <g stroke="#5CFF72" stroke-width="6" stroke-linecap="round" fill="none" filter="url(#graffitiGlow)">
+      <!-- Underline Spray Arrow -->
+      <path d="M 100 325 Q 450 350 820 315 M 790 295 L 830 315 L 795 335" />
+      <!-- Sparkle / Star 1 -->
+      <path d="M 910 120 L 910 150 M 895 135 L 925 135" stroke="#FF7A00" stroke-width="4"/>
+      <!-- Sparkle / Star 2 -->
+      <path d="M 70 220 L 70 240 M 60 230 L 80 230" stroke="#FF7A00" stroke-width="3"/>
+    </g>
+
+  </g>
+</svg>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Group - Underground Chat</title>
+    <meta name="theme-color" content="#050505">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            padding-bottom: 90px;
+            background: #080808;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .create-group-container {
+            max-width: 600px;
+            margin: 90px auto 30px auto;
+            padding: 24px;
+            background: #111;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+        }
+
+        .group-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .group-header h2 {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 1.8rem;
+            color: #fff;
+        }
+
+        .group-header h2 span {
+            color: var(--green, #5CFF72);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            background: #181818;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: #fff;
+            outline: none;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .form-group input[type="text"]:focus {
+            border-color: var(--green, #5CFF72);
+        }
+
+        .friends-select-list {
+            max-height: 250px;
+            overflow-y: auto;
+            background: #151515;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .friend-checkbox-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: #1e1e1e;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .friend-checkbox-card label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 0;
+            color: #fff;
+        }
+
+        .friend-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--green, #5CFF72);
+        }
+
+        .friend-checkbox-card input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--green, #5CFF72);
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--green, #5CFF72);
+            color: #000;
+            font-weight: 800;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .submit-btn:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+
+    <!-- Dynamic Navigation Container -->
+    <div id="navbar-container"></div>
+
+    <div class="create-group-container">
+        <div class="group-header">
+            <h2>CREATE <span>CREW</span></h2>
+            <p style="color: #777; font-size: 0.85rem;">Form a private group tunnel with your friends.</p>
+        </div>
+
+        <form id="createGroupForm">
+            <div class="form-group">
+                <label for="groupNameInput">Group Name</label>
+                <input type="text" id="groupNameInput" placeholder="Enter Crew/Group Title..." required autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label>Select Crew Members</label>
+                <div class="friends-select-list" id="friendsSelectList">
+                    <p style="color: #666; text-align: center; margin: auto;">Loading friends...</p>
+                </div>
+            </div>
+
+            <button type="submit" id="createGroupBtn" class="submit-btn">CREATE GROUP</button>
+        </form>
+    </div>
+
+    <!-- FIREBASE SDKs & LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            getDocs,
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+            authDomain: "urbannoir-13ce8.firebaseapp.com",
+            projectId: "urbannoir-13ce8",
+            storageBucket: "urbannoir-13ce8.firebasestorage.app",
+            messagingSenderId: "1059246827383",
+            appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
+            measurementId: "G-CEPWKZXQVF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        const currentUserId = localStorage.getItem("ug_current_user_id");
+        const friendsSelectList = document.getElementById("friendsSelectList");
+        const createGroupForm = document.getElementById("createGroupForm");
+        const createGroupBtn = document.getElementById("createGroupBtn");
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user && !currentUserId) {
+                window.location.href = "createaccount.html";
+                return;
+            }
+            const activeUid = user ? user.uid : currentUserId;
+            loadFriendsForSelection(activeUid);
+        });
+
+        // 1. Load users/friends to select for the group
+        async function loadFriendsForSelection(myUid) {
+            try {
+                const usersSnap = await getDocs(collection(db, "users"));
+                friendsSelectList.innerHTML = "";
+
+                let hasUsers = false;
+                usersSnap.forEach((docSnap) => {
+                    if (docSnap.id !== myUid) { // Exclude current logged in user
+                        hasUsers = true;
+                        const userData = docSnap.data();
+                        
+                        const itemHTML = `
+                            <div class="friend-checkbox-card">
+                                <label for="user_${docSnap.id}">
+                                    <img class="friend-avatar" src="${userData.photo || 'assets/svg/user.svg'}" alt="User">
+                                    <span>${userData.fullName || 'Tagger User'}</span>
+                                </label>
+                                <input type="checkbox" id="user_${docSnap.id}" value="${docSnap.id}" class="member-checkbox">
+                            </div>
+                        `;
+                        friendsSelectList.insertAdjacentHTML("beforeend", itemHTML);
+                    }
+                });
+
+                if (!hasUsers) {
+                    friendsSelectList.innerHTML = `<p style="color:#666; text-align:center; margin:auto;">No other users found.</p>`;
+                }
+            } catch (error) {
+                console.error("Error loading users:", error);
+                friendsSelectList.innerHTML = `<p style="color:#e74c3c; text-align:center; margin:auto;">Failed to load contacts.</p>`;
+            }
+        }
+
+        // 2. Handle Group Creation Form Submit
+        createGroupForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            const groupName = document.getElementById("groupNameInput").value.trim();
+            const checkedBoxes = document.querySelectorAll(".member-checkbox:checked");
+            
+            if (!groupName) {
+                alert("Please enter a group name.");
+                return;
+            }
+
+            const selectedMemberUids = Array.from(checkedBoxes).map(cb => cb.value);
+            const activeUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
+            
+            // Add current user into the group members array
+            const allMembers = [...selectedMemberUids, activeUid];
+
+            createGroupBtn.disabled = true;
+            createGroupBtn.textContent = "CREATING...";
+
+            try {
+                // Create Group Document in Firestore
+                const groupRef = await addDoc(collection(db, "groups"), {
+                    groupName: groupName,
+                    createdBy: activeUid,
+                    members: allMembers,
+                    lastMessage: "Group created",
+                    updatedAt: serverTimestamp()
+                });
+
+                // Redirect to Live Chat with groupId
+                window.location.href = `live-chat.html?groupId=${groupRef.id}`;
+            } catch (err) {
+                console.error("Group Creation Error:", err);
+                alert("Failed to create group. Please check connection.");
+                createGroupBtn.disabled = false;
+                createGroupBtn.textContent = "CREATE GROUP";
+            }
+        });
+    </script>
+
+    <!-- Navigation Script -->
+    <script src="navbar.js"></script>
+</body>
+</html>

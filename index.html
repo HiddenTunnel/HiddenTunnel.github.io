@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Underground Chat - Leave Your Mark</title>
+  <title>Underground Tunnel - Leave Your Mark</title>
   <meta name="theme-color" content="#050505">
 
   <!-- Google Fonts -->
@@ -17,7 +17,10 @@
     :root {
       --green: #5CFF72;
       --orange: #FF7A00;
+      --red: #FF4D4D;
       --bg: #050505;
+      --nav-bg: rgba(5, 5, 5, 0.85);
+      --transition-smooth: cubic-bezier(0.25, 1, 0.5, 1);
     }
 
     *, *::before, *::after {
@@ -33,9 +36,10 @@
       overflow-x: hidden;
       min-height: 100vh;
       position: relative;
+      padding-bottom: 80px;
     }
 
-    /* Ambient FX & Graffiti Background Layers */
+    /* Ambient FX & Backgrounds */
     #graffiti-bg {
       position: fixed;
       top: 0;
@@ -48,7 +52,7 @@
       opacity: 0.18;
       pointer-events: none;
       z-index: 0;
-      transition: transform 0.1s ease-out;
+      transition: transform 0.2s var(--transition-smooth);
       will-change: transform;
     }
 
@@ -63,7 +67,7 @@
       pointer-events: none;
       z-index: 2;
       transform: translate(-50%, -50%);
-      transition: transform 0.03s linear;
+      transition: transform 0.05s linear;
     }
 
     #particles-canvas {
@@ -76,14 +80,84 @@
       z-index: 1;
     }
 
-    /* Navigation Header */
+    /* 📱 MOBILE FLOATING TOP BAR */
+    .mobile-top-bar {
+      display: none;
+      position: fixed;
+      top: 14px;
+      left: 0;
+      width: 100%;
+      padding: 0 16px;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .mobile-top-bar * {
+      pointer-events: auto;
+    }
+
+    /* Mobile Profile Pic (Top Left) */
+    .mobile-profile-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 2px solid var(--green);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      transition: transform 0.3s var(--transition-smooth);
+      text-decoration: none;
+    }
+
+    .mobile-profile-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .mobile-profile-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* Mobile Logout Button (Top Right) */
+    .mobile-logout-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(18, 18, 18, 0.85);
+      border: 1px solid rgba(255, 77, 77, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      transition: all 0.3s var(--transition-smooth);
+    }
+
+    .mobile-logout-btn img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .mobile-logout-btn:active {
+      transform: scale(0.92);
+      background: rgba(255, 77, 77, 0.25);
+    }
+
+    /* 💻 DESKTOP NAVIGATION HEADER */
     header {
       width: 100%;
-      padding: 18px 32px;
+      padding: 16px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(5, 5, 5, 0.75);
+      background: var(--nav-bg);
       position: fixed;
       top: 0;
       left: 0;
@@ -99,15 +173,47 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 16px;
+    }
+
+    .brand-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Desktop Profile Avatar (Top Left) */
+    .desktop-profile-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--green);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      transition: transform 0.3s var(--transition-smooth), box-shadow 0.3s ease;
+    }
+
+    .desktop-profile-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .desktop-profile-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 15px rgba(92, 255, 114, 0.4);
     }
 
     .logo {
       font-family: 'Permanent Marker', cursive;
-      font-size: 1.6rem;
+      font-size: 1.7rem;
       color: #fff;
       text-decoration: none;
       letter-spacing: 1px;
-      transition: transform 0.3s ease;
+      transition: transform 0.3s var(--transition-smooth);
     }
 
     .logo:hover {
@@ -118,40 +224,62 @@
       color: var(--green);
     }
 
-    nav ul {
+    /* Desktop Nav Links */
+    .desktop-nav {
       display: flex;
-      gap: 20px;
+      gap: 12px;
       list-style: none;
+      align-items: center;
     }
 
-    nav ul li a {
+    .desktop-nav li a {
       color: #aaa;
       text-decoration: none;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
+      gap: 8px;
+      padding: 8px 16px;
       border-radius: 20px;
-      transition: all 0.3s ease;
+      transition: all 0.3s var(--transition-smooth);
     }
 
-    nav ul li a:hover,
-    nav ul li a.active {
+    .desktop-nav li a .nav-icon {
+      width: 18px;
+      height: 18px;
+      opacity: 0.7;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .desktop-nav li a:hover .nav-icon,
+    .desktop-nav li a.active .nav-icon {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .desktop-nav li a:hover,
+    .desktop-nav li a.active {
       color: var(--green);
       background: rgba(92, 255, 114, 0.08);
       transform: translateY(-2px);
     }
 
+    /* Desktop Right Actions */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
     .nav-btn .join {
       background: var(--green);
       color: #050505;
-      padding: 9px 20px;
+      padding: 10px 22px;
       border-radius: 30px;
       font-weight: 800;
       text-decoration: none;
-      transition: all 0.3s ease;
+      transition: all 0.3s var(--transition-smooth);
       box-shadow: 0 0 15px rgba(92, 255, 114, 0.3);
       display: inline-block;
     }
@@ -159,6 +287,31 @@
     .nav-btn .join:hover {
       transform: translateY(-3px) scale(1.03);
       box-shadow: 0 0 25px rgba(92, 255, 114, 0.6);
+    }
+
+    .desktop-logout-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 77, 77, 0.1);
+      border: 1px solid rgba(255, 77, 77, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s var(--transition-smooth);
+    }
+
+    .desktop-logout-btn img {
+      width: 18px;
+      height: 18px;
+    }
+
+    .desktop-logout-btn:hover {
+      background: rgba(255, 77, 77, 0.25);
+      border-color: var(--red);
+      transform: scale(1.08);
+      box-shadow: 0 0 15px rgba(255, 77, 77, 0.4);
     }
 
     /* Hero Section */
@@ -172,6 +325,7 @@
       text-align: center;
       position: relative;
       z-index: 10;
+      animation: fadeInUp 0.8s var(--transition-smooth);
     }
 
     .badge-wrapper {
@@ -199,7 +353,6 @@
       transform: scale(1.05);
     }
 
-    /* Rating & Avg Display */
     .rating-box {
       display: flex;
       align-items: center;
@@ -218,16 +371,11 @@
       transform: translateY(-2px);
     }
 
-    .rating-stars {
-      color: #FFD400;
-    }
-
-    .rating-score {
-      color: #fff;
-    }
+    .rating-stars { color: #FFD400; }
+    .rating-score { color: #fff; }
 
     .hero-title {
-      font-size: clamp(2.5rem, 9vw, 5.2rem);
+      font-size: clamp(2.5rem, 8vw, 5.2rem);
       font-weight: 900;
       line-height: 1.05;
       margin-bottom: 20px;
@@ -235,12 +383,15 @@
       letter-spacing: -1px;
     }
 
+    .hero-title .desktop-title { display: inline; }
+    .hero-title .mobile-title { display: none; }
+
     .hero-title .highlight {
       font-family: 'Permanent Marker', cursive;
       color: var(--green);
       text-shadow: 0 0 20px rgba(92, 255, 114, 0.4);
       display: inline-block;
-      transition: transform 0.3s ease;
+      transition: transform 0.3s var(--transition-smooth);
     }
 
     .hero-title .highlight:hover {
@@ -273,7 +424,7 @@
       border-radius: 40px;
       text-decoration: none;
       box-shadow: 0 0 25px rgba(92, 255, 114, 0.35);
-      transition: all 0.3s ease;
+      transition: all 0.3s var(--transition-smooth);
     }
 
     .btn-primary:hover {
@@ -291,7 +442,7 @@
       font-weight: 700;
       border-radius: 40px;
       text-decoration: none;
-      transition: all 0.3s ease;
+      transition: all 0.3s var(--transition-smooth);
     }
 
     .btn-secondary:hover {
@@ -300,7 +451,7 @@
       transform: translateY(-4px) scale(1.02);
     }
 
-    /* Chat Preview Mockup Card */
+    /* Chat Mockup Card */
     .chat-mockup {
       width: 100%;
       max-width: 420px;
@@ -310,11 +461,10 @@
       padding: 24px;
       box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(92, 255, 114, 0.1);
       position: relative;
-      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      transition: transform 0.4s var(--transition-smooth), border-color 0.3s ease, box-shadow 0.3s ease;
       will-change: transform;
     }
 
-    /* Interactive Hover-to-Move effect on Chat Mockup */
     .chat-mockup:hover {
       transform: translateY(-8px) scale(1.02);
       border-color: rgba(92, 255, 114, 0.4);
@@ -362,9 +512,7 @@
       transition: transform 0.2s ease;
     }
 
-    .msg:hover {
-      transform: scale(1.02);
-    }
+    .msg:hover { transform: scale(1.02); }
 
     .msg-incoming {
       background: #1e1e1e;
@@ -381,50 +529,182 @@
       border-bottom-right-radius: 4px;
     }
 
+    /* Mobile Bottom Navigation Bar */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(18, 18, 18, 0.95);
+      backdrop-filter: blur(15px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0;
+      z-index: 1000;
+      animation: slideUp 0.5s var(--transition-smooth);
+    }
+
+    .mobile-bottom-nav a {
+      color: #888;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      transition: all 0.3s var(--transition-smooth);
+    }
+
+    .mobile-bottom-nav a .nav-icon {
+      width: 22px;
+      height: 22px;
+      transition: transform 0.3s var(--transition-smooth);
+    }
+
+    .mobile-bottom-nav a:hover,
+    .mobile-bottom-nav a.active {
+      color: var(--green);
+    }
+
+    .mobile-bottom-nav a:hover .nav-icon,
+    .mobile-bottom-nav a.active .nav-icon {
+      transform: translateY(-3px) scale(1.1);
+    }
+
+    /* Keyframes */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    /* Responsive Queries */
     @media (max-width: 768px) {
-      header {
-        padding: 14px 18px;
+      header { display: none !important; }
+      .mobile-top-bar { display: flex; }
+      .hero-title .desktop-title { display: none; }
+      .hero-title .mobile-title {
+        display: inline;
+        font-family: 'Permanent Marker', cursive;
+        letter-spacing: 0.5px;
       }
-      nav ul {
-        display: none;
-      }
-      .hero-buttons {
-        flex-direction: column;
-      }
+      .mobile-bottom-nav { display: flex; }
+      .hero { margin-top: 70px; }
+      .hero-buttons { flex-direction: column; }
     }
   </style>
 </head>
 <body>
-  <!-- Ambient FX & SVG Graffiti Wall Background -->
+  <!-- Ambient FX & SVG Background -->
   <div id="graffiti-bg"></div>
   <div id="mouse-glow"></div>
   <canvas id="particles-canvas"></canvas>
-  <div class="noise"></div>
 
-  <!-- Header Navigation -->
+  <!-- 📱 MOBILE TOP BAR (Top-Left Profile Pic, Top-Right Logout) -->
+  <div class="mobile-top-bar">
+    <a href="id.html" class="mobile-profile-btn" title="View Profile">
+      <img src="assets/svg/user.svg" alt="Profile ID" id="mobileProfilePic">
+    </a>
+
+    <button type="button" class="mobile-logout-btn" id="logoutBtnMobile" title="Logout">
+      <img src="assets/svg/logout.svg" alt="Logout">
+    </button>
+  </div>
+
+  <!-- 💻 DESKTOP HEADER NAVIGATION -->
   <header>
     <nav>
-      <a href="index.html" class="logo">
-        UNDERGROUND <span>CHAT</span>
-      </a>
-      <ul>
-        <li><a href="index.html" class="active">🏠 Home</a></li>
-        <li><a href="chat.html">💬 Chats</a></li>
-        <li><a href="friends.html">👥 Friends</a></li>
-        <li><a href="notification.html">🔔 Notifications</a></li>
-        <li><a href="settings.html">⚙ Settings</a></li>
+      <div class="brand-container">
+        <!-- Desktop Profile Avatar (Top Left) -->
+        <a href="id.html" class="desktop-profile-btn" title="View Profile">
+          <img src="assets/svg/user.svg" alt="Profile ID" id="desktopProfilePic">
+        </a>
+        <a href="index.html" class="logo">
+          UNDERGROUND <span>CHAT</span>
+        </a>
+      </div>
+
+      <!-- Desktop Nav Options -->
+      <ul class="desktop-nav">
+        <li>
+          <a href="index.html" class="active">
+            <img src="assets/svg/home.svg" class="nav-icon" alt="Home">
+            <span>Home</span>
+          </a>
+        </li>
+        <li>
+          <a href="user.html">
+            <img src="assets/svg/chat.svg" class="nav-icon" alt="Chats">
+            <span>Chats</span>
+          </a>
+        </li>
+        <li>
+          <a href="friends.html">
+            <img src="assets/svg/friends.svg" class="nav-icon" alt="Friends">
+            <span>Friends</span>
+          </a>
+        </li>
+        <li>
+          <a href="notification.html">
+            <img src="assets/svg/notification.svg" class="nav-icon" alt="Notifications">
+            <span>Notifications</span>
+          </a>
+        </li>
+        <li>
+          <a href="settings.html">
+            <img src="assets/svg/setting.svg" class="nav-icon" alt="Settings">
+            <span>Settings</span>
+          </a>
+        </li>
       </ul>
-      <div class="nav-btn">
-        <a href="chat.html" class="join">Enter Tunnel</a>
+
+      <!-- Desktop Right Actions -->
+      <div class="header-actions">
+        <div class="nav-btn">
+          <a href="user.html" class="join">Enter Tunnel</a>
+        </div>
+        <button type="button" class="desktop-logout-btn" id="logoutBtnDesktop" title="Logout">
+          <img src="assets/svg/logout.svg" alt="Logout">
+        </button>
       </div>
     </nav>
   </header>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <div class="mobile-bottom-nav">
+    <a href="index.html" class="active">
+      <img src="assets/svg/home.svg" class="nav-icon" alt="Home">
+      <span>Home</span>
+    </a>
+    <a href="user.html">
+      <img src="assets/svg/chat.svg" class="nav-icon" alt="Chats">
+      <span>Chats</span>
+    </a>
+    <a href="friends.html">
+      <img src="assets/svg/friends.svg" class="nav-icon" alt="Friends">
+      <span>Friends</span>
+    </a>
+    <a href="notification.html">
+      <img src="assets/svg/notification.svg" class="nav-icon" alt="Alerts">
+      <span>Alerts</span>
+    </a>
+    <a href="settings.html">
+      <img src="assets/svg/setting.svg" class="nav-icon" alt="Settings">
+      <span>Settings</span>
+    </a>
+  </div>
 
   <!-- Hero Section -->
   <main class="hero">
     <div class="badge-wrapper">
       <span class="badge">// Signal Active</span>
-      <!-- Average Rating Display -->
       <div class="rating-box">
         <span class="rating-stars">★★★★★</span>
         <span class="rating-score">4.9 Avg</span>
@@ -432,41 +712,98 @@
     </div>
 
     <h1 class="hero-title">
-      Leave Your <span class="highlight">Mark.</span>
+      <span class="desktop-title">Leave Your <span class="highlight">Mark.</span></span>
+      <span class="mobile-title">Underground <span class="highlight">Tunnel</span></span>
     </h1>
 
     <p class="hero-description">
-      An authentic, hacker-inspired street chat platform built for crews, digital taggers, and subterranean conversations. Encrypted, instant, and raw.
+      An authentic street-inspired chat platform built for crews, taggers, and subterranean conversations. Encrypted, instant, and raw.
     </p>
 
     <div class="hero-buttons">
-      <a href="chat.html" class="btn-primary">Spray Message</a>
+      <a href="user.html" class="btn-primary">Spray Message</a>
       <a href="friends.html" class="btn-secondary">Find Crew</a>
     </div>
 
-    <!-- UI Mockup Box -->
+    <!-- Chat Mockup -->
     <div class="chat-mockup" id="interactiveCard">
       <div class="crown-badge">
         <img src="assets/svg/graffiti-crown.svg" alt="Crown">
       </div>
 
       <div class="chat-messages">
-        <div class="msg msg-incoming">
-          Yo, you active in the tunnel?
-        </div>
-        <div class="msg msg-outgoing">
-          Always. Just dropped a new tag on the wall.
-        </div>
-        <div class="msg msg-incoming">
-          Catch you underground at 00:00.
-        </div>
+        <div class="msg msg-incoming">Yo, you active in the tunnel?</div>
+        <div class="msg msg-outgoing">Always. Just dropped a new tag on the wall.</div>
+        <div class="msg msg-incoming">Catch you underground at 00:00.</div>
       </div>
     </div>
   </main>
 
-  <!-- Interactive Parallax Background & Mouse Hover Script -->
+  <!-- 🚀 DYNAMIC PHOTO SCRIPT (EXACT MATCH FOR ID.HTML DATA.PHOTO) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+      authDomain: "urbannoir-13ce8.firebaseapp.com",
+      projectId: "urbannoir-13ce8",
+      storageBucket: "urbannoir-13ce8.firebasestorage.app",
+      messagingSenderId: "1059246827383",
+      appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
+      measurementId: "G-CEPWKZXQVF"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // Apply exact photo to top-left mobile & desktop image elements
+    function setProfilePhoto(photoUrl) {
+      if (!photoUrl) return;
+      const mPic = document.getElementById("mobileProfilePic");
+      const dPic = document.getElementById("desktopProfilePic");
+      if (mPic) mPic.src = photoUrl;
+      if (dPic) dPic.src = photoUrl;
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          // Exact same doc call as id.html
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            // Exactly matching id.html: data.photo
+            if (data.photo && data.photo.trim() !== "") {
+              setProfilePhoto(data.photo);
+            }
+          }
+        } catch (e) {
+          console.error("Error fetching photo for header:", e);
+        }
+      }
+    });
+
+    // Logout handling
+    async function handleLogout() {
+      try {
+        await signOut(auth);
+        window.location.href = "login.html";
+      } catch (err) {
+        console.error("Logout Error:", err);
+      }
+    }
+
+    document.getElementById("logoutBtnDesktop")?.addEventListener("click", handleLogout);
+    document.getElementById("logoutBtnMobile")?.addEventListener("click", handleLogout);
+  </script>
+
+  <!-- Parallax Background & Canvas FX -->
   <script>
-    // Parallax mouse hover elements
     const glow = document.getElementById('mouse-glow');
     const graffitiBg = document.getElementById('graffiti-bg');
     const interactiveCard = document.getElementById('interactiveCard');
@@ -475,34 +812,33 @@
       const mouseX = e.clientX;
       const mouseY = e.clientY;
 
-      // Mouse Glow tracking
       glow.style.left = mouseX + 'px';
       glow.style.top = mouseY + 'px';
 
-      // Background Graffiti Parallax shift
       const moveX = (mouseX / window.innerWidth - 0.5) * -25;
       const moveY = (mouseY / window.innerHeight - 0.5) * -25;
       graffitiBg.style.transform = `translate(${moveX}px, ${moveY}px) scale(1.02)`;
 
-      // Subtle 3D tilt movement on hover over card
-      const rect = interactiveCard.getBoundingClientRect();
-      const cardCenterX = rect.left + rect.width / 2;
-      const cardCenterY = rect.top + rect.height / 2;
-      
-      const cardX = (mouseX - cardCenterX) / 20;
-      const cardY = (mouseY - cardCenterY) / 20;
+      if (interactiveCard) {
+        const rect = interactiveCard.getBoundingClientRect();
+        const cardCenterX = rect.left + rect.width / 2;
+        const cardCenterY = rect.top + rect.height / 2;
+        
+        const cardX = (mouseX - cardCenterX) / 20;
+        const cardY = (mouseY - cardCenterY) / 20;
 
-      if (
-        mouseX >= rect.left - 50 && mouseX <= rect.right + 50 &&
-        mouseY >= rect.top - 50 && mouseY <= rect.bottom + 50
-      ) {
-        interactiveCard.style.transform = `translate(${cardX}px, ${cardY - 8}px) scale(1.02)`;
-      } else {
-        interactiveCard.style.transform = `translate(0px, 0px) scale(1)`;
+        if (
+          mouseX >= rect.left - 50 && mouseX <= rect.right + 50 &&
+          mouseY >= rect.top - 50 && mouseY <= rect.bottom + 50
+        ) {
+          interactiveCard.style.transform = `translate(${cardX}px, ${cardY - 8}px) scale(1.02)`;
+        } else {
+          interactiveCard.style.transform = `translate(0px, 0px) scale(1)`;
+        }
       }
     });
 
-    // Particles Canvas Animation
+    /* Particle FX */
     const canvas = document.getElementById('particles-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];

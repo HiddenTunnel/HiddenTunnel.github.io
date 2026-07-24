@@ -165,7 +165,7 @@
             </a>
             <ul>
                 <li><a href="index.html">Home</a></li>
-                <li><a href="chat.html">Chat</a></li>
+                <li><a href="us.html">Chat</a></li>
                 <li><a href="id.html">My ID</a></li>
             </ul>
         </nav>
@@ -201,8 +201,8 @@
             </div>
 
             <div class="input-group">
-                <label for="versityId">Versity ID No.</label>
-                <input type="text" id="versityId" placeholder="e.g. 26206037" required>
+                <label for="versityId">Versity ID No. (Must be 8 digits)</label>
+                <input type="text" id="versityId" placeholder="e.g. 26206037" maxlength="8" minlength="8" pattern="[0-9]{8}" title="ID must be exactly 8 digits (e.g. 26206037)" required>
             </div>
 
             <button type="submit" id="submitBtn" class="submit-btn">GENERATE ID CARD</button>
@@ -212,11 +212,16 @@
     <!-- FIREBASE SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import {
-    getAuth,
-    onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            collection, 
+            query, 
+            where, 
+            getDocs 
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
@@ -230,110 +235,126 @@ import {
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-const auth = getAuth(app);
+        const auth = getAuth(app);
 
-onAuthStateChanged(auth, (user) => {
-
-    if (!user) {
-        window.location.href = "login.html";
-        return;
-    }
-
-});
-
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
+        });
 
         let uploadedPhotoURL = "";
-const CLOUD_NAME = "z1vtvdmj";
-const UPLOAD_PRESET = "urbaun_chat";
+        const CLOUD_NAME = "z1vtvdmj";
+        const UPLOAD_PRESET = "urbaun_chat";
         const photoInput = document.getElementById('photoInput');
         const imagePreview = document.getElementById('imagePreview');
         const previewPlaceholder = document.getElementById('previewPlaceholder');
-photoInput.addEventListener("change", async (e) => {
 
-    const file = e.target.files[0];
+        photoInput.addEventListener("change", async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
 
-    if (!file) return;
+            previewPlaceholder.textContent = "Uploading...";
 
-    previewPlaceholder.textContent = "Uploading...";
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", UPLOAD_PRESET);
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", UPLOAD_PRESET);
+            try {
+                const response = await fetch(
+                    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
 
-    try {
+                const data = await response.json();
 
-        const response = await fetch(
-            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-            {
-                method: "POST",
-                body: formData
+                if (!data.secure_url) {
+                    throw new Error("Cloudinary upload failed");
+                }
+
+                uploadedPhotoURL = data.secure_url;
+
+                imagePreview.src = uploadedPhotoURL;
+                imagePreview.style.display = "block";
+                previewPlaceholder.style.display = "none";
+
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+                previewPlaceholder.textContent = "Click to upload photo";
             }
-        );
-
-        const data = await response.json();
-
-        if (!data.secure_url) {
-            throw new Error("Cloudinary upload failed");
-        }
-
-        uploadedPhotoURL = data.secure_url;
-
-        imagePreview.src = uploadedPhotoURL;
-        imagePreview.style.display = "block";
-        previewPlaceholder.style.display = "none";
-
-} catch (error) {
-
-    console.error(error);
-    alert(error.message);
-
-    previewPlaceholder.textContent = "Click to upload photo";
-}
-
-});
+        });
 
         document.getElementById('createAccountForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
-            submitBtn.textContent = "SAVING TO CLOUD...";
-            submitBtn.disabled = true;
+            const versityId = document.getElementById('versityId').value.trim();
+
+            // 🔴 1. 8-Digit Format Validation Check Logic
+            const isEightDigits = /^[0-9]{8}$/.test(versityId);
+            if (!isEightDigits) {
+                alert("Invalid ID! Versity ID must be exactly 8 digits (e.g. 26206037).");
+                return;
+            }
 
             const user = auth.currentUser;
+            if (!user) {
+                alert("Please login first.");
+                window.location.href = "login.html";
+                return;
+            }
 
-if (!user) {
-    alert("Please login first.");
-    window.location.href = "login.html";
-    return;
-}
-
-            const versityId = document.getElementById('versityId').value.trim();
-            const profileData = {
-                fullName: document.getElementById('fullName').value.trim(),
-                email: document.getElementById('email').value.trim(),
-                phone: document.getElementById('phone').value.trim(),
-                versityId: versityId,
-photo: uploadedPhotoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80"
-            };
+            submitBtn.textContent = "CHECKING ID AVAILABILITY...";
+            submitBtn.disabled = true;
 
             try {
+                // 🔴 2. Check if the Versity ID is already used by another user in Firestore
+                const q = query(
+                    collection(db, "users"), 
+                    where("versityId", "==", versityId)
+                );
+                const querySnapshot = await getDocs(q);
+
+                // Filter out current user's document if updating profile
+                const isDuplicate = querySnapshot.docs.some(doc => doc.id !== user.uid);
+
+                if (isDuplicate) {
+                    alert("This Versity ID is already registered by another account! Please enter a unique 8-digit ID.");
+                    submitBtn.textContent = "GENERATE ID CARD";
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                submitBtn.textContent = "SAVING TO CLOUD...";
+
+                const profileData = {
+                    fullName: document.getElementById('fullName').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    phone: document.getElementById('phone').value.trim(),
+                    versityId: versityId,
+                    photo: uploadedPhotoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80"
+                };
+
                 // Save profile to Cloud Firestore database
                 await setDoc(doc(db, "users", user.uid), {
-    ...profileData,
-    uid: user.uid,
-    email: user.email
-});
+                    ...profileData,
+                    uid: user.uid,
+                    email: user.email
+                });
+
                 // Save user ID to localStorage session
-localStorage.setItem("ug_current_user_id", user.uid);
+                localStorage.setItem("ug_current_user_id", user.uid);
                 window.location.href = 'id.html';
-            } 
-            
-            catch (error) {
-    console.error("Firebase Error:", error);
-    alert("Error: " + error.message);
 
+            } catch (error) {
+                console.error("Firebase Error:", error);
+                alert("Error: " + error.message);
 
-
-submitBtn.textContent = "GENERATE ID CARD";
+                submitBtn.textContent = "GENERATE ID CARD";
                 submitBtn.disabled = false;
             }
         });

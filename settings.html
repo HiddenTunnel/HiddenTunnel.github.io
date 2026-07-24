@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Underground Chat - Settings</title>
+  <meta name="theme-color" content="#050505">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --green: #5CFF72;
+      --orange: #FF7A00;
+      --red: #FF4D4D;
+      --bg: #050505;
+      --surface: #111111;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+      padding-bottom: 90px;
+    }
+
+    /* Ambient FX Layers */
+    #graffiti-bg {
+      position: fixed;
+      inset: 0;
+      background-image: url('assets/svg/graffiti-wall.svg');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #mouse-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 450px;
+      height: 450px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(92, 255, 114, 0.08) 0%, rgba(255, 122, 0, 0.03) 45%, transparent 70%);
+      pointer-events: none;
+      z-index: 2;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Header Navigation */
+    header {
+      width: 100%;
+      padding: 18px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(5, 5, 5, 0.85);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    nav {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      font-family: 'Permanent Marker', cursive;
+      font-size: 1.4rem;
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: 1px;
+    }
+
+    .logo span { color: var(--green); }
+
+    .desktop-nav {
+      display: flex;
+      gap: 16px;
+      list-style: none;
+    }
+
+    .desktop-nav li a {
+      color: #aaa;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .desktop-nav li a:hover,
+    .desktop-nav li a.active {
+      color: var(--green);
+      background: rgba(92, 255, 114, 0.08);
+    }
+
+    .btn-logout {
+      background: rgba(255, 77, 77, 0.1);
+      border: 1px solid rgba(255, 77, 77, 0.4);
+      color: var(--red);
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-logout:hover {
+      background: rgba(255, 77, 77, 0.25);
+      transform: translateY(-2px);
+    }
+
+    /* Mobile Bottom Navigation */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(18, 18, 18, 0.95);
+      backdrop-filter: blur(15px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 0;
+      z-index: 1000;
+    }
+
+    .mobile-bottom-nav a,
+    .mobile-bottom-nav button {
+      color: #888;
+      background: none;
+      border: none;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .mobile-bottom-nav a.active { color: var(--green); }
+
+    .mobile-user-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid var(--green);
+    }
+
+    /* Main Container */
+    .settings-container {
+      max-width: 800px;
+      margin: 110px auto 40px auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .page-title {
+      font-family: 'Permanent Marker', cursive;
+      font-size: 2.2rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+      color: #888;
+      font-size: 0.95rem;
+      margin-bottom: 30px;
+    }
+
+    /* Card Panels */
+    .panel-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .panel-card.danger-zone {
+      border-color: rgba(255, 77, 77, 0.3);
+      background: rgba(255, 77, 77, 0.02);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .panel-header h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    /* Input & Form Elements */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      color: #aaa;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .form-control {
+      width: 100%;
+      background: #080808;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--green);
+    }
+
+    /* Toggle Switches */
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .setting-row:last-child { border-bottom: none; }
+
+    .setting-info h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .setting-info p {
+      color: #666;
+      font-size: 0.8rem;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 24px;
+    }
+
+    .switch input { opacity: 0; width: 0; height: 0; }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #222;
+      transition: .3s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider { background-color: var(--green); }
+    input:checked + .slider:before { transform: translateX(22px); background-color: #000; }
+
+    /* Action Buttons */
+    .btn-save {
+      background: var(--green);
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      font-weight: 800;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .btn-save:hover { transform: scale(1.02); }
+
+    .btn-danger {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      font-weight: 800;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+
+    .btn-danger:hover { opacity: 0.9; }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: #141414;
+      border: 1px solid var(--red);
+      border-radius: 20px;
+      padding: 28px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .modal-box h3 {
+      color: var(--red);
+      font-size: 1.4rem;
+      margin-bottom: 12px;
+    }
+
+    .modal-box p {
+      color: #aaa;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .btn-cancel {
+      background: #222;
+      color: #fff;
+      border: 1px solid var(--border);
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      header { display: none !important; }
+      .mobile-bottom-nav { display: flex; }
+      .settings-container { margin-top: 30px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="graffiti-bg"></div>
+  <div id="mouse-glow"></div>
+
+  <!-- Header Navigation -->
+  <header>
+    <nav>
+      <a href="index.html" class="logo">UNDERGROUND <span>CHAT</span></a>
+      <ul class="desktop-nav">
+        <li><a href="index.html">🏠 Home</a></li>
+        <li><a href="user.html">💬 Chats</a></li>
+        <li><a href="friends.html">👥 Friends</a></li>
+        <li><a href="notification.html">🔔 Notifications</a></li>
+        <li><a href="settings.html" class="active">⚙ Settings</a></li>
+      </ul>
+      <div class="nav-btn-group">
+        <button id="logoutBtn" class="btn-logout">
+          <img src="assets/svg/logoutbutton.svg" width="18" height="18" alt="Logout">
+          <span>Logout</span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Mobile Bottom Navigation -->
+  <div class="mobile-bottom-nav">
+    <a href="index.html"><img src="assets/svg/home.svg" width="22" height="22" alt="Home"><span>Home</span></a>
+    <a href="user.html"><img src="assets/svg/chat.svg" width="22" height="22" alt="Chats"><span>Chats</span></a>
+    <a href="friends.html"><img src="assets/svg/friends.svg" width="22" height="22" alt="Friends"><span>Friends</span></a>
+    <a href="id.html"><img id="mobileUserAvatar" class="mobile-user-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Profile"><span>Profile</span></a>
+    <a href="settings.html" class="active"><img src="assets/svg/setting.svg" width="22" height="22" alt="Settings"><span>Settings</span></a>
+  </div>
+
+  <!-- Settings Interface -->
+  <main class="settings-container">
+    <h1 class="page-title">SYSTEM SETTINGS</h1>
+    <p class="page-subtitle">Configure your signal configurations and secure profile access.</p>
+
+    <!-- Profile Management -->
+    <section class="panel-card">
+      <div class="panel-header">
+        <h2>👤 Identity Details</h2>
+      </div>
+      <form id="profileForm">
+        <div class="form-group">
+          <label for="usernameInput">Tag / Username</label>
+          <input type="text" id="usernameInput" class="form-control" placeholder="Loading identity..." required>
+        </div>
+        <div class="form-group">
+          <label for="statusInput">Status Message</label>
+          <input type="text" id="statusInput" class="form-control" placeholder="Set your broadcast message...">
+        </div>
+        <button type="submit" class="btn-save">Update Identity</button>
+      </form>
+    </section>
+
+    <!-- Signal Preferences -->
+    <section class="panel-card">
+      <div class="panel-header">
+        <h2>⚙ Preferences & Signals</h2>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Push Notifications</h4>
+          <p>Receive real-time alerts on new incoming messages.</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="notificationsToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <h4>Stealth Mode</h4>
+          <p>Hide your active status on the network grid.</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="stealthToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Danger Zone (Delete Account) -->
+    <section class="panel-card danger-zone">
+      <div class="panel-header">
+        <h2 style="color: var(--red);">⚠️ Terminal Actions</h2>
+      </div>
+      <p style="color: #888; font-size: 0.88rem; margin-bottom: 16px;">
+        Permanently purge your access keys, identity record, and data from the network. This action cannot be undone.
+      </p>
+      <button id="openDeleteModalBtn" class="btn-danger">Purge Identity (Delete Account)</button>
+    </section>
+  </main>
+
+  <!-- Delete Account Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+      <h3>CONFIRM PURGE</h3>
+      <p>Enter your password to authorize complete identity deletion.</p>
+      <div class="form-group" style="text-align: left;">
+        <input type="password" id="deletePasswordInput" class="form-control" placeholder="Enter password" required>
+      </div>
+      <div class="modal-actions">
+        <button id="cancelDeleteBtn" class="btn-cancel">Cancel</button>
+        <button id="confirmDeleteBtn" class="btn-danger">Confirm Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+      authDomain: "urbannoir-13ce8.firebaseapp.com",
+      projectId: "urbannoir-13ce8",
+      storageBucket: "urbannoir-13ce8.firebasestorage.app",
+      messagingSenderId: "1059246827383",
+      appId: "1:1059246827383:web:caa91c40c408d46e3b6372"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const usernameInput = document.getElementById("usernameInput");
+    const statusInput = document.getElementById("statusInput");
+    const mobileUserAvatar = document.getElementById("mobileUserAvatar");
+    const profileForm = document.getElementById("profileForm");
+
+    const deleteModal = document.getElementById("deleteModal");
+    const openDeleteModalBtn = document.getElementById("openDeleteModalBtn");
+    const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+    const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+    const deletePasswordInput = document.getElementById("deletePasswordInput");
+
+    let currentUser = null;
+
+    // Load User Data
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        try {
+          const userSnap = await getDoc(doc(db, "users", user.uid));
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+            usernameInput.value = data.username || data.name || "";
+            statusInput.value = data.status || "";
+            if (data.photo && mobileUserAvatar) {
+              mobileUserAvatar.src = data.photo;
+            }
+          }
+        } catch (err) {
+          console.error("Error loading profile details:", err);
+        }
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    // Save Profile Settings
+    profileForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      try {
+        await updateDoc(doc(db, "users", currentUser.uid), {
+          username: usernameInput.value.trim(),
+          status: statusInput.value.trim()
+        });
+        alert("Identity specifications updated.");
+      } catch (err) {
+        console.error("Profile update error:", err);
+        alert("Failed to update identity record.");
+      }
+    });
+
+    // Modal Control
+    openDeleteModalBtn.addEventListener("click", () => deleteModal.style.display = "flex");
+    cancelDeleteBtn.addEventListener("click", () => {
+      deleteModal.style.display = "none";
+      deletePasswordInput.value = "";
+    });
+
+    // Account Deletion Workflow
+    confirmDeleteBtn.addEventListener("click", async () => {
+      const password = deletePasswordInput.value;
+      if (!password) {
+        alert("Authorization credential required.");
+        return;
+      }
+
+      try {
+        const credential = EmailAuthProvider.credential(currentUser.email, password);
+        await reauthenticateWithCredential(currentUser, credential);
+
+        // Remove from Firestore
+        await deleteDoc(doc(db, "users", currentUser.uid));
+
+        // Delete Authentication Account
+        await deleteUser(currentUser);
+
+        localStorage.removeItem("ug_current_user_id");
+        alert("Account permanently purged from network.");
+        window.location.href = "login.html";
+      } catch (err) {
+        console.error("Account Purge Error:", err);
+        alert("Authentication failed. " + err.message);
+      }
+    });
+
+    // Logout Handling
+    async function handleLogout() {
+      try {
+        await signOut(auth);
+        localStorage.removeItem("ug_current_user_id");
+        window.location.href = "login.html";
+      } catch (err) {
+        console.error("Logout Error:", err);
+      }
+    }
+
+    document.getElementById("logoutBtn")?.addEventListener("click", handleLogout);
+  </script>
+
+  <!-- Interactive Background Script -->
+  <script>
+    const glow = document.getElementById('mouse-glow');
+    window.addEventListener('mousemove', (e) => {
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+    });
+  </script>
+</body>
+</html>
