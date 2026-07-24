@@ -12,397 +12,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
-  <style>
-    :root {
-      --green: #5CFF72;
-      --orange: #FF7A00;
-      --red: #FF4D4D;
-      --bg: #050505;
-      --surface: #111111;
-      --card-bg: rgba(255, 255, 255, 0.03);
-      --border: rgba(255, 255, 255, 0.08);
-    }
-
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background-color: var(--bg);
-      color: #ffffff;
-      font-family: 'Outfit', sans-serif;
-      overflow-x: hidden;
-      min-height: 100vh;
-      position: relative;
-      padding-bottom: 90px;
-    }
-
-    /* Ambient FX Layers */
-    #graffiti-bg {
-      position: fixed;
-      inset: 0;
-      background-image: url('assets/svg/graffiti-wall.svg');
-      background-size: cover;
-      background-position: center;
-      opacity: 0.15;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    #mouse-glow {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 450px;
-      height: 450px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(92, 255, 114, 0.08) 0%, rgba(255, 122, 0, 0.03) 45%, transparent 70%);
-      pointer-events: none;
-      z-index: 2;
-      transform: translate(-50%, -50%);
-    }
-
-    /* Header Navigation */
-    header {
-      width: 100%;
-      padding: 18px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(5, 5, 5, 0.85);
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 100;
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    nav {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo {
-      font-family: 'Permanent Marker', cursive;
-      font-size: 1.4rem;
-      color: #fff;
-      text-decoration: none;
-      letter-spacing: 1px;
-    }
-
-    .logo span { color: var(--green); }
-
-    .desktop-nav {
-      display: flex;
-      gap: 16px;
-      list-style: none;
-    }
-
-    .desktop-nav li a {
-      color: #aaa;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 20px;
-      transition: all 0.3s ease;
-    }
-
-    .desktop-nav li a:hover,
-    .desktop-nav li a.active {
-      color: var(--green);
-      background: rgba(92, 255, 114, 0.08);
-    }
-
-    .btn-logout {
-      background: rgba(255, 77, 77, 0.1);
-      border: 1px solid rgba(255, 77, 77, 0.4);
-      color: var(--red);
-      padding: 6px 14px;
-      border-radius: 30px;
-      font-weight: 700;
-      font-size: 0.85rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.3s ease;
-    }
-
-    .btn-logout:hover {
-      background: rgba(255, 77, 77, 0.25);
-      transform: translateY(-2px);
-    }
-
-    /* Mobile Bottom Navigation */
-    .mobile-bottom-nav {
-      display: none;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: rgba(18, 18, 18, 0.95);
-      backdrop-filter: blur(15px);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      justify-content: space-around;
-      align-items: center;
-      padding: 8px 0;
-      z-index: 1000;
-    }
-
-    .mobile-bottom-nav a,
-    .mobile-bottom-nav button {
-      color: #888;
-      background: none;
-      border: none;
-      text-decoration: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .mobile-bottom-nav a.active { color: var(--green); }
-
-    .mobile-user-avatar {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1.5px solid var(--green);
-    }
-
-    /* Main Container */
-    .settings-container {
-      max-width: 800px;
-      margin: 110px auto 40px auto;
-      padding: 0 24px;
-      position: relative;
-      z-index: 10;
-    }
-
-    .page-title {
-      font-family: 'Permanent Marker', cursive;
-      font-size: 2.2rem;
-      color: #fff;
-      margin-bottom: 8px;
-    }
-
-    .page-subtitle {
-      color: #888;
-      font-size: 0.95rem;
-      margin-bottom: 30px;
-    }
-
-    /* Card Panels */
-    .panel-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 24px;
-    }
-
-    .panel-card.danger-zone {
-      border-color: rgba(255, 77, 77, 0.3);
-      background: rgba(255, 77, 77, 0.02);
-    }
-
-    .panel-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 12px;
-    }
-
-    .panel-header h2 {
-      font-size: 1.2rem;
-      font-weight: 700;
-    }
-
-    /* Input & Form Elements */
-    .form-group {
-      margin-bottom: 18px;
-    }
-
-    .form-group label {
-      display: block;
-      color: #aaa;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .form-control {
-      width: 100%;
-      background: #080808;
-      border: 1px solid var(--border);
-      color: #fff;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-family: inherit;
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.3s ease;
-    }
-
-    .form-control:focus {
-      border-color: var(--green);
-    }
-
-    /* Toggle Switches */
-    .setting-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-    }
-
-    .setting-row:last-child { border-bottom: none; }
-
-    .setting-info h4 {
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
-
-    .setting-info p {
-      color: #666;
-      font-size: 0.8rem;
-    }
-
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 46px;
-      height: 24px;
-    }
-
-    .switch input { opacity: 0; width: 0; height: 0; }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      inset: 0;
-      background-color: #222;
-      transition: .3s;
-      border-radius: 24px;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .3s;
-      border-radius: 50%;
-    }
-
-    input:checked + .slider { background-color: var(--green); }
-    input:checked + .slider:before { transform: translateX(22px); background-color: #000; }
-
-    /* Action Buttons */
-    .btn-save {
-      background: var(--green);
-      color: #000;
-      border: none;
-      padding: 12px 24px;
-      font-weight: 800;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    .btn-save:hover { transform: scale(1.02); }
-
-    .btn-danger {
-      background: var(--red);
-      color: #fff;
-      border: none;
-      padding: 12px 24px;
-      font-weight: 800;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: opacity 0.2s ease;
-    }
-
-    .btn-danger:hover { opacity: 0.9; }
-
-    /* Modal Styling */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
-      z-index: 2000;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .modal-box {
-      background: #141414;
-      border: 1px solid var(--red);
-      border-radius: 20px;
-      padding: 28px;
-      max-width: 440px;
-      width: 100%;
-      text-align: center;
-    }
-
-    .modal-box h3 {
-      color: var(--red);
-      font-size: 1.4rem;
-      margin-bottom: 12px;
-    }
-
-    .modal-box p {
-      color: #aaa;
-      font-size: 0.9rem;
-      margin-bottom: 20px;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-    }
-
-    .btn-cancel {
-      background: #222;
-      color: #fff;
-      border: 1px solid var(--border);
-      padding: 10px 20px;
-      border-radius: 20px;
-      cursor: pointer;
-    }
-
-    @media (max-width: 768px) {
-      header { display: none !important; }
-      .mobile-bottom-nav { display: flex; }
-      .settings-container { margin-top: 30px; }
-    }
-  </style>
 </head>
 <body>
 
@@ -490,11 +99,11 @@
 
     <!-- Danger Zone (Delete Account) -->
     <section class="panel-card danger-zone">
-      <div class="panel-header">
-        <h2 style="color: var(--red);">⚠️ Terminal Actions</h2>
+      <div class="panel-header danger-title">
+        <h2>⚠️ Terminal Actions</h2>
       </div>
-      <p style="color: #888; font-size: 0.88rem; margin-bottom: 16px;">
-        Permanently purge your access keys, identity record, and data from the network. This action cannot be undone.
+      <p class="danger-description">
+        Permanently purge your access keys, identity record, chat history, and data from the network. This action cannot be undone.
       </p>
       <button id="openDeleteModalBtn" class="btn-danger">Purge Identity (Delete Account)</button>
     </section>
@@ -504,8 +113,8 @@
   <div class="modal-overlay" id="deleteModal">
     <div class="modal-box">
       <h3>CONFIRM PURGE</h3>
-      <p>Enter your password to authorize complete identity deletion.</p>
-      <div class="form-group" style="text-align: left;">
+      <p>Enter your password to authorize complete identity deletion and chat history wipe.</p>
+      <div class="form-group text-left">
         <input type="password" id="deletePasswordInput" class="form-control" placeholder="Enter password" required>
       </div>
       <div class="modal-actions">
@@ -519,7 +128,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
@@ -593,7 +202,7 @@
       deletePasswordInput.value = "";
     });
 
-    // Account Deletion Workflow
+    // Account Deletion & Complete Data Purge Workflow
     confirmDeleteBtn.addEventListener("click", async () => {
       const password = deletePasswordInput.value;
       if (!password) {
@@ -605,14 +214,25 @@
         const credential = EmailAuthProvider.credential(currentUser.email, password);
         await reauthenticateWithCredential(currentUser, credential);
 
-        // Remove from Firestore
-        await deleteDoc(doc(db, "users", currentUser.uid));
+        const uid = currentUser.uid;
 
-        // Delete Authentication Account
+        // 1. Delete all chats/conversations where the user is a member
+        const chatsQuery = query(collection(db, "chats"), where("members", "array-contains", uid));
+        const chatSnapshots = await getDocs(chatsQuery);
+        const chatDeletionPromises = [];
+        chatSnapshots.forEach((chatDoc) => {
+          chatDeletionPromises.push(deleteDoc(doc(db, "chats", chatDoc.id)));
+        });
+        await Promise.all(chatDeletionPromises);
+
+        // 2. Delete user document from Firestore collection
+        await deleteDoc(doc(db, "users", uid));
+
+        // 3. Delete user from Firebase Authentication
         await deleteUser(currentUser);
 
         localStorage.removeItem("ug_current_user_id");
-        alert("Account permanently purged from network.");
+        alert("Account, chat history, and identity records permanently purged from network.");
         window.location.href = "login.html";
       } catch (err) {
         console.error("Account Purge Error:", err);

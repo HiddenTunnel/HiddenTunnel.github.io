@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alerts & Tunnel Signals - Underground Chat</title>
+    <title>Alerts - Underground Chat</title>
     <meta name="theme-color" content="#050505">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,47 +13,25 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-        /* ================= FX LAYERS ================= */
         #mouse-glow {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 400px;
-            height: 400px;
+            top: 0; left: 0;
+            width: 400px; height: 400px;
             border-radius: 50%;
             background: radial-gradient(circle, rgba(92, 255, 114, 0.12) 0%, rgba(255, 122, 0, 0.04) 45%, transparent 70%);
             pointer-events: none;
             z-index: 10;
             transform: translate(-50%, -50%);
-            transition: transform 0.04s linear;
         }
 
         #particles-canvas {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
             pointer-events: none;
             z-index: 1;
         }
 
-        .ambient-smoke {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0.3;
-            background: url('assets/svg/smoke.svg') center/cover no-repeat;
-            animation: smokeMove 25s infinite alternate ease-in-out;
-        }
-
-        @keyframes smokeMove {
-            0% { transform: scale(1) translate(0, 0); }
-            100% { transform: scale(1.1) translate(-30px, 20px); }
-        }
-
-        /* ================= NOTIFICATIONS CONTAINER ================= */
         .notif-container {
             max-width: 800px;
             margin: 120px auto 60px auto;
@@ -75,34 +53,11 @@
             font-family: 'Permanent Marker', cursive;
             font-size: 2.8rem;
             color: #fff;
-            letter-spacing: 1px;
             margin: 0;
         }
 
-        .section-header h1 span {
-            color: var(--green, #5CFF72);
-        }
+        .section-header h1 span { color: var(--green, #5CFF72); }
 
-        .mark-read-btn {
-            background: rgba(92, 255, 114, 0.1);
-            color: var(--green, #5CFF72);
-            border: 1px solid rgba(92, 255, 114, 0.3);
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .mark-read-btn:hover {
-            background: var(--green, #5CFF72);
-            color: #050505;
-            box-shadow: 0 0 15px rgba(92, 255, 114, 0.4);
-        }
-
-        /* Tabs Filter */
         .notif-tabs {
             display: flex;
             gap: 12px;
@@ -122,18 +77,12 @@
             transition: all 0.3s ease;
         }
 
-        .notif-tab.active, .notif-tab:hover {
-            color: #fff;
-            border-color: rgba(92, 255, 114, 0.4);
-        }
-
         .notif-tab.active {
             background: rgba(92, 255, 114, 0.15);
             color: var(--green, #5CFF72);
             border-color: var(--green, #5CFF72);
         }
 
-        /* Notification List */
         .notif-list {
             display: flex;
             flex-direction: column;
@@ -148,18 +97,12 @@
             display: flex;
             align-items: flex-start;
             gap: 16px;
-            position: relative;
             transition: all 0.3s ease;
         }
 
         .notif-card.unread {
             border-left: 4px solid var(--green, #5CFF72);
             background: #161616;
-        }
-
-        .notif-card:hover {
-            transform: translateX(4px);
-            border-color: rgba(255, 255, 255, 0.2);
         }
 
         .notif-icon-box {
@@ -170,39 +113,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
             flex-shrink: 0;
+            overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .notif-content {
-            flex: 1;
+        .notif-icon-box img {
+            width: 100%; height: 100%;
+            object-fit: cover;
         }
 
-        .notif-title {
-            color: #fff;
-            font-size: 1rem;
-            font-weight: 700;
-            margin: 0 0 4px 0;
-        }
-
-        .notif-desc {
-            color: #a5a5a5;
-            font-size: 0.9rem;
-            margin: 0 0 10px 0;
-            line-height: 1.4;
-        }
-
-        .notif-time {
-            color: #666;
-            font-size: 0.78rem;
-            font-weight: 600;
-        }
+        .notif-content { flex: 1; }
+        .notif-title { color: #fff; font-size: 1rem; font-weight: 700; margin: 0 0 4px 0; }
+        .notif-desc { color: #a5a5a5; font-size: 0.9rem; margin: 0 0 10px 0; }
+        .notif-time { color: #666; font-size: 0.78rem; font-weight: 600; }
 
         .notif-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
+            display: flex; gap: 10px; margin-top: 10px;
         }
 
         .btn-notif {
@@ -213,136 +140,55 @@
             font-size: 0.82rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
             text-decoration: none;
         }
 
-        .btn-notif-primary {
-            background: var(--green, #5CFF72);
-            color: #050505;
-        }
-
-        .btn-notif-primary:hover {
-            background: #4ae660;
-            box-shadow: 0 0 10px rgba(92, 255, 114, 0.3);
-        }
-
-        .btn-notif-secondary {
-            background: rgba(255, 255, 255, 0.08);
-            color: #ccc;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .btn-notif-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-        }
-
-        .dismiss-btn {
-            background: transparent;
-            border: none;
-            color: #555;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 0 4px;
-            transition: color 0.2s;
-        }
-
-        .dismiss-btn:hover {
-            color: #ff4d4d;
-        }
+        .btn-notif-primary { background: var(--green, #5CFF72); color: #050505; }
+        .btn-notif-secondary { background: rgba(255, 255, 255, 0.08); color: #ccc; border: 1px solid rgba(255, 255, 255, 0.15); }
 
         .empty-notif {
-            text-align: center;
-            color: #666;
-            padding: 60px 0;
-            font-size: 1.1rem;
-        }
-
-        /* Toast Popup */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #1a1a1a;
-            color: #fff;
-            border: 1px solid var(--green, #5CFF72);
-            padding: 12px 20px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-            z-index: 9999;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
-            pointer-events: none;
-            font-weight: 600;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
+            text-align: center; color: #666; padding: 60px 0; font-size: 1.1rem;
         }
     </style>
 </head>
 <body>
 
-    <!-- Background FX -->
     <div id="mouse-glow"></div>
     <canvas id="particles-canvas"></canvas>
-    <div class="ambient-smoke"></div>
 
-    <!-- Noise Overlay -->
-    <div class="noise"></div>
-
-    <!-- Header Navigation -->
     <header>
         <nav>
-            <a href="index.html" class="logo">
-                UNDERGROUND
-                <span>CHAT</span>
-            </a>
+            <a href="index.html" class="logo">UNDERGROUND <span>CHAT</span></a>
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="chat.html">Chat</a></li>
-                <li><a href="friends.html">Crew</a></li>
+                <li><a href="user.html">Crew</a></li>
                 <li><a href="notification.html" style="color: var(--green, #5CFF72);">Alerts</a></li>
                 <li><a href="id.html">My ID</a></li>
             </ul>
-            <div class="nav-btn">
-                <a href="chat.html" class="join">Enter Tunnel</a>
-            </div>
         </nav>
     </header>
 
-    <!-- Main Container -->
     <div class="notif-container">
         <div class="section-header">
-            <div>
-                <h1>TUNNEL <span>ALERTS</span></h1>
-            </div>
-            <button class="mark-read-btn" id="markAllReadBtn">Clear All Signals</button>
+            <h1>TUNNEL <span>ALERTS</span></h1>
         </div>
 
-        <!-- Filter Tabs -->
         <div class="notif-tabs">
             <button class="notif-tab active" data-filter="all">All Alerts</button>
-            <button class="notif-tab" data-filter="unread">Unread</button>
-            <button class="notif-tab" data-filter="crew">Crew Invites</button>
+            <button class="notif-tab" data-filter="requests">Requests</button>
+            <button class="notif-tab" data-filter="messages">Messages</button>
         </div>
 
-        <!-- Notification List -->
         <div class="notif-list" id="notifList">
-            <!-- Dynamic notifications injected here -->
+            <div class="empty-notif">Listening for underground signals...</div>
         </div>
     </div>
 
-    <!-- Toast Popup -->
-    <div class="toast" id="toast">Action Complete! ⚡</div>
-
-    <!-- FIREBASE SDK & REALTIME LISTENER -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, query, where, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, onSnapshot, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
@@ -356,228 +202,171 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
-        const currentUserId = localStorage.getItem("ug_current_user_id");
+        const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235CFF72'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>";
+
         const notifList = document.getElementById("notifList");
-        const markAllReadBtn = document.getElementById("markAllReadBtn");
-        const toast = document.getElementById("toast");
-
-        let notifications = [];
+        let currentUserId = null;
         let activeFilter = "all";
 
-        // Mock baseline notifications if Firestore is empty
-        const mockNotifs = [
-            {
-                id: "mock1",
-                type: "crew",
-                icon: "👥",
-                title: "Crew Invite Received",
-                desc: "ToxicSpray wants you to join 'Tunnel Zero Crew'.",
-                time: "5 mins ago",
-                unread: true,
-                actions: true
-            },
-            {
-                id: "mock2",
-                type: "poke",
-                icon: "👈",
-                title: "You've been poked!",
-                desc: "NeonVandal sent you a street signal.",
-                time: "1 hour ago",
-                unread: true,
-                actions: false
-            },
-            {
-                id: "mock3",
-                type: "chat",
-                icon: "💬",
-                title: "New Message in Wall",
-                desc: "AcidBurn left a tag on your wall board.",
-                time: "3 hours ago",
-                unread: false,
-                actions: false
-            }
-        ];
+        let friendRequests = [];
+        let chatAlerts = [];
 
-        function showToast(msg) {
-            toast.textContent = msg;
-            toast.classList.add("show");
-            setTimeout(() => toast.classList.remove("show"), 2500);
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                listenToFriendRequests();
+                listenToChatAlerts();
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        function listenToFriendRequests() {
+            const q = query(collection(db, "friendRequests"), where("to", "==", currentUserId));
+            
+            onSnapshot(q, async (snapshot) => {
+                friendRequests = [];
+                for (let docSnap of snapshot.docs) {
+                    const reqData = docSnap.data();
+                    let senderData = {};
+                    try {
+                        const senderDoc = await getDoc(doc(db, "users", reqData.from));
+                        if (senderDoc.exists()) senderData = senderDoc.data();
+                    } catch (e) { console.warn("Could not fetch user profile", e); }
+
+                    friendRequests.push({
+                        id: docSnap.id,
+                        fromUid: reqData.from,
+                        type: "request",
+                        icon: senderData.photo || senderData.avatar || defaultAvatar,
+                        title: senderData.fullName || senderData.name || "Unknown Operator",
+                        desc: "sent you a crew connection request.",
+                        time: "Pending Request",
+                        unread: true
+                    });
+                }
+                renderAllNotifications();
+            }, (error) => {
+                console.error("Friend Request listener error:", error);
+            });
         }
 
-        function renderNotifications() {
-            notifList.innerHTML = "";
+        function listenToChatAlerts() {
+            const q = query(collection(db, "chats"), where("members", "array-contains", currentUserId));
+            
+            onSnapshot(q, async (snapshot) => {
+                chatAlerts = [];
+                for (let docSnap of snapshot.docs) {
+                    const data = docSnap.data();
+                    if (data.lastSenderId && data.lastSenderId !== currentUserId && data.isRead === false) {
+                        let senderData = {};
+                        try {
+                            const senderDoc = await getDoc(doc(db, "users", data.lastSenderId));
+                            if (senderDoc.exists()) senderData = senderDoc.data();
+                        } catch (e) { console.warn("Could not fetch sender info", e); }
 
-            const filtered = notifications.filter(n => {
-                if (activeFilter === "unread") return n.unread;
-                if (activeFilter === "crew") return n.type === "crew";
-                return true;
+                        chatAlerts.push({
+                            id: docSnap.id,
+                            peerUid: data.lastSenderId,
+                            type: "message",
+                            icon: senderData.photo || senderData.avatar || defaultAvatar,
+                            title: `New Signal from ${senderData.fullName || senderData.name || 'Crew'}`,
+                            desc: `"${data.lastMessage || 'Sent a message'}"`,
+                            time: "Unread Message",
+                            unread: true
+                        });
+                    }
+                }
+                renderAllNotifications();
+            }, (error) => {
+                console.error("Chat Alerts listener error:", error);
             });
+        }
 
-            if (filtered.length === 0) {
-                notifList.innerHTML = `<div class="empty-notif">No tunnel alerts at the moment. You're clear! 🟢</div>`;
+        function renderAllNotifications() {
+            notifList.innerHTML = "";
+            let combined = [...friendRequests, ...chatAlerts];
+
+            if (activeFilter === "requests") combined = combined.filter(n => n.type === "request");
+            if (activeFilter === "messages") combined = combined.filter(n => n.type === "message");
+
+            if (combined.length === 0) {
+                notifList.innerHTML = `<div class="empty-notif">No active signals found in the tunnel. 🟢</div>`;
                 return;
             }
 
-            filtered.forEach(notif => {
+            combined.forEach(notif => {
                 const card = document.createElement("div");
                 card.className = `notif-card ${notif.unread ? 'unread' : ''}`;
 
                 card.innerHTML = `
-                    <div class="notif-icon-box">${notif.icon}</div>
+                    <div class="notif-icon-box">
+                        <img src="${notif.icon}" alt="Avatar">
+                    </div>
                     <div class="notif-content">
                         <h3 class="notif-title">${notif.title}</h3>
                         <p class="notif-desc">${notif.desc}</p>
                         <span class="notif-time">${notif.time}</span>
-                        ${notif.actions ? `
+                        ${notif.type === 'request' ? `
                             <div class="notif-actions">
-                                <button class="btn-notif btn-notif-primary accept-btn" data-id="${notif.id}">Accept Crew</button>
-                                <button class="btn-notif btn-notif-secondary decline-btn" data-id="${notif.id}">Decline</button>
+                                <button class="btn-notif btn-notif-primary accept-btn" data-req-id="${notif.id}" data-from="${notif.fromUid}">Accept</button>
+                                <button class="btn-notif btn-notif-secondary decline-btn" data-req-id="${notif.id}">Decline</button>
                             </div>
-                        ` : ''}
+                        ` : `
+                            <div class="notif-actions">
+                                <a href="chat.html?chatId=${notif.id}&peerUid=${notif.peerUid}" class="btn-notif btn-notif-primary">Open Chat</a>
+                            </div>
+                        `}
                     </div>
-                    <button class="dismiss-btn" data-id="${notif.id}" title="Dismiss">&times;</button>
                 `;
-
                 notifList.appendChild(card);
             });
 
-            // Action Listeners
-            document.querySelectorAll(".dismiss-btn").forEach(btn => {
-                btn.addEventListener("click", () => dismissNotification(btn.dataset.id));
-            });
-
             document.querySelectorAll(".accept-btn").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    showToast("🎉 Crew invite accepted!");
-                    dismissNotification(btn.dataset.id);
-                });
+                btn.onclick = () => acceptFriendRequest(btn.dataset.reqId, btn.dataset.from);
             });
 
             document.querySelectorAll(".decline-btn").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    showToast("Invite declined.");
-                    dismissNotification(btn.dataset.id);
-                });
+                btn.onclick = () => declineFriendRequest(btn.dataset.reqId);
             });
         }
 
-        async function dismissNotification(id) {
-            notifications = notifications.filter(n => n.id !== id);
-            renderNotifications();
-            showToast("Alert cleared");
-
-            // Delete from Firestore if authenticated
-            if (currentUserId && !id.startsWith("mock")) {
-                try {
-                    await deleteDoc(doc(db, "notifications", id));
-                } catch (e) {
-                    console.error("Firestore error deleting notification:", e);
-                }
+        async function acceptFriendRequest(requestId, fromUid) {
+            try {
+                await setDoc(doc(db, "friends", `${currentUserId}_${fromUid}`), {
+                    user1: currentUserId,
+                    user2: fromUid,
+                    timestamp: Date.now()
+                });
+                await setDoc(doc(db, "friends", `${fromUid}_${currentUserId}`), {
+                    user1: fromUid,
+                    user2: currentUserId,
+                    timestamp: Date.now()
+                });
+                await deleteDoc(doc(db, "friendRequests", requestId));
+            } catch (err) {
+                console.error("Accept error:", err);
             }
         }
 
-        // Listen for Realtime Notifications in Firebase
-        if (currentUserId) {
-            const q = query(collection(db, "notifications"), where("userId", "==", currentUserId));
-            onSnapshot(q, (snapshot) => {
-                const liveNotifs = [];
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    liveNotifs.push({
-                        id: docSnap.id,
-                        type: data.type || "general",
-                        icon: data.icon || "🔔",
-                        title: data.title || "Notification",
-                        desc: data.message || "",
-                        time: "Just now",
-                        unread: data.unread ?? true,
-                        actions: data.type === "crew"
-                    });
-                });
-
-                notifications = liveNotifs.length > 0 ? liveNotifs : mockNotifs;
-                renderNotifications();
-            });
-        } else {
-            notifications = mockNotifs;
-            renderNotifications();
+        async function declineFriendRequest(requestId) {
+            try {
+                await deleteDoc(doc(db, "friendRequests", requestId));
+            } catch (err) {
+                console.error("Decline error:", err);
+            }
         }
 
-        // Filter Tab Handlers
         document.querySelectorAll(".notif-tab").forEach(tab => {
             tab.addEventListener("click", () => {
                 document.querySelectorAll(".notif-tab").forEach(t => t.classList.remove("active"));
                 tab.classList.add("active");
                 activeFilter = tab.dataset.filter;
-                renderNotifications();
+                renderAllNotifications();
             });
         });
-
-        // Mark All Read Handler
-        markAllReadBtn.addEventListener("click", () => {
-            notifications.forEach(n => n.unread = false);
-            renderNotifications();
-            showToast("All signals marked as read.");
-        });
-    </script>
-
-    <!-- UI ANIMATIONS & CANVAS SCRIPT -->
-    <script>
-        // --- MOUSE GLOW ---
-        const glow = document.getElementById('mouse-glow');
-        window.addEventListener('mousemove', (e) => {
-            glow.style.left = e.clientX + 'px';
-            glow.style.top = e.clientY + 'px';
-        });
-
-        // --- PARTICLES CANVAS ---
-        const canvas = document.getElementById('particles-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        class Particle {
-            constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 1;
-                this.speedX = (Math.random() - 0.5) * 0.5;
-                this.speedY = (Math.random() - 0.5) * 0.5 - 0.2;
-                this.opacity = Math.random() * 0.6 + 0.2;
-                this.color = Math.random() > 0.5 ? '#5CFF72' : '#FF7A00';
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-                    this.reset();
-                }
-            }
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.globalAlpha = this.opacity;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        for (let i = 0; i < 50; i++) particles.push(new Particle());
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
     </script>
 </body>
 </html>

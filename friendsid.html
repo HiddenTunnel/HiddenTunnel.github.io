@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-        /* Base resets & theme colors */
         :root {
             --green: #5CFF72;
             --orange: #FF7A00;
@@ -22,8 +21,7 @@
 
         *, *::before, *::after {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
         }
 
         body {
@@ -35,23 +33,6 @@
             position: relative;
         }
 
-        /* Exact Graffiti Background from index.html */
-        #graffiti-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-image: url('assets/svg/graffiti-wall.svg');
-            background-size: cover;
-            background-position: center;
-            opacity: 0.18;
-            pointer-events: none;
-            z-index: 0;
-            transition: transform 0.1s ease-out;
-            will-change: transform;
-        }
-
         #mouse-glow {
             position: fixed;
             top: 0; left: 0;
@@ -61,7 +42,6 @@
             pointer-events: none;
             z-index: 2;
             transform: translate(-50%, -50%);
-            transition: transform 0.03s linear;
         }
 
         #particles-canvas {
@@ -72,27 +52,9 @@
             z-index: 1;
         }
 
-        .ambient-smoke {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0.3;
-            background: url('assets/svg/smoke.svg') center/cover no-repeat;
-            animation: smokeMove 25s infinite alternate ease-in-out;
-        }
-
-        @keyframes smokeMove {
-            0% { transform: scale(1) translate(0, 0); }
-            100% { transform: scale(1.1) translate(-30px, 20px); }
-        }
-
-        /* Fixed Navigation Styles */
         header {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             z-index: 100;
             background: rgba(5, 5, 5, 0.85);
             backdrop-filter: blur(12px);
@@ -106,59 +68,28 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 15px;
         }
 
         .logo {
-            font-family: 'Permanent Marker', cursive, sans-serif;
+            font-family: 'Permanent Marker', cursive;
             font-size: 1.3rem;
             color: #fff;
             text-decoration: none;
-            letter-spacing: 1px;
-            white-space: nowrap;
-            transition: transform 0.3s ease;
         }
 
-        .logo:hover {
-            transform: scale(1.05) rotate(-1deg);
-        }
-
-        .logo span {
-            color: var(--green);
-        }
+        .logo span { color: var(--green); }
 
         nav ul {
             display: flex;
-            align-items: center;
-            gap: clamp(10px, 2vw, 24px);
+            gap: 20px;
             list-style: none;
         }
 
         nav ul li a {
             text-decoration: none;
             color: #b0b0b0;
-            font-family: 'Outfit', sans-serif;
             font-weight: 600;
             font-size: 0.85rem;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-
-        nav ul li a:hover, nav ul li a.active {
-            color: var(--green);
-        }
-
-        @media (max-width: 600px) {
-            header {
-                padding: 12px 16px;
-            }
-            nav ul {
-                gap: 12px;
-            }
-            nav ul li a {
-                font-size: 0.78rem;
-            }
         }
 
         .profile-container {
@@ -169,51 +100,21 @@
             padding: 0 20px;
         }
 
-        /* Card Body Structure */
         .id-card {
-            background: var(--surface, #111111);
+            background: #111111;
             border: 2px solid rgba(255, 255, 255, 0.1);
             border-radius: 28px;
-            padding: 45px 25px 35px 25px;
-            min-height: 560px;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(92, 255, 114, 0.08);
+            padding: 40px 25px;
             text-align: center;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
             position: relative;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .id-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(92, 255, 114, 0.4);
-            box-shadow: 0 0 60px rgba(0, 0, 0, 0.95), 0 0 40px rgba(92, 255, 114, 0.15);
-        }
-
-        /* Asset SVG Accent Overlay */
-        .card-svg-custom {
-            position: absolute;
-            bottom: -20px;
-            right: -20px;
-            width: 180px;
-            height: auto;
-            opacity: 0.18;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .card-content-wrap {
-            position: relative;
-            z-index: 2;
         }
 
         .avatar-wrapper {
-            position: relative;
-            width: 135px;
-            height: 135px;
-            margin: 0 auto 24px auto;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px auto;
         }
 
         .profile-avatar {
@@ -222,83 +123,58 @@
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid var(--green);
-            box-shadow: 0 0 25px rgba(92, 255, 114, 0.25);
-            background: #222;
         }
 
         .user-name {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.85rem;
+            font-size: 1.8rem;
             font-weight: 700;
-            color: #fff;
-            margin-bottom: 6px;
-            word-break: break-word;
+            margin-bottom: 4px;
         }
 
         .user-tag {
             color: var(--orange);
             font-family: monospace;
-            font-size: 1rem;
-            margin-bottom: 24px;
-            letter-spacing: 1.5px;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
         }
 
         .info-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
             text-align: left;
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 20px;
-            border-radius: 18px;
+            padding: 16px;
+            border-radius: 16px;
             margin-bottom: 25px;
+            font-size: 0.9rem;
         }
 
         .info-item {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
+            margin-bottom: 8px;
         }
 
-        .info-label {
-            color: #888;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-
-        .info-value {
-            color: #ddd;
-            font-weight: 400;
-            text-align: right;
-            word-break: break-all;
-        }
+        .info-item:last-child { margin-bottom: 0; }
+        .info-label { color: #888; }
+        .info-value { color: #ddd; }
 
         .action-buttons {
             display: flex;
-            gap: 14px;
-            position: relative;
-            z-index: 2;
-            margin-top: auto;
+            gap: 12px;
         }
 
         .btn {
             flex: 1;
-            padding: 14px 18px;
+            padding: 12px;
             border-radius: 50px;
-            font-family: 'Outfit', sans-serif;
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             cursor: pointer;
             border: none;
-            transition: all 0.25s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
         }
 
         .btn-chat {
@@ -306,21 +182,10 @@
             color: #050505;
         }
 
-        .btn-chat:hover {
-            box-shadow: 0 0 25px rgba(92, 255, 114, 0.45);
-            transform: translateY(-2px);
-        }
-
         .btn-friend {
             background: rgba(255, 255, 255, 0.08);
             color: #fff;
             border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-friend:hover {
-            border-color: var(--orange);
-            color: var(--orange);
-            transform: translateY(-2px);
         }
 
         .btn-friend.requested {
@@ -334,49 +199,30 @@
             color: var(--green);
             border-color: var(--green);
         }
-
-        .loading-state {
-            color: #888;
-            font-size: 1rem;
-            padding: 60px 0;
-            margin: auto 0;
-            position: relative;
-            z-index: 2;
-        }
     </style>
 </head>
 <body>
 
-    <!-- Exact Ambient FX & SVG Graffiti Wall Background -->
-    <div id="graffiti-bg"></div>
     <div id="mouse-glow"></div>
     <canvas id="particles-canvas"></canvas>
-    <div class="ambient-smoke"></div>
 
     <header>
         <nav>
-            <a href="index.html" class="logo">
-                UNDERGROUND <span>CHAT</span>
-            </a>
+            <a href="index.html" class="logo">UNDERGROUND <span>CHAT</span></a>
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="user.html">Chats</a></li>
-                <li><a href="friends.html" class="active">Friends</a></li>
-                <li><a href="id.html">My ID</a></li>
+                <li><a href="notification.html">Alerts</a></li>
             </ul>
         </nav>
     </header>
 
     <main class="profile-container">
         <div class="id-card" id="profileCard">
-            <!-- Custom SVG Overlay from Local Assets -->
-            <img src="assets/svg/paint-splash.svg" class="card-svg-custom" alt="Paint Accent">
-
-            <div class="loading-state">Loading user profile...</div>
+            <p style="color:#888;">Fetching target signal...</p>
         </div>
     </main>
 
-    <!-- FIREBASE SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -400,19 +246,13 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const targetUid = urlParams.get('uid');
-
         const profileCard = document.getElementById('profileCard');
         let currentUserId = null;
 
         onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUserId = user.uid;
-            }
+            if (user) currentUserId = user.uid;
             if (!targetUid) {
-                profileCard.innerHTML = `
-                    <img src="assets/svg/paint-splash.svg" class="card-svg-custom" alt="Paint Accent">
-                    <div class="loading-state" style="color:#FF2E7A;">No target user ID provided.</div>
-                `;
+                profileCard.innerHTML = `<p style="color:#ff4d4d;">No target user ID provided.</p>`;
                 return;
             }
             await fetchUserProfile();
@@ -420,69 +260,40 @@
 
         async function fetchUserProfile() {
             try {
-                const userDocRef = doc(db, "users", targetUid);
-                const snap = await getDoc(userDocRef);
-
+                const snap = await getDoc(doc(db, "users", targetUid));
                 if (!snap.exists()) {
-                    profileCard.innerHTML = `
-                        <img src="assets/svg/paint-splash.svg" class="card-svg-custom" alt="Paint Accent">
-                        <div class="loading-state" style="color:#FF2E7A;">User profile not found.</div>
-                    `;
+                    profileCard.innerHTML = `<p style="color:#ff4d4d;">User profile does not exist.</p>`;
                     return;
                 }
 
                 const u = snap.data();
-                const name = u.fullName || u.name || u.displayName || 'Anonymous Tagger';
-                const avatar = u.photo || u.photoURL || u.avatar || defaultAvatar;
-                const vId = u.versityId || u.studentId || targetUid.slice(0, 8);
-                const email = u.email || 'N/A';
-                const bio = u.bio || 'Underground member';
+                const chatId = currentUserId < targetUid ? `${currentUserId}_${targetUid}` : `${targetUid}_${currentUserId}`;
 
                 profileCard.innerHTML = `
-                    <img src="assets/svg/paint-splash.svg" class="card-svg-custom" alt="Paint Accent">
-                    <div class="card-content-wrap">
-                        <div class="avatar-wrapper">
-                            <img src="${avatar}" class="profile-avatar" alt="User Profile">
-                        </div>
-                        <h2 class="user-name">${name}</h2>
-                        <div class="user-tag">ID: ${vId}</div>
+                    <div class="avatar-wrapper">
+                        <img src="${u.photo || u.avatar || defaultAvatar}" class="profile-avatar" alt="Avatar">
+                    </div>
+                    <h2 class="user-name">${u.fullName || u.name || 'Anonymous'}</h2>
+                    <div class="user-tag">ID: ${u.versityId || targetUid.slice(0, 8)}</div>
 
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <span class="info-label">Email</span>
-                                <span class="info-value">${email}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Bio</span>
-                                <span class="info-value">${bio}</span>
-                            </div>
-                        </div>
+                    <div class="info-grid">
+                        <div class="info-item"><span class="info-label">Email</span><span class="info-value">${u.email || 'N/A'}</span></div>
+                        <div class="info-item"><span class="info-label">Status</span><span class="info-value">${u.bio || 'Underground Operator'}</span></div>
                     </div>
 
                     ${currentUserId !== targetUid ? `
                         <div class="action-buttons">
-                            <a href="user.html?uid=${targetUid}" class="btn btn-chat">
-                                💬 Chat
-                            </a>
-                            <button id="friendBtn" class="btn btn-friend">
-                                ➕ Add Friend
-                            </button>
+                            <a href="chat.html?chatId=${chatId}&peerUid=${targetUid}" class="btn btn-chat">💬 Chat</a>
+                            <button id="friendBtn" class="btn btn-friend">➕ Connect</button>
                         </div>
-                    ` : `
-                        <div class="loading-state" style="padding:10px 0;">This is your own profile.</div>
-                    `}
+                    ` : `<p style="color:#666;">This is your card.</p>`}
                 `;
 
                 if (currentUserId && currentUserId !== targetUid) {
                     setupFriendButton();
                 }
-
             } catch (err) {
-                console.error("Profile Fetch Error:", err);
-                profileCard.innerHTML = `
-                    <img src="assets/svg/paint-splash.svg" class="card-svg-custom" alt="Paint Accent">
-                    <div class="loading-state" style="color:#FF2E7A;">Error loading user profile.</div>
-                `;
+                console.error(err);
             }
         }
 
@@ -493,111 +304,24 @@
 
             onSnapshot(requestRef, (reqSnap) => {
                 if (reqSnap.exists()) {
-                    friendBtn.textContent = "⏳ Request Sent";
+                    friendBtn.textContent = "⏳ Signal Sent";
                     friendBtn.className = "btn btn-friend requested";
-                    friendBtn.onclick = () => cancelRequest(requestRef);
+                    friendBtn.onclick = () => deleteDoc(requestRef);
                 } else {
                     getDoc(friendRef).then((fSnap) => {
                         if (fSnap.exists()) {
-                            friendBtn.textContent = "✔ Friends";
+                            friendBtn.textContent = "✔ Crew Member";
                             friendBtn.className = "btn btn-friend friends";
                             friendBtn.onclick = null;
                         } else {
-                            friendBtn.textContent = "➕ Add Friend";
+                            friendBtn.textContent = "➕ Add Crew";
                             friendBtn.className = "btn btn-friend";
-                            friendBtn.onclick = () => sendRequest(requestRef);
+                            friendBtn.onclick = () => setDoc(requestRef, { from: currentUserId, to: targetUid, timestamp: Date.now() });
                         }
                     });
                 }
             });
         }
-
-        async function sendRequest(ref) {
-            try {
-                await setDoc(ref, {
-                    from: currentUserId,
-                    to: targetUid,
-                    timestamp: Date.now()
-                });
-            } catch (err) {
-                console.error("Error sending request:", err);
-            }
-        }
-
-        async function cancelRequest(ref) {
-            try {
-                await deleteDoc(ref);
-            } catch (err) {
-                console.error("Error cancelling request:", err);
-            }
-        }
-    </script>
-
-    <!-- Parallax Background & Particles Animation -->
-    <script>
-        const glow = document.getElementById('mouse-glow');
-        const graffitiBg = document.getElementById('graffiti-bg');
-
-        window.addEventListener('mousemove', (e) => {
-            const mouseX = e.clientX;
-            const mouseY = e.clientY;
-
-            glow.style.left = mouseX + 'px';
-            glow.style.top = mouseY + 'px';
-
-            if (graffitiBg) {
-                const moveX = (mouseX / window.innerWidth - 0.5) * -25;
-                const moveY = (mouseY / window.innerHeight - 0.5) * -25;
-                graffitiBg.style.transform = `translate(${moveX}px, ${moveY}px) scale(1.02)`;
-            }
-        });
-
-        const canvas = document.getElementById('particles-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        class Particle {
-            constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 1;
-                this.speedX = (Math.random() - 0.5) * 0.5;
-                this.speedY = (Math.random() - 0.5) * 0.5 - 0.2;
-                this.opacity = Math.random() * 0.6 + 0.2;
-                this.color = Math.random() > 0.5 ? '#5CFF72' : '#FF7A00';
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-                    this.reset();
-                }
-            }
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.globalAlpha = this.opacity;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        for (let i = 0; i < 60; i++) particles.push(new Particle());
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
     </script>
 </body>
 </html>
