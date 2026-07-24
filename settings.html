@@ -1,266 +1,820 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Underground Chat - Settings</title>
-  <meta name="theme-color" content="#050505">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Underground Chat</title>
+    <meta name="theme-color" content="#050505">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --green: #5CFF72;
+            --orange: #FF7A00;
+            --red: #FF4D4D;
+            --bg: #050505;
+            --surface: #111111;
+            --border: rgba(255, 255, 255, 0.08);
+        }
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  <link rel="stylesheet" href="style.css">
+        body {
+            background-color: var(--bg);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 90px;
+        }
+
+        .noise {
+            position: fixed;
+            inset: 0;
+            background-image: url('assets/svg/graffiti-wall.svg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #mouse-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(92, 255, 114, 0.08) 0%, rgba(255, 122, 0, 0.03) 45%, transparent 70%);
+            pointer-events: none;
+            z-index: 2;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Desktop Header */
+        header {
+            width: 100%;
+            padding: 18px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5, 5, 5, 0.85);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        nav {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .profile-pic {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--green);
+        }
+
+        .logo {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 1.4rem;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .logo span { color: var(--green); }
+
+        .desktop-nav {
+            display: flex;
+            gap: 16px;
+            list-style: none;
+        }
+
+        .desktop-nav li a {
+            color: #aaa;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .desktop-nav li a:hover,
+        .desktop-nav li a.active {
+            color: var(--green);
+            background: rgba(92, 255, 114, 0.08);
+        }
+
+        .logout-btn {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid rgba(255, 77, 77, 0.4);
+            color: var(--red);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 77, 77, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Mobile Top Bar */
+        .mobile-top-bar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 12px 20px;
+            background: rgba(5, 5, 5, 0.85);
+            backdrop-filter: blur(12px);
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .mobile-profile-btn img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1.5px solid var(--green);
+        }
+
+        .mobile-logout-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .mobile-logout-btn img {
+            width: 20px;
+            height: 20px;
+            filter: drop-shadow(0 0 4px rgba(255, 77, 77, 0.5));
+        }
+
+        /* Mobile Bottom Navigation */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+
+        .mobile-bottom-nav a {
+            color: #888;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .mobile-bottom-nav a.active { color: var(--green); }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Settings Container */
+        .settings-container {
+            max-width: 680px;
+            margin: 110px auto 40px auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .page-title {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .page-subtitle {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+
+        .settings-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(92, 255, 114, 0.03);
+        }
+
+        .settings-card.danger-zone {
+            border-color: rgba(255, 77, 77, 0.3);
+            background: rgba(255, 77, 77, 0.02);
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        .settings-avatar-wrapper {
+            position: relative;
+            width: 72px;
+            height: 72px;
+            flex-shrink: 0;
+        }
+
+        .settings-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--green);
+            background: #222;
+        }
+
+        .settings-user-info h2 {
+            font-size: 1.15rem;
+            color: #fff;
+            margin: 0 0 4px 0;
+        }
+
+        .settings-user-info p {
+            font-size: 0.82rem;
+            color: var(--orange);
+            font-family: monospace;
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input, 
+        .form-group textarea {
+            width: 100%;
+            background: #080808;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #fff;
+            outline: none;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.92rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus, 
+        .form-group textarea:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 12px rgba(92, 255, 114, 0.15);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .setting-row:last-child { border-bottom: none; }
+
+        .setting-info h4 {
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
+
+        .setting-info p {
+            color: #666;
+            font-size: 0.78rem;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #222;
+            transition: .3s;
+            border-radius: 22px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--green); }
+        input:checked + .slider:before { transform: translateX(22px); background-color: #000; }
+
+        .save-btn {
+            width: 100%;
+            background: var(--green);
+            color: #000;
+            border: none;
+            border-radius: 30px;
+            padding: 13px;
+            font-weight: 800;
+            font-size: 0.92rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(92, 255, 114, 0.2);
+            margin-top: 6px;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(92, 255, 114, 0.4);
+        }
+
+        .btn-danger {
+            background: var(--red);
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+            width: 100%;
+        }
+
+        .btn-danger:hover { opacity: 0.9; }
+
+        .status-message {
+            text-align: center;
+            font-size: 0.82rem;
+            margin-top: 12px;
+            color: var(--green);
+            min-height: 20px;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-box {
+            background: #141414;
+            border: 1px solid var(--red);
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-box h3 {
+            color: var(--red);
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .modal-box p {
+            color: #aaa;
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+
+        .btn-cancel {
+            background: #222;
+            color: #fff;
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.88rem;
+            width: 50%;
+        }
+
+        @media (max-width: 768px) {
+            header { display: none !important; }
+            .mobile-top-bar { display: flex; }
+            .mobile-bottom-nav { display: flex; }
+            .settings-container { margin-top: 80px; }
+        }
+    </style>
 </head>
 <body>
+    <div class="noise"></div>
+    <div id="mouse-glow"></div>
 
-  <div id="graffiti-bg"></div>
-  <div id="mouse-glow"></div>
-
-  <!-- Header Navigation -->
-  <header>
-    <nav>
-      <a href="index.html" class="logo">UNDERGROUND <span>CHAT</span></a>
-      <ul class="desktop-nav">
-        <li><a href="index.html">🏠 Home</a></li>
-        <li><a href="user.html">💬 Chats</a></li>
-        <li><a href="friends.html">👥 Friends</a></li>
-        <li><a href="notification.html">🔔 Notifications</a></li>
-        <li><a href="settings.html" class="active">⚙ Settings</a></li>
-      </ul>
-      <div class="nav-btn-group">
-        <button id="logoutBtn" class="btn-logout">
-          <img src="assets/svg/logoutbutton.svg" width="18" height="18" alt="Logout">
-          <span>Logout</span>
+    <!-- Mobile Top Bar -->
+    <div class="mobile-top-bar">
+        <a href="user.html" class="mobile-profile-btn">
+            <img id="mobileTopAvatar" class="profile-pic" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Profile">
+        </a>
+        <button class="mobile-logout-btn logout-btn" aria-label="Logout" id="mobileLogoutBtn">
+            <img src="assets/svg/logout.svg" alt="Logout">
         </button>
-      </div>
-    </nav>
-  </header>
-
-  <!-- Mobile Bottom Navigation -->
-  <div class="mobile-bottom-nav">
-    <a href="index.html"><img src="assets/svg/home.svg" width="22" height="22" alt="Home"><span>Home</span></a>
-    <a href="user.html"><img src="assets/svg/chat.svg" width="22" height="22" alt="Chats"><span>Chats</span></a>
-    <a href="friends.html"><img src="assets/svg/friends.svg" width="22" height="22" alt="Friends"><span>Friends</span></a>
-    <a href="id.html"><img id="mobileUserAvatar" class="mobile-user-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Profile"><span>Profile</span></a>
-    <a href="settings.html" class="active"><img src="assets/svg/setting.svg" width="22" height="22" alt="Settings"><span>Settings</span></a>
-  </div>
-
-  <!-- Settings Interface -->
-  <main class="settings-container">
-    <h1 class="page-title">SYSTEM SETTINGS</h1>
-    <p class="page-subtitle">Configure your signal configurations and secure profile access.</p>
-
-    <!-- Profile Management -->
-    <section class="panel-card">
-      <div class="panel-header">
-        <h2>👤 Identity Details</h2>
-      </div>
-      <form id="profileForm">
-        <div class="form-group">
-          <label for="usernameInput">Tag / Username</label>
-          <input type="text" id="usernameInput" class="form-control" placeholder="Loading identity..." required>
-        </div>
-        <div class="form-group">
-          <label for="statusInput">Status Message</label>
-          <input type="text" id="statusInput" class="form-control" placeholder="Set your broadcast message...">
-        </div>
-        <button type="submit" class="btn-save">Update Identity</button>
-      </form>
-    </section>
-
-    <!-- Signal Preferences -->
-    <section class="panel-card">
-      <div class="panel-header">
-        <h2>⚙ Preferences & Signals</h2>
-      </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <h4>Push Notifications</h4>
-          <p>Receive real-time alerts on new incoming messages.</p>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="notificationsToggle" checked>
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <h4>Stealth Mode</h4>
-          <p>Hide your active status on the network grid.</p>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="stealthToggle">
-          <span class="slider"></span>
-        </label>
-      </div>
-    </section>
-
-    <!-- Danger Zone (Delete Account) -->
-    <section class="panel-card danger-zone">
-      <div class="panel-header danger-title">
-        <h2>⚠️ Terminal Actions</h2>
-      </div>
-      <p class="danger-description">
-        Permanently purge your access keys, identity record, chat history, and data from the network. This action cannot be undone.
-      </p>
-      <button id="openDeleteModalBtn" class="btn-danger">Purge Identity (Delete Account)</button>
-    </section>
-  </main>
-
-  <!-- Delete Account Confirmation Modal -->
-  <div class="modal-overlay" id="deleteModal">
-    <div class="modal-box">
-      <h3>CONFIRM PURGE</h3>
-      <p>Enter your password to authorize complete identity deletion and chat history wipe.</p>
-      <div class="form-group text-left">
-        <input type="password" id="deletePasswordInput" class="form-control" placeholder="Enter password" required>
-      </div>
-      <div class="modal-actions">
-        <button id="cancelDeleteBtn" class="btn-cancel">Cancel</button>
-        <button id="confirmDeleteBtn" class="btn-danger">Confirm Delete</button>
-      </div>
     </div>
-  </div>
 
-  <!-- Firebase Logic -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    <!-- Desktop Header -->
+    <header>
+        <nav>
+            <div class="brand-container">
+                <a href="user.html" class="desktop-profile-btn">
+                    <img id="desktopTopAvatar" class="profile-pic" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Profile">
+                </a>
+                <a href="index.html" class="logo">UNDERGROUND <span>CHAT</span></a>
+            </div>
+            <ul class="desktop-nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="user.html">Chats</a></li>
+                <li><a href="friends.html">Friends</a></li>
+                <li><a href="notification.html">Alerts</a></li>
+                <li><a href="settings.html" class="active">Settings</a></li>
+            </ul>
+            <div class="header-actions">
+                <button class="logout-btn" id="desktopLogoutBtn">DISCONNECT</button>
+            </div>
+        </nav>
+    </header>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
-      authDomain: "urbannoir-13ce8.firebaseapp.com",
-      projectId: "urbannoir-13ce8",
-      storageBucket: "urbannoir-13ce8.firebasestorage.app",
-      messagingSenderId: "1059246827383",
-      appId: "1:1059246827383:web:caa91c40c408d46e3b6372"
-    };
+    <!-- Settings Main Container -->
+    <main class="settings-container">
+        <h1 class="page-title">SYSTEM SETTINGS</h1>
+        <p class="page-subtitle">Configure your signal configurations and secure profile access.</p>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        <!-- Profile Management Card -->
+        <div class="settings-card">
+            <div class="settings-header">
+                <div class="settings-avatar-wrapper">
+                    <img id="settingsAvatar" class="settings-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Avatar">
+                </div>
+                <div class="settings-user-info">
+                    <h2 id="settingsDisplayName">Operator</h2>
+                    <p id="settingsDisplayTag">ID: ----</p>
+                </div>
+            </div>
 
-    const usernameInput = document.getElementById("usernameInput");
-    const statusInput = document.getElementById("statusInput");
-    const mobileUserAvatar = document.getElementById("mobileUserAvatar");
-    const profileForm = document.getElementById("profileForm");
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label for="fullNameInput">Operator Name / Alias</label>
+                    <input type="text" id="fullNameInput" placeholder="Enter your alias" required>
+                </div>
 
-    const deleteModal = document.getElementById("deleteModal");
-    const openDeleteModalBtn = document.getElementById("openDeleteModalBtn");
-    const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
-    const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
-    const deletePasswordInput = document.getElementById("deletePasswordInput");
+                <div class="form-group">
+                    <label for="photoInput">Avatar Image URL</label>
+                    <input type="url" id="photoInput" placeholder="https://example.com/avatar.jpg">
+                </div>
 
-    let currentUser = null;
+                <div class="form-group">
+                    <label for="bioInput">Signal Status / Bio</label>
+                    <textarea id="bioInput" placeholder="Set your broadcast message..."></textarea>
+                </div>
 
-    // Load User Data
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        currentUser = user;
-        try {
-          const userSnap = await getDoc(doc(db, "users", user.uid));
-          if (userSnap.exists()) {
-            const data = userSnap.data();
-            usernameInput.value = data.username || data.name || "";
-            statusInput.value = data.status || "";
-            if (data.photo && mobileUserAvatar) {
-              mobileUserAvatar.src = data.photo;
+                <button type="submit" class="save-btn" id="saveBtn">UPDATE SIGNAL</button>
+                <div id="statusMessage" class="status-message"></div>
+            </form>
+        </div>
+
+        <!-- Signal Preferences Card -->
+        <div class="settings-card">
+            <div class="settings-header" style="margin-bottom: 16px;">
+                <h2 style="font-size: 1.15rem; font-weight: 700;">⚙ Preferences & Signals</h2>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <h4>Push Notifications</h4>
+                    <p>Receive real-time alerts on new incoming messages.</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="notificationsToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <h4>Stealth Mode</h4>
+                    <p>Hide your active status on the network grid.</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="stealthToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="settings-card danger-zone">
+            <div class="settings-header" style="border-color: rgba(255, 77, 77, 0.2); margin-bottom: 16px;">
+                <h2 style="color: var(--red); font-size: 1.15rem; font-weight: 700;">⚠️ Terminal Actions</h2>
+            </div>
+            <p style="color: #888; font-size: 0.88rem; margin-bottom: 16px;">
+                Permanently purge your access keys, identity record, and data from the network. This action cannot be undone.
+            </p>
+            <button id="openDeleteModalBtn" class="btn-danger">Purge Identity (Delete Account)</button>
+        </div>
+    </main>
+
+    <!-- Delete Account Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-box">
+            <h3>CONFIRM PURGE</h3>
+            <p>Enter your password to authorize complete identity deletion.</p>
+            <div class="form-group" style="text-align: left;">
+                <input type="password" id="deletePasswordInput" class="form-control" placeholder="Enter password" required style="width:100%; background:#080808; border:1.5px solid rgba(255,255,255,0.15); border-radius:12px; padding:12px 16px; color:#fff; outline:none;">
+            </div>
+            <div class="modal-actions">
+                <button id="cancelDeleteBtn" class="btn-cancel">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn-danger" style="width: 50%;">Confirm Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-bottom-nav">
+        <a href="index.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+            Home
+        </a>
+        <a href="user.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Chats
+        </a>
+        <a href="friends.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Friends
+        </a>
+        <a href="notification.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            Alerts
+        </a>
+        <a href="settings.html" class="active">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            Settings
+        </a>
+    </div>
+
+    <!-- Firebase SDK & Settings Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+            authDomain: "urbannoir-13ce8.firebaseapp.com",
+            projectId: "urbannoir-13ce8",
+            storageBucket: "urbannoir-13ce8.firebasestorage.app",
+            messagingSenderId: "1059246827383",
+            appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
+            measurementId: "G-CEPWKZXQVF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Elements
+        const settingsAvatar = document.getElementById('settingsAvatar');
+        const mobileTopAvatar = document.getElementById('mobileTopAvatar');
+        const desktopTopAvatar = document.getElementById('desktopTopAvatar');
+        const settingsDisplayName = document.getElementById('settingsDisplayName');
+        const settingsDisplayTag = document.getElementById('settingsDisplayTag');
+        
+        const fullNameInput = document.getElementById('fullNameInput');
+        const photoInput = document.getElementById('photoInput');
+        const bioInput = document.getElementById('bioInput');
+        const settingsForm = document.getElementById('settingsForm');
+        const statusMessage = document.getElementById('statusMessage');
+
+        const deleteModal = document.getElementById('deleteModal');
+        const openDeleteModalBtn = document.getElementById('openDeleteModalBtn');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const deletePasswordInput = document.getElementById('deletePasswordInput');
+
+        let currentUser = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            const fallbackId = localStorage.getItem("ug_current_user_id");
+            if (!user && !fallbackId) {
+                window.location.href = "login.html";
+                return;
             }
-          }
-        } catch (err) {
-          console.error("Error loading profile details:", err);
+            currentUser = user;
+            const activeUid = user ? user.uid : fallbackId;
+            await loadUserData(activeUid);
+        });
+
+        async function loadUserData(uid) {
+            try {
+                const docRef = doc(db, "users", uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const name = data.fullName || data.username || data.name || "Operator";
+                    const tag = data.versityId || uid.slice(0, 8);
+                    const photo = data.photo || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
+                    const bio = data.bio || data.status || "";
+
+                    settingsDisplayName.textContent = name;
+                    settingsDisplayTag.textContent = `ID: ${tag}`;
+                    
+                    settingsAvatar.src = photo;
+                    if (mobileTopAvatar) mobileTopAvatar.src = photo;
+                    if (desktopTopAvatar) desktopTopAvatar.src = photo;
+
+                    fullNameInput.value = name;
+                    photoInput.value = data.photo || "";
+                    bioInput.value = bio;
+                }
+            } catch (err) {
+                console.error("Error loading user settings:", err);
+            }
         }
-      } else {
-        window.location.href = "login.html";
-      }
-    });
 
-    // Save Profile Settings
-    profileForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!currentUser) return;
+        // Save Profile Updates
+        settingsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
 
-      try {
-        await updateDoc(doc(db, "users", currentUser.uid), {
-          username: usernameInput.value.trim(),
-          status: statusInput.value.trim()
+            statusMessage.textContent = "Updating signal...";
+            try {
+                const userRef = doc(db, "users", currentUser.uid);
+                const newName = fullNameInput.value.trim();
+                const newPhoto = photoInput.value.trim();
+                const newBio = bioInput.value.trim();
+
+                await updateDoc(userRef, {
+                    fullName: newName,
+                    username: newName,
+                    photo: newPhoto,
+                    bio: newBio,
+                    status: newBio
+                });
+
+                localStorage.setItem('ug_username', newName);
+                if (newPhoto) {
+                    localStorage.setItem('ug_user_photo', newPhoto);
+                    settingsAvatar.src = newPhoto;
+                    if (mobileTopAvatar) mobileTopAvatar.src = newPhoto;
+                    if (desktopTopAvatar) desktopTopAvatar.src = newPhoto;
+                }
+
+                settingsDisplayName.textContent = newName;
+                statusMessage.textContent = "Signal updated successfully!";
+                setTimeout(() => { statusMessage.textContent = ""; }, 3000);
+            } catch (err) {
+                console.error("Error updating profile:", err);
+                statusMessage.textContent = "Failed to update signal.";
+            }
         });
-        alert("Identity specifications updated.");
-      } catch (err) {
-        console.error("Profile update error:", err);
-        alert("Failed to update identity record.");
-      }
-    });
 
-    // Modal Control
-    openDeleteModalBtn.addEventListener("click", () => deleteModal.style.display = "flex");
-    cancelDeleteBtn.addEventListener("click", () => {
-      deleteModal.style.display = "none";
-      deletePasswordInput.value = "";
-    });
-
-    // Account Deletion & Complete Data Purge Workflow
-    confirmDeleteBtn.addEventListener("click", async () => {
-      const password = deletePasswordInput.value;
-      if (!password) {
-        alert("Authorization credential required.");
-        return;
-      }
-
-      try {
-        const credential = EmailAuthProvider.credential(currentUser.email, password);
-        await reauthenticateWithCredential(currentUser, credential);
-
-        const uid = currentUser.uid;
-
-        // 1. Delete all chats/conversations where the user is a member
-        const chatsQuery = query(collection(db, "chats"), where("members", "array-contains", uid));
-        const chatSnapshots = await getDocs(chatsQuery);
-        const chatDeletionPromises = [];
-        chatSnapshots.forEach((chatDoc) => {
-          chatDeletionPromises.push(deleteDoc(doc(db, "chats", chatDoc.id)));
+        // Account Purge Modal Control
+        openDeleteModalBtn.addEventListener('click', () => deleteModal.style.display = 'flex');
+        cancelDeleteBtn.addEventListener('click', () => {
+            deleteModal.style.display = 'none';
+            deletePasswordInput.value = "";
         });
-        await Promise.all(chatDeletionPromises);
 
-        // 2. Delete user document from Firestore collection
-        await deleteDoc(doc(db, "users", uid));
+        // Account Deletion Workflow
+        confirmDeleteBtn.addEventListener('click', async () => {
+            const password = deletePasswordInput.value;
+            if (!password) {
+                alert("Authorization credential required.");
+                return;
+            }
 
-        // 3. Delete user from Firebase Authentication
-        await deleteUser(currentUser);
+            try {
+                const credential = EmailAuthProvider.credential(currentUser.email, password);
+                await reauthenticateWithCredential(currentUser, credential);
 
-        localStorage.removeItem("ug_current_user_id");
-        alert("Account, chat history, and identity records permanently purged from network.");
-        window.location.href = "login.html";
-      } catch (err) {
-        console.error("Account Purge Error:", err);
-        alert("Authentication failed. " + err.message);
-      }
-    });
+                await deleteDoc(doc(db, "users", currentUser.uid));
+                await deleteUser(currentUser);
 
-    // Logout Handling
-    async function handleLogout() {
-      try {
-        await signOut(auth);
-        localStorage.removeItem("ug_current_user_id");
-        window.location.href = "login.html";
-      } catch (err) {
-        console.error("Logout Error:", err);
-      }
-    }
+                localStorage.removeItem("ug_current_user_id");
+                alert("Account permanently purged from network.");
+                window.location.href = "login.html";
+            } catch (err) {
+                console.error("Account Purge Error:", err);
+                alert("Authentication failed. " + err.message);
+            }
+        });
 
-    document.getElementById("logoutBtn")?.addEventListener("click", handleLogout);
-  </script>
+        // Logout Handlers
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                localStorage.removeItem("ug_current_user_id");
+                window.location.href = "login.html";
+            } catch (err) {
+                console.error("Logout Error:", err);
+            }
+        }
 
-  <!-- Interactive Background Script -->
-  <script>
-    const glow = document.getElementById('mouse-glow');
-    window.addEventListener('mousemove', (e) => {
-      glow.style.left = e.clientX + 'px';
-      glow.style.top = e.clientY + 'px';
-    });
-  </script>
+        document.getElementById('desktopLogoutBtn')?.addEventListener('click', handleLogout);
+        document.getElementById('mobileLogoutBtn')?.addEventListener('click', handleLogout);
+
+        // Mouse Glow Tracking
+        const glow = document.getElementById('mouse-glow');
+        window.addEventListener('mousemove', (e) => {
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+    </script>
 </body>
 </html>
