@@ -739,7 +739,7 @@
     </div>
   </main>
 
-  <!-- 🚀 DYNAMIC PHOTO SCRIPT (EXACT MATCH FOR ID.HTML DATA.PHOTO) -->
+  <!-- 🚀 AUTH GUARD & DYNAMIC PHOTO SCRIPT -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -759,7 +759,7 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // Apply exact photo to top-left mobile & desktop image elements
+    // Apply photo to profile elements
     function setProfilePhoto(photoUrl) {
       if (!photoUrl) return;
       const mPic = document.getElementById("mobileProfilePic");
@@ -768,23 +768,26 @@
       if (dPic) dPic.src = photoUrl;
     }
 
+    // 🔒 Auth Guard and Profile Sync
     onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          // Exact same doc call as id.html
-          const docRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(docRef);
+      if (!user) {
+        // Redirect unauthenticated / logged-out users to login.html
+        window.location.href = "login.html";
+        return;
+      }
 
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            // Exactly matching id.html: data.photo
-            if (data.photo && data.photo.trim() !== "") {
-              setProfilePhoto(data.photo);
-            }
+      try {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.photo && data.photo.trim() !== "") {
+            setProfilePhoto(data.photo);
           }
-        } catch (e) {
-          console.error("Error fetching photo for header:", e);
         }
+      } catch (e) {
+        console.error("Error fetching photo for header:", e);
       }
     });
 
