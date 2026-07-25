@@ -51,6 +51,7 @@
         .chat-container {
             max-width: 700px;
             margin: 5px auto 0 auto;
+            /* dynamically adjusts screen height leaving space for bottom nav */
             height: calc(100dvh - 85px); 
             background: #111;
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -109,7 +110,7 @@
             touch-action: pan-y;
         }
 
-        /* Message Row & Layout */
+        /* Message Bubble Container & Reply Button Wrapper */
         .message-row {
             display: flex;
             align-items: center;
@@ -168,18 +169,11 @@
         }
 
         .message-bubble.mine .message-sender {
-            color: #111;
+            color: #222;
             text-align: right;
         }
 
-        .message-time {
-            font-size: 0.62rem;
-            opacity: 0.7;
-            margin-left: 6px;
-            font-weight: 400;
-        }
-
-        /* 🟢 Messenger-Style Status Indicators */
+        /* Message Status Indicator Styles */
         .message-status {
             font-size: 0.68rem;
             margin-top: 4px;
@@ -188,31 +182,22 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 4px;
-            user-select: none;
+            gap: 3px;
         }
 
         .message-status.sent {
-            color: #333;
+            color: #555;
         }
 
         .message-status.delivered {
-            color: #111;
+            color: #333;
         }
 
         .message-status.seen {
-            color: #0044cc;
+            color: #007aff;
         }
 
-        .seen-avatar-icon {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid #0044cc;
-        }
-
-        /* Quoted/Replied Message Block */
+        /* Quoted/Replied Message Block Inside Bubble */
         .reply-quote {
             background: rgba(0, 0, 0, 0.25);
             border-left: 3px solid var(--green, #5CFF72);
@@ -249,7 +234,7 @@
             color: #222;
         }
 
-        /* Desktop Reply Button */
+        /* Desktop Reply Hover Button */
         .desktop-reply-btn {
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -384,7 +369,9 @@
     <div class="chat-container">
         <div class="chat-header">
             <div class="chat-header-user">
+                <!-- ⬅️ Back Button -->
                 <button id="backBtn" class="back-btn" aria-label="Go Back">❮</button>
+                
                 <img id="peerAvatar" class="chat-header-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Peer">
                 <h2 id="peerName">TUNNEL <span>CHAT</span></h2>
             </div>
@@ -392,7 +379,7 @@
         </div>
 
         <div class="chat-messages" id="messagesList">
-            <!-- Messages load dynamically -->
+            <!-- Messages load here -->
         </div>
 
         <div class="chat-input-wrapper">
@@ -459,9 +446,7 @@
 
         const currentUserId = localStorage.getItem("ug_current_user_id");
         let currentUserProfile = null;
-        let peerUserProfile = null;
-        let activeReplyTarget = null;
-        let currentMessagesList = [];
+        let activeReplyTarget = null; // Store reply context { id, senderName, text }
 
         const messagesList = document.getElementById('messagesList');
         const chatForm = document.getElementById('chatForm');
@@ -473,17 +458,6 @@
         const replyBannerAuthor = document.getElementById('replyBannerAuthor');
         const replyBannerText = document.getElementById('replyBannerText');
         const cancelReplyBtn = document.getElementById('cancelReplyBtn');
-
-        // Helper: Escape HTML to avoid XSS and template literal crashes
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
 
         onAuthStateChanged(auth, async (user) => {
             if (!user && !currentUserId) {
@@ -501,11 +475,10 @@
             }
 
             if (peerUid) {
-                await loadPeerProfile(peerUid);
+                loadPeerProfile(peerUid);
             }
 
             listenForMessages(chatId);
-            setupVisibilityAndFocusHandlers(chatId);
         });
 
         async function loadCurrentUser(uid) {
@@ -525,15 +498,16 @@
                 const peerRef = doc(db, "users", pUid);
                 const peerSnap = await getDoc(peerRef);
                 if (peerSnap.exists()) {
-                    peerUserProfile = peerSnap.data();
-                    peerName.innerHTML = `${escapeHtml(peerUserProfile.fullName || 'Tagger')} <span>SIGNAL</span>`;
-                    if (peerUserProfile.photo) peerAvatar.src = peerUserProfile.photo;
+                    const data = peerSnap.data();
+                    peerName.innerHTML = `${data.fullName || 'Tagger'} <span>SIGNAL</span>`;
+                    if (data.photo) peerAvatar.src = data.photo;
                 }
             } catch (err) {
                 console.error("Peer Profile Load Error:", err);
             }
         }
 
+        // Set active reply state
         function setReplyTarget(id, senderName, text) {
             activeReplyTarget = { id, senderName, text };
             replyBannerAuthor.textContent = `Replying to ${senderName}`;
@@ -542,6 +516,7 @@
             messageInput.focus();
         }
 
+        // Clear active reply state
         function clearReplyTarget() {
             activeReplyTarget = null;
             replyBanner.classList.remove('active');
@@ -549,45 +524,22 @@
 
         cancelReplyBtn.addEventListener('click', clearReplyTarget);
 
-        // Safe Event Delegation for Reply Actions
-        messagesList.addEventListener('click', (e) => {
-            const replyBtn = e.target.closest('.desktop-reply-btn');
-            if (replyBtn) {
-                const row = replyBtn.closest('.message-row');
-                if (row) {
-                    const id = row.getAttribute('data-id');
-                    const sender = row.getAttribute('data-sender');
-                    const text = row.getAttribute('data-text');
-                    setReplyTarget(id, sender, text);
-                }
-            }
-        });
-
-        // Format message timestamp
-        function formatTime(createdAt) {
-            if (!createdAt) return '';
-            const date = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
-            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-
-        // Render message with Messenger-style status indicators
         function renderMessage(msg, docId) {
             const myUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
             const isMine = msg.senderId === myUid;
             const senderName = isMine ? "You" : (msg.senderName || "Tagger");
-            const formattedTime = formatTime(msg.createdAt);
 
             let replyBlock = '';
             if (msg.replyTo) {
                 replyBlock = `
                     <div class="reply-quote">
-                        <div class="reply-quote-author">${escapeHtml(msg.replyTo.senderName || 'Signal')}</div>
-                        <div class="reply-quote-text">${escapeHtml(msg.replyTo.text || '')}</div>
+                        <div class="reply-quote-author">${msg.replyTo.senderName || 'Signal'}</div>
+                        <div class="reply-quote-text">${msg.replyTo.text || ''}</div>
                     </div>
                 `;
             }
 
-            // 🟢 Messenger-style Status UI
+            // Status Indicator Display Logic
             let statusHtml = '';
             if (isMine) {
                 const status = msg.status || 'sent';
@@ -600,8 +552,6 @@
                 } else if (status === 'seen') {
                     icon = '✓✓';
                     label = 'Seen';
-                    const peerPhoto = peerUserProfile?.photo || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80';
-                    icon = `<img class="seen-avatar-icon" src="${peerPhoto}" title="Seen by ${escapeHtml(peerUserProfile?.fullName || 'Peer')}" />`;
                 }
 
                 statusHtml = `
@@ -611,32 +561,40 @@
                 `;
             }
 
-            const safeText = escapeHtml(msg.text || '');
-            const safeSenderName = escapeHtml(senderName);
-            const avatarSrc = msg.senderPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80';
+            const escapedText = (msg.text || '').replace(/"/g, '&quot;');
+            const escapedName = senderName.replace(/"/g, '&quot;');
 
             return `
-                <div class="message-row ${isMine ? 'mine-row' : ''}" data-id="${docId}" data-sender="${safeSenderName}" data-text="${safeText}">
-                    ${isMine ? `<button class="desktop-reply-btn" title="Reply">↩</button>` : ''}
+                <div class="message-row ${isMine ? 'mine-row' : ''}" data-id="${docId}" data-sender="${escapedName}" data-text="${escapedText}">
+                    ${isMine ? `
+                        <button class="desktop-reply-btn" title="Reply" onclick="window.triggerReply('${docId}', '${escapedName}', '${escapedText}')">↩</button>
+                    ` : ''}
                     
                     <div class="message-bubble ${isMine ? "mine" : ""}">
-                        <img class="message-avatar" src="${avatarSrc}" alt="Avatar">
+                        <img class="message-avatar" 
+                             src="${msg.senderPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}" 
+                             alt="Avatar">
                         <div class="message-content">
                             ${replyBlock}
-                            <div class="message-sender">
-                                ${safeSenderName} <span class="message-time">${formattedTime}</span>
-                            </div>
-                            <div>${safeText}</div>
+                            <div class="message-sender">${senderName}</div>
+                            <div>${msg.text || ""}</div>
                             ${statusHtml}
                         </div>
                     </div>
 
-                    ${!isMine ? `<button class="desktop-reply-btn" title="Reply">↩</button>` : ''}
+                    ${!isMine ? `
+                        <button class="desktop-reply-btn" title="Reply" onclick="window.triggerReply('${docId}', '${escapedName}', '${escapedText}')">↩</button>
+                    ` : ''}
                 </div>
             `;
         }
 
-        // Touch Swipe Gestures for Mobile Reply
+        // Global Desktop Reply Click Handler
+        window.triggerReply = function(id, senderName, text) {
+            setReplyTarget(id, senderName, text);
+        };
+
+        // Mobile Touch Swipe Gesture Implementation
         function attachSwipeGestures() {
             const rows = document.querySelectorAll('.message-row');
             rows.forEach(row => {
@@ -654,6 +612,7 @@
                     currentX = e.touches[0].clientX;
                     const diffX = currentX - startX;
 
+                    // Limit drag movement distance
                     if (Math.abs(diffX) < 80) {
                         row.style.transform = `translateX(${diffX}px)`;
                     }
@@ -664,6 +623,7 @@
                     isSwiping = false;
                     const diffX = currentX - startX;
 
+                    // Trigger reply if swiped beyond threshold
                     if (Math.abs(diffX) > 50) {
                         const id = row.getAttribute('data-id');
                         const sender = row.getAttribute('data-sender');
@@ -678,66 +638,33 @@
             });
         }
 
-        // 🔄 Realtime Messenger Status Updater
-        async function updateIncomingMessageStatuses(cId, snapshot) {
-            const activeUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
-            const isTabActive = document.visibilityState === 'visible' && document.hasFocus();
-
-            snapshot.forEach((docSnap) => {
-                const msg = docSnap.data();
-                if (msg.senderId !== activeUid) {
-                    const msgRef = doc(db, "chats", cId, "messages", docSnap.id);
-                    
-                    if (isTabActive && msg.status !== 'seen') {
-                        // Mark as SEEN when user is actively viewing the screen
-                        updateDoc(msgRef, { status: 'seen' }).catch(err => console.error(err));
-                    } else if (!isTabActive && msg.status === 'sent') {
-                        // Mark as DELIVERED when message arrives while tab/app is in background
-                        updateDoc(msgRef, { status: 'delivered' }).catch(err => console.error(err));
-                    }
-                }
-            });
-        }
-
-        // Mark unseen messages as 'seen' when user tab regains focus
-        function setupVisibilityAndFocusHandlers(cId) {
-            const markAllUnseenAsSeen = () => {
-                if (document.visibilityState === 'visible' && document.hasFocus()) {
-                    const activeUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
-                    currentMessagesList.forEach(item => {
-                        if (item.data.senderId !== activeUid && item.data.status !== 'seen') {
-                            const msgRef = doc(db, "chats", cId, "messages", item.id);
-                            updateDoc(msgRef, { status: 'seen' }).catch(err => console.error(err));
-                        }
-                    });
-                }
-            };
-
-            window.addEventListener('focus', markAllUnseenAsSeen);
-            document.addEventListener('visibilitychange', markAllUnseenAsSeen);
-        }
-
         function listenForMessages(cId) {
             const messagesQuery = query(
                 collection(db, "chats", cId, "messages"),
                 orderBy("createdAt", "asc")
             );
 
+            const activeUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
+
             onSnapshot(messagesQuery, (snapshot) => {
                 messagesList.innerHTML = "";
-                currentMessagesList = [];
-
                 if (snapshot.empty) {
                     messagesList.innerHTML = `<p style="color:#555; text-align:center; margin: auto;">No signals yet. Leave your mark!</p>`;
                 }
-
+                
                 snapshot.forEach((docSnap) => {
                     const msg = docSnap.data();
-                    currentMessagesList.push({ id: docSnap.id, data: msg });
+                    
+                    // Update status to 'seen' when the recipient loads the incoming messages
+                    if (msg.senderId !== activeUid && msg.status !== 'seen') {
+                        updateDoc(doc(db, "chats", cId, "messages", docSnap.id), {
+                            status: 'seen'
+                        }).catch(err => console.error("Error updating status to seen:", err));
+                    }
+
                     messagesList.insertAdjacentHTML("beforeend", renderMessage(msg, docSnap.id));
                 });
-
-                updateIncomingMessageStatuses(cId, snapshot);
+                
                 attachSwipeGestures();
                 messagesList.scrollTop = messagesList.scrollHeight;
             }, (error) => {
@@ -762,7 +689,7 @@
                     senderName: currentUserProfile?.fullName || "Anonymous",
                     senderPhoto: currentUserProfile?.photo || "",
                     type: "text",
-                    status: "sent", // Starts as SENT
+                    status: "sent", // Initial status when message is sent
                     createdAt: now
                 };
 
