@@ -1,0 +1,186 @@
+/*=============================
+ROOT & RESET
+=============================*/
+
+:root {
+  --bg: #000000;
+  --surface: #0f0f0f;
+  --card-bg: rgba(17, 17, 17, 0.88);
+  --white: #f4f4f4;
+  --gray: #888888;
+
+  --green: #5CFF72;
+  --cyan: #00D9FF;
+  --orange: #FF7A00;
+  --red: #FF4D4D;
+  
+  --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--white);
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden;
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 1️⃣ Base Layer: AMOLED Black + Concrete Background */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: 
+    linear-gradient(rgba(0, 0, 0, 0.80), rgba(0, 0, 0, 0.90)),
+    url("assets/svg/concrete.svg");
+  background-size: cover;
+  background-position: center;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* 2️⃣ Top Layer: Graffiti-1 on top of Concrete */
+.graffiti-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('assets/svg/graffiti-wall.svg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.20;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/*=============================
+LOGIN CARD COMPONENTS
+=============================*/
+
+.login-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 420px;
+  padding: 38px 30px;
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(92, 255, 114, 0.06);
+  text-align: center;
+  animation: popup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.brand-logo {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.8rem;
+  color: var(--white);
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.brand-logo span {
+  color: var(--green);
+}
+
+.subtitle {
+  color: var(--gray);
+  font-size: 0.88rem;
+  margin-bottom: 26px;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: var(--green);
+  color: #000000;
+  font-weight: 800;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  margin-top: 10px;
+  box-shadow: 0 0 20px rgba(92, 255, 114, 0.25);
+  transition: all 0.3s var(--transition-smooth);
+}
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(92, 255, 114, 0.55);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  color: #444;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.divider span {
+  padding: 0 12px;
+}
+
+.register-prompt {
+  margin-top: 24px;
+  font-size: 0.85rem;
+  color: var(--gray);
+}
+
+.register-prompt a {
+  color: var(--green);
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.register-prompt a:hover {
+  color: var(--white);
+  text-decoration: underline;
+}
+
+/*=============================
+ANIMATIONS
+=============================*/
+
+@keyframes popup {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

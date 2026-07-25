@@ -8,11 +8,10 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 🔴 Remove Top Navigation Header injected by navbar.js */
         header, nav, .top-nav, #navbar-container > header {
             display: none !important;
         }
@@ -21,13 +20,12 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Prevent page scrolling */
+            overflow: hidden;
             background-color: #080808;
             color: #fff;
             font-family: 'Outfit', sans-serif;
         }
 
-        /* Back Button Styling */
         .back-btn {
             background: transparent;
             border: none;
@@ -40,14 +38,8 @@
             padding: 4px 8px;
             margin-right: 6px;
             border-radius: 50%;
-            transition: background 0.2s ease;
         }
 
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* 📱 Fixed Mobile Chat Box Layout */
         .chat-container {
             max-width: 700px;
             margin: 5px auto 0 auto;
@@ -80,23 +72,33 @@
         }
 
         .chat-header-avatar {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             object-fit: cover;
             border: 1px solid var(--green, #5CFF72);
         }
 
+        .header-info-details {
+            display: flex;
+            flex-direction: column;
+        }
+
         .chat-header h2 {
-            font-family: 'Outfit', sans-serif;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.98rem;
             color: #fff;
             margin: 0;
         }
 
-        .chat-header h2 span {
-            color: var(--green, #5CFF72);
+        .status-text {
+            font-size: 0.72rem;
+            color: #888;
+        }
+
+        .status-text.online {
+            color: #5CFF72;
+            font-weight: 600;
         }
 
         .chat-messages {
@@ -106,18 +108,15 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            touch-action: pan-y;
         }
 
-        /* Message Bubble Container & Reply Button Wrapper */
         .message-row {
             display: flex;
             align-items: center;
             gap: 8px;
             width: 100%;
             position: relative;
-            transition: transform 0.15s ease-out;
-            will-change: transform;
+            user-select: none;
         }
 
         .message-row.mine-row {
@@ -152,6 +151,7 @@
             font-size: 0.88rem;
             position: relative;
             word-break: break-word;
+            user-select: text;
         }
 
         .message-bubble.mine .message-content {
@@ -172,7 +172,27 @@
             text-align: right;
         }
 
-        /* Message Meta (Time & Status Ticks) */
+        .chat-media-img {
+            max-width: 100%;
+            max-height: 220px;
+            border-radius: 8px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .file-attachment-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0,0,0,0.2);
+            padding: 6px 10px;
+            border-radius: 6px;
+            color: inherit;
+            text-decoration: none;
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+
         .message-meta {
             display: flex;
             align-items: center;
@@ -183,21 +203,9 @@
             margin-top: 3px;
         }
 
-        .message-bubble.mine .message-meta {
-            color: #333;
-        }
+        .message-bubble.mine .message-meta { color: #333; }
+        .msg-status.seen { color: #0084ff; }
 
-        .msg-status {
-            font-weight: bold;
-            font-size: 0.75rem;
-            letter-spacing: -1px;
-        }
-
-        .msg-status.seen {
-            color: #0084ff; /* Messenger Blue for Seen */
-        }
-
-        /* Quoted/Replied Message Block Inside Bubble */
         .reply-quote {
             background: rgba(0, 0, 0, 0.25);
             border-left: 3px solid var(--green, #5CFF72);
@@ -212,63 +220,14 @@
             border-left-color: #000;
         }
 
-        .reply-quote-author {
-            font-weight: 700;
-            font-size: 0.7rem;
-            color: var(--green, #5CFF72);
+        .typing-indicator-bar {
+            padding: 4px 16px;
+            font-size: 0.75rem;
+            color: #5CFF72;
+            font-style: italic;
+            height: 20px;
         }
 
-        .message-bubble.mine .reply-quote-author {
-            color: #000;
-        }
-
-        .reply-quote-text {
-            color: #ccc;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 200px;
-        }
-
-        .message-bubble.mine .reply-quote-text {
-            color: #222;
-        }
-
-        /* Desktop Reply Hover Button */
-        .desktop-reply-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #fff;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
-        }
-
-        .desktop-reply-btn img {
-            width: 16px;
-            height: 16px;
-            object-fit: contain;
-        }
-
-        .message-row:hover .desktop-reply-btn {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .desktop-reply-btn:hover {
-            background: var(--green, #5CFF72);
-            border-color: var(--green, #5CFF72);
-        }
-
-        /* Chat Input Area & Active Reply Preview Banner */
         .chat-input-wrapper {
             background: #181818;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -286,52 +245,31 @@
             justify-content: space-between;
             gap: 8px;
             font-size: 0.8rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .reply-banner.active {
-            display: flex;
-        }
-
-        .reply-banner-info {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .reply-banner-author {
-            color: var(--green, #5CFF72);
-            font-weight: 700;
-            font-size: 0.72rem;
-        }
-
-        .reply-banner-text {
-            color: #aaa;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .cancel-reply-btn {
-            background: transparent;
-            border: none;
-            color: #888;
-            font-size: 1.1rem;
-            cursor: pointer;
-            padding: 0 4px;
-        }
-
-        .cancel-reply-btn:hover {
-            color: #ff4d4d;
-        }
+        .reply-banner.active { display: flex; }
+        .cancel-reply-btn { background: transparent; border: none; color: #888; font-size: 1.1rem; cursor: pointer; }
 
         .chat-input-area {
             padding: 10px;
             display: flex;
-            gap: 8px;
+            align-items: center;
+            gap: 6px;
         }
 
-        .chat-input-area input {
+        .icon-btn {
+            background: transparent;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            color: #aaa;
+        }
+
+        .icon-btn:hover { color: #5CFF72; background: rgba(255,255,255,0.05); }
+
+        .chat-input-area input[type="text"] {
             flex: 1;
             background: #0d0d0d;
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -339,12 +277,7 @@
             padding: 10px 16px;
             color: #fff;
             outline: none;
-            font-family: 'Outfit', sans-serif;
             font-size: 0.88rem;
-        }
-
-        .chat-input-area input:focus {
-            border-color: var(--green, #5CFF72);
         }
 
         .send-btn {
@@ -352,84 +285,131 @@
             color: #000;
             border: none;
             border-radius: 30px;
-            padding: 0 18px;
+            padding: 10px 18px;
             font-weight: 800;
             font-size: 0.82rem;
             cursor: pointer;
-            transition: all 0.3s;
         }
 
-        .send-btn:hover {
-            transform: scale(1.03);
+        /* Context Menu Styles */
+        #messageActions {
+            position: fixed;
+            background: #181818;
+            border: 1px solid rgba(92, 255, 114, 0.3);
+            border-radius: 12px;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            z-index: 500;
+            box-shadow: 0 10px 30px #000;
         }
+
+        #messageActions button {
+            background: #222;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        #messageActions button:hover { background: #5CFF72; color: #000; }
+        #messageActions button.delete-btn:hover { background: #ff4d4d; color: #fff; }
+
+        /* Emoji Picker Box Popup */
+        .emoji-picker-popup {
+            position: absolute;
+            bottom: 60px;
+            left: 10px;
+            background: #181818;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 8px;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            z-index: 100;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.8);
+        }
+
+        .emoji-picker-popup span {
+            font-size: 1.3rem;
+            cursor: pointer;
+            text-align: center;
+            padding: 4px;
+            border-radius: 6px;
+        }
+
+        .emoji-picker-popup span:hover { background: rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
     <div class="noise"></div>
- 
-    <!-- Dynamic Navigation Container -->
-    <div id="navbar-container"></div>
+
+    <!-- Message Action Menu -->
+    <div id="messageActions" style="display:none;">
+        <button id="replyAction">↩ Reply</button>
+        <button id="forwardAction">↪ Forward</button>
+        <button id="copyAction">📋 Copy</button>
+        <button id="deleteAction" class="delete-btn" style="display:none;">🗑️ Delete</button>
+    </div>
 
     <div class="chat-container">
         <div class="chat-header">
             <div class="chat-header-user">
-                <!-- ⬅️ Back Button -->
-                <button id="backBtn" class="back-btn" aria-label="Go Back">❮</button>
-                
+                <button id="backBtn" class="back-btn">❮</button>
                 <img id="peerAvatar" class="chat-header-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Peer">
-                <h2 id="peerName">TUNNEL <span>CHAT</span></h2>
+                <div class="header-info-details">
+                    <h2 id="peerName">TUNNEL CHAT</h2>
+                    <span id="userOnlineStatus" class="status-text">Offline</span>
+                </div>
             </div>
             <small style="color: #888; font-size: 0.72rem;">Encrypted</small>
         </div>
 
-        <div class="chat-messages" id="messagesList">
-            <!-- Messages load here -->
-        </div>
+        <div class="chat-messages" id="messagesList"></div>
+
+        <!-- Typing Indicator Banner -->
+        <div id="typingIndicator" class="typing-indicator-bar"></div>
 
         <div class="chat-input-wrapper">
-            <!-- Reply Banner Preview -->
             <div id="replyBanner" class="reply-banner">
-                <div class="reply-banner-info">
-                    <span id="replyBannerAuthor" class="reply-banner-author">Replying to User</span>
-                    <span id="replyBannerText" class="reply-banner-text">Sample message snippet...</span>
+                <div style="display:flex; flex-direction:column; overflow:hidden;">
+                    <span id="replyBannerAuthor" style="color:#5CFF72; font-weight:700; font-size:0.72rem;">Replying</span>
+                    <span id="replyBannerText" style="color:#aaa; font-size:0.8rem;">Snippet...</span>
                 </div>
-                <button id="cancelReplyBtn" class="cancel-reply-btn" aria-label="Cancel Reply">✕</button>
+                <button id="cancelReplyBtn" class="cancel-reply-btn">✕</button>
+            </div>
+
+            <!-- Emoji Popup Window -->
+            <div id="emojiPicker" class="emoji-picker-popup" style="display:none;">
+                <span>👍</span><span>❤️</span><span>😂</span><span>🔥</span><span>🎉</span><span>😮</span>
+                <span>😊</span><span>😎</span><span>🙏</span><span>✨</span><span>💯</span><span>👏</span>
             </div>
 
             <form class="chat-input-area" id="chatForm">
+                <button type="button" id="emojiToggleBtn" class="icon-btn">🙂</button>
+                
+                <input type="file" id="fileAttachmentInput" style="display:none;">
+                <button type="button" id="attachFileBtn" class="icon-btn">📎</button>
+
                 <input type="text" id="messageInput" placeholder="Type a message..." required autocomplete="off">
                 <button type="submit" class="send-btn">SEND</button>
             </form>
         </div>
     </div>
 
-    <!-- FIREBASE SDKs & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { 
-            getFirestore, 
-            collection, 
-            addDoc, 
-            doc, 
-            getDoc, 
-            updateDoc, 
-            query, 
-            orderBy, 
-            onSnapshot, 
-            serverTimestamp,
-            writeBatch
+            getFirestore, collection, addDoc, doc, getDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, writeBatch 
         } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-        // Back Button Logic
-        const backBtn = document.getElementById('backBtn');
-        backBtn.addEventListener('click', () => {
-            if (document.referrer && (document.referrer.includes("user.html") || document.referrer.includes("friends.html"))) {
-                window.history.back();
-            } else {
-                window.location.href = "user.html";
-            }
-        });
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
@@ -444,279 +424,284 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const storage = getStorage(app);
+
+        // Step 1 - Bug #2 Fix: XSS Escape Helper Function
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>"']/g, m => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            })[m]);
+        }
 
         const urlParams = new URLSearchParams(window.location.search);
         const chatId = urlParams.get('chatId');
         const peerUid = urlParams.get('peerUid');
-
-        const currentUserId = localStorage.getItem("ug_current_user_id");
-        let currentUserProfile = null;
-        let activeReplyTarget = null;
-        
-        // Caching user profiles to dynamically load current photo/name
-        const userProfilesCache = {};
+        let currentUserId = localStorage.getItem("ug_current_user_id");
 
         const messagesList = document.getElementById('messagesList');
         const chatForm = document.getElementById('chatForm');
         const messageInput = document.getElementById('messageInput');
         const peerName = document.getElementById('peerName');
         const peerAvatar = document.getElementById('peerAvatar');
-        
-        const replyBanner = document.getElementById('replyBanner');
-        const replyBannerAuthor = document.getElementById('replyBannerAuthor');
-        const replyBannerText = document.getElementById('replyBannerText');
-        const cancelReplyBtn = document.getElementById('cancelReplyBtn');
+        const userOnlineStatus = document.getElementById('userOnlineStatus');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const attachFileBtn = document.getElementById('attachFileBtn');
+        const fileAttachmentInput = document.getElementById('fileAttachmentInput');
+        const emojiToggleBtn = document.getElementById('emojiToggleBtn');
+        const emojiPicker = document.getElementById('emojiPicker');
 
-        onAuthStateChanged(auth, async (user) => {
-            if (!user && !currentUserId) {
-                window.location.href = "login.html";
-                return;
+        let activeReplyTarget = null;
+        let selectedMessageForAction = null;
+        let typingTimeout = null;
+        const userProfilesCache = {};
+
+        document.getElementById('backBtn').addEventListener('click', () => window.history.back());
+
+        document.addEventListener('click', (e) => {
+            const box = document.getElementById("messageActions");
+            if (box && !box.contains(e.target)) box.style.display = "none";
+            if (emojiPicker && !emojiPicker.contains(e.target) && e.target !== emojiToggleBtn) {
+                emojiPicker.style.display = "none";
             }
-
-            const activeUid = user ? user.uid : currentUserId;
-            await loadCurrentUser(activeUid);
-
-            if (!chatId) {
-                messagesList.innerHTML = `<p style="color:#888; text-align:center; margin: auto;">Select a conversation to start chatting.</p>`;
-                chatForm.style.display = "none";
-                return;
-            }
-
-            if (peerUid) {
-                loadPeerProfile(peerUid);
-            }
-
-            listenForMessages(chatId, activeUid);
         });
 
-        async function loadCurrentUser(uid) {
-            try {
-                const userRef = doc(db, "users", uid);
-                const userSnap = await getDoc(userRef);
-                if (userSnap.exists()) {
-                    currentUserProfile = userSnap.data();
-                    userProfilesCache[uid] = currentUserProfile; // Cache self profile
-                }
-            } catch (error) {
-                console.error("Error loading profile:", error);
-            }
+        // 1. Online / Offline Presence Updates
+        function setupPresenceSystem(uid) {
+            const userRef = doc(db, "users", uid);
+            updateDoc(userRef, { online: true, lastSeen: serverTimestamp() }).catch(() => {});
+
+            window.addEventListener("beforeunload", () => {
+                updateDoc(userRef, { online: false, lastSeen: serverTimestamp() });
+            });
         }
 
-        async function loadPeerProfile(pUid) {
-            try {
-                const peerRef = doc(db, "users", pUid);
-                const peerSnap = await getDoc(peerRef);
-                if (peerSnap.exists()) {
-                    const data = peerSnap.data();
-                    userProfilesCache[pUid] = data; // Cache peer profile
-                    peerName.innerHTML = `${data.fullName || 'Tagger'} <span>SIGNAL</span>`;
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                setupPresenceSystem(currentUserId);
+            }
+            if (peerUid) listenToPeerStatus(peerUid);
+            if (chatId) {
+                listenForMessages(chatId, currentUserId);
+                listenForTypingStatus(chatId);
+            }
+        });
+
+        // Listen for Peer's Online/Offline Realtime Status
+        function listenToPeerStatus(pUid) {
+            onSnapshot(doc(db, "users", pUid), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    peerName.textContent = data.fullName || "User";
                     if (data.photo) peerAvatar.src = data.photo;
+                    
+                    if (data.online) {
+                        userOnlineStatus.textContent = "🟢 Online";
+                        userOnlineStatus.className = "status-text online";
+                    } else {
+                        userOnlineStatus.textContent = "Offline";
+                        userOnlineStatus.className = "status-text";
+                    }
                 }
-            } catch (err) {
-                console.error("Peer Profile Load Error:", err);
-            }
+            });
         }
 
-        // Fetch user profile dynamically (realtime check if updated)
-        async function getSenderProfile(senderId) {
-            if (userProfilesCache[senderId]) {
-                return userProfilesCache[senderId];
-            }
-            try {
-                const userRef = doc(db, "users", senderId);
-                const userSnap = await getDoc(userRef);
-                if (userSnap.exists()) {
-                    userProfilesCache[senderId] = userSnap.data();
-                    return userProfilesCache[senderId];
-                }
-            } catch (e) {
-                console.error("Error fetching sender profile:", e);
-            }
-            return { fullName: "Anonymous", photo: "" };
-        }
-
-        function setReplyTarget(id, senderName, text) {
-            activeReplyTarget = { id, senderName, text };
-            replyBannerAuthor.textContent = `Replying to ${senderName}`;
-            replyBannerText.textContent = text;
-            replyBanner.classList.add('active');
-            messageInput.focus();
-        }
-
-        function clearReplyTarget() {
-            activeReplyTarget = null;
-            replyBanner.classList.remove('active');
-        }
-
-        cancelReplyBtn.addEventListener('click', clearReplyTarget);
-
-        async function renderMessage(msg, docId) {
-            const myUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
-            const isMine = msg.senderId === myUid;
+        // 2. Typing Indicator Logic
+        messageInput.addEventListener("input", () => {
+            if (!chatId || !currentUserId) return;
+            const chatRef = doc(db, "chats", chatId);
             
-            // Fetch latest sender profile live from cache/DB so photo updates instantly everywhere!
-            const senderProfile = await getSenderProfile(msg.senderId);
-            const senderName = isMine ? "You" : (senderProfile.fullName || msg.senderName || "Tagger");
-            const senderPhoto = senderProfile.photo || msg.senderPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80';
+            updateDoc(chatRef, { [`typing.${currentUserId}`]: true }).catch(() => {});
+            clearTimeout(typingTimeout);
+
+            typingTimeout = setTimeout(() => {
+                updateDoc(chatRef, { [`typing.${currentUserId}`]: false }).catch(() => {});
+            }, 2000);
+        });
+
+        function listenForTypingStatus(cId) {
+            onSnapshot(doc(db, "chats", cId), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const typingData = data.typing || {};
+                    const isPeerTyping = Object.keys(typingData).some(id => id !== currentUserId && typingData[id] === true);
+                    typingIndicator.textContent = isPeerTyping ? `${peerName.textContent} is typing...` : "";
+                }
+            });
+        }
+
+        // 3. Emoji Picker Integration
+        emojiToggleBtn.addEventListener("click", () => {
+            emojiPicker.style.display = emojiPicker.style.display === "none" ? "grid" : "none";
+        });
+
+        emojiPicker.querySelectorAll("span").forEach(emoji => {
+            emoji.addEventListener("click", () => {
+                messageInput.value += emoji.textContent;
+                emojiPicker.style.display = "none";
+                messageInput.focus();
+            });
+        });
+
+        // 4. File / Image Uploading Feature
+        attachFileBtn.addEventListener("click", () => fileAttachmentInput.click());
+
+        fileAttachmentInput.addEventListener("change", async (e) => {
+            const file = e.target.files[0];
+            if (!file || !chatId) return;
+
+            const fileRef = ref(storage, `chat_files/${Date.now()}_${file.name}`);
+            try {
+                attachFileBtn.textContent = "⏳";
+                const snap = await uploadBytes(fileRef, file);
+                const downloadURL = await getDownloadURL(snap.ref);
+
+                const isImage = file.type.startsWith("image/");
+                const payload = {
+                    senderId: currentUserId,
+                    type: isImage ? "image" : "file",
+                    status: "sent",
+                    createdAt: serverTimestamp()
+                };
+
+                if (isImage) payload.imageURL = downloadURL;
+                else {
+                    payload.fileURL = downloadURL;
+                    payload.fileName = file.name;
+                }
+
+                await addDoc(collection(db, "chats", chatId, "messages"), payload);
+                await updateDoc(doc(db, "chats", chatId), {
+                    lastMessage: isImage ? "📷 Image" : "📁 File",
+                    lastSenderId: currentUserId,
+                    updatedAt: serverTimestamp()
+                });
+            } catch (err) {
+                console.error("File upload failed:", err);
+                alert("Upload failed!");
+            } finally {
+                attachFileBtn.textContent = "📎";
+                fileAttachmentInput.value = "";
+            }
+        });
+
+        // 5. Message Render with XSS protection Applied
+        async function renderMessage(msg, docId) {
+            const isMine = msg.senderId === currentUserId;
+            
+            let contentHTML = `<div>${escapeHTML(msg.text)}</div>`;
+            if (msg.imageURL) {
+                contentHTML += `<img class="chat-media-img" src="${escapeHTML(msg.imageURL)}" alt="Shared image" />`;
+            }
+            if (msg.fileURL) {
+                contentHTML += `<a class="file-attachment-link" href="${escapeHTML(msg.fileURL)}" target="_blank">📄 ${escapeHTML(msg.fileName || "Download Attachment")}</a>`;
+            }
 
             let replyBlock = '';
             if (msg.replyTo) {
                 replyBlock = `
                     <div class="reply-quote">
-                        <div class="reply-quote-author">${msg.replyTo.senderName || 'Signal'}</div>
-                        <div class="reply-quote-text">${msg.replyTo.text || ''}</div>
+                        <div class="reply-quote-author">${escapeHTML(msg.replyTo.senderName)}</div>
+                        <div style="color:#aaa;">${escapeHTML(msg.replyTo.text)}</div>
                     </div>
                 `;
             }
 
-            // Messenger Status Indicators logic
-            let statusHTML = '';
-            if (isMine) {
-                let ticks = '✓'; // sent
-                let statusClass = '';
-                if (msg.status === 'delivered') {
-                    ticks = '✓✓';
-                } else if (msg.status === 'seen') {
-                    ticks = '✓✓';
-                    statusClass = 'seen';
-                }
-                statusHTML = `<span class="msg-status ${statusClass}" title="${msg.status || 'sent'}">${ticks}</span>`;
-            }
-
-            const escapedText = (msg.text || '').replace(/"/g, '&quot;');
-            const escapedName = senderName.replace(/"/g, '&quot;');
+            let forwardLabel = msg.isForwarded ? `<small style="color:#5CFF72; font-style:italic;">↪ Forwarded</small>` : '';
 
             return `
-                <div class="message-row ${isMine ? 'mine-row' : ''}" data-id="${docId}" data-sender="${escapedName}" data-text="${escapedText}">
-                    ${isMine ? `
-                        <button class="desktop-reply-btn" title="Reply" onclick="window.triggerReply('${docId}', '${escapedName}', '${escapedText}')">
-                            <img src="assets/svg/reply.svg" alt="Reply">
-                        </button>
-                    ` : ''}
+                <div class="message-row ${isMine ? 'mine-row' : ''}" 
+                     data-id="${docId}"
+                     data-sender-id="${msg.senderId}"
+                     data-sender="${escapeHTML(isMine ? 'You' : peerName.textContent)}" 
+                     data-text="${escapeHTML(msg.text || '')}"
+                     oncontextmenu="openActions(event,'${docId}','${msg.senderId}','${escapeHTML(isMine ? 'You' : peerName.textContent)}','${escapeHTML(msg.text || '')}')">
                     
                     <div class="message-bubble ${isMine ? "mine" : ""}">
-                        <img class="message-avatar" src="${senderPhoto}" alt="Avatar">
                         <div class="message-content">
+                            ${forwardLabel}
                             ${replyBlock}
-                            <div class="message-sender">${senderName}</div>
-                            <div>${msg.text || ""}</div>
-                            <div class="message-meta">
-                                ${statusHTML}
-                            </div>
+                            ${contentHTML}
                         </div>
                     </div>
-
-                    ${!isMine ? `
-                        <button class="desktop-reply-btn" title="Reply" onclick="window.triggerReply('${docId}', '${escapedName}', '${escapedText}')">
-                            <img src="asset/svg/reply.svg" alt="Reply">
-                        </button>
-                    ` : ''}
                 </div>
             `;
         }
 
-        window.triggerReply = function(id, senderName, text) {
-            setReplyTarget(id, senderName, text);
+        window.openActions = function(e, id, senderId, name, text) {
+            e.preventDefault();
+            selectedMessageForAction = { id, senderId, senderName: name, text };
+            
+            const box = document.getElementById("messageActions");
+            const deleteBtn = document.getElementById("deleteAction");
+
+            // Show delete option only for own messages
+            deleteBtn.style.display = (senderId === currentUserId) ? "block" : "none";
+            box.style.display = "flex";
+
+            let x = e.clientX, y = e.clientY;
+            if (x + 180 > window.innerWidth) x = window.innerWidth - 190;
+            if (y + 150 > window.innerHeight) y = window.innerHeight - 160;
+
+            box.style.left = x + "px";
+            box.style.top = y + "px";
         };
 
-        function attachSwipeGestures() {
-            const rows = document.querySelectorAll('.message-row');
-            rows.forEach(row => {
-                let startX = 0;
-                let currentX = 0;
-                let isSwiping = false;
-
-                row.addEventListener('touchstart', (e) => {
-                    startX = e.touches[0].clientX;
-                    isSwiping = true;
-                }, { passive: true });
-
-                row.addEventListener('touchmove', (e) => {
-                    if (!isSwiping) return;
-                    currentX = e.touches[0].clientX;
-                    const diffX = currentX - startX;
-
-                    if (Math.abs(diffX) < 80) {
-                        row.style.transform = `translateX(${diffX}px)`;
-                    }
-                }, { passive: true });
-
-                row.addEventListener('touchend', () => {
-                    if (!isSwiping) return;
-                    isSwiping = false;
-                    const diffX = currentX - startX;
-
-                    if (Math.abs(diffX) > 50) {
-                        const id = row.getAttribute('data-id');
-                        const sender = row.getAttribute('data-sender');
-                        const text = row.getAttribute('data-text');
-                        setReplyTarget(id, sender, text);
-                    }
-
-                    row.style.transform = 'translateX(0px)';
-                    startX = 0;
-                    currentX = 0;
-                });
-            });
-        }
-
-        async function markMessagesAsSeenOrDelivered(snapshot, activeUid) {
-            const batch = writeBatch(db);
-            let hasUpdates = false;
-
-            snapshot.forEach((docSnap) => {
-                const msgData = docSnap.data();
-                const msgId = docSnap.id;
-
-                if (msgData.senderId !== activeUid) {
-                    if (msgData.status !== 'seen') {
-                        const msgRef = doc(db, "chats", chatId, "messages", msgId);
-                        batch.update(msgRef, { status: 'seen' });
-                        hasUpdates = true;
-                    }
-                } else {
-                    if (msgData.status === 'sent') {
-                        const msgRef = doc(db, "chats", chatId, "messages", msgId);
-                        batch.update(msgRef, { status: 'delivered' });
-                        hasUpdates = true;
-                    }
-                }
-            });
-
-            if (hasUpdates) {
+        // Message Delete Action Handler
+        document.getElementById("deleteAction").onclick = async function() {
+            if (!selectedMessageForAction || !chatId) return;
+            if (confirm("Delete this message?")) {
                 try {
-                    await batch.commit();
-                } catch (err) {
-                    console.error("Batch update status error:", err);
+                    await deleteDoc(doc(db, "chats", chatId, "messages", selectedMessageForAction.id));
+                    document.getElementById("messageActions").style.display = "none";
+                } catch (e) {
+                    console.error("Delete failed:", e);
                 }
             }
-        }
+        };
+
+        document.getElementById("replyAction").onclick = function() {
+            if (!selectedMessageForAction) return;
+            activeReplyTarget = selectedMessageForAction;
+            document.getElementById("replyBannerAuthor").textContent = `Replying to ${selectedMessageForAction.senderName}`;
+            document.getElementById("replyBannerText").textContent = selectedMessageForAction.text;
+            document.getElementById("replyBanner").classList.add("active");
+            document.getElementById("messageActions").style.display = "none";
+            messageInput.focus();
+        };
+
+        document.getElementById("cancelReplyBtn").onclick = function() {
+            activeReplyTarget = null;
+            document.getElementById("replyBanner").classList.remove("active");
+        };
+
+        document.getElementById("forwardAction").onclick = function() {
+            if (!selectedMessageForAction) return;
+            localStorage.setItem("forwardMessage", JSON.stringify(selectedMessageForAction));
+            window.location.href = "forward.html";
+        };
+
+        document.getElementById("copyAction").onclick = function() {
+            if (selectedMessageForAction?.text) {
+                navigator.clipboard.writeText(selectedMessageForAction.text);
+            }
+            document.getElementById("messageActions").style.display = "none";
+        };
 
         function listenForMessages(cId, activeUid) {
-            const messagesQuery = query(
-                collection(db, "chats", cId, "messages"),
-                orderBy("createdAt", "asc")
-            );
-
-            onSnapshot(messagesQuery, async (snapshot) => {
+            const q = query(collection(db, "chats", cId, "messages"), orderBy("createdAt", "asc"));
+            onSnapshot(q, async (snapshot) => {
                 messagesList.innerHTML = "";
-                if (snapshot.empty) {
-                    messagesList.innerHTML = `<p style="color:#555; text-align:center; margin: auto;">No signals yet. Leave your mark!</p>`;
-                } else {
-                    await markMessagesAsSeenOrDelivered(snapshot, activeUid);
-                }
-
-                // Render all messages with dynamic live profiles
                 for (const docSnap of snapshot.docs) {
-                    const msg = docSnap.data();
-                    const renderedHTML = await renderMessage(msg, docSnap.id);
-                    messagesList.insertAdjacentHTML("beforeend", renderedHTML);
+                    const rendered = await renderMessage(docSnap.data(), docSnap.id);
+                    messagesList.insertAdjacentHTML("beforeend", rendered);
                 }
-                
-                attachSwipeGestures();
                 messagesList.scrollTop = messagesList.scrollHeight;
-            }, (error) => {
-                console.error("Realtime Messages Error:", error);
             });
         }
 
@@ -725,50 +710,33 @@
             const text = messageInput.value.trim();
             if (!text || !chatId) return;
 
-            messageInput.disabled = true;
+            const payload = {
+                text: text,
+                senderId: currentUserId,
+                type: "text",
+                status: "sent",
+                createdAt: serverTimestamp()
+            };
 
-            try {
-                const now = serverTimestamp();
-                const activeUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
-                
-                const messagePayload = {
-                    text: text,
-                    senderId: activeUid,
-                    type: "text",
-                    status: "sent",
-                    createdAt: now
+            if (activeReplyTarget) {
+                payload.replyTo = {
+                    id: activeReplyTarget.id,
+                    senderName: activeReplyTarget.senderName,
+                    text: activeReplyTarget.text
                 };
-
-                if (activeReplyTarget) {
-                    messagePayload.replyTo = {
-                        id: activeReplyTarget.id,
-                        senderName: activeReplyTarget.senderName,
-                        text: activeReplyTarget.text
-                    };
-                }
-
-                await addDoc(collection(db, "chats", chatId, "messages"), messagePayload);
-
-                const chatRef = doc(db, "chats", chatId);
-                await updateDoc(chatRef, {
-                    lastMessage: text,
-                    lastSenderId: activeUid,
-                    isRead: false,
-                    updatedAt: now
-                });
-
-                messageInput.value = "";
-                clearReplyTarget();
-                messageInput.focus();
-            } catch (error) {
-                console.error("Error sending message:", error);
-            } finally {
-                messageInput.disabled = false;
             }
+
+            messageInput.value = "";
+            document.getElementById("replyBanner").classList.remove("active");
+
+            await addDoc(collection(db, "chats", chatId, "messages"), payload);
+            await updateDoc(doc(db, "chats", chatId), {
+                lastMessage: text,
+                lastSenderId: currentUserId,
+                updatedAt: serverTimestamp(),
+                [`typing.${currentUserId}`]: false
+            });
         });
     </script>
-
-    <!-- Bottom Nav Injector -->
-    <script src="navbar.js"></script>
 </body>
 </html>

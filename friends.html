@@ -25,14 +25,6 @@
             transition: transform 0.04s linear;
         }
 
-        #particles-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            pointer-events: none;
-            z-index: 1;
-        }
-
         .ambient-smoke {
             position: fixed;
             inset: 0;
@@ -198,7 +190,6 @@
 <body>
 
     <div id="mouse-glow"></div>
-    <canvas id="particles-canvas"></canvas>
     <div class="ambient-smoke"></div>
 
     <header>
@@ -256,7 +247,6 @@
         let currentUserId = null;
         let cachedUsers = [];
 
-        // Pre-fetch user list when auth state settles
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUserId = user.uid;
@@ -285,7 +275,6 @@
                 return;
             }
 
-            // Fallback fetch if cache was empty on load
             if (cachedUsers.length === 0) {
                 resultsList.innerHTML = `<div class="empty-state">Searching database...</div>`;
                 await preloadUsers();
@@ -342,60 +331,13 @@
         });
     </script>
 
-    <!-- Canvas Background Animation -->
+    <!-- Mouse Glow Script -->
     <script>
         const glow = document.getElementById('mouse-glow');
         window.addEventListener('mousemove', (e) => {
             glow.style.left = e.clientX + 'px';
             glow.style.top = e.clientY + 'px';
         });
-
-        const canvas = document.getElementById('particles-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        class Particle {
-            constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 1;
-                this.speedX = (Math.random() - 0.5) * 0.5;
-                this.speedY = (Math.random() - 0.5) * 0.5 - 0.2;
-                this.opacity = Math.random() * 0.6 + 0.2;
-                this.color = Math.random() > 0.5 ? '#5CFF72' : '#FF7A00';
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-                    this.reset();
-                }
-            }
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.globalAlpha = this.opacity;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        for (let i = 0; i < 60; i++) particles.push(new Particle());
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
     </script>
 </body>
 </html>

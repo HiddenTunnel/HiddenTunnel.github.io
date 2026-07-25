@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forward Message - Underground Chat</title>
+    <meta name="theme-color" content="#050505">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --green: #5CFF72; --orange: #FF7A00; --bg: #080808; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg); color: #fff; font-family: 'Outfit', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 16px; }
+        .forward-container { width: 100%; max-width: 550px; background: #111; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.8); margin-top: 10px; }
+        .forward-header { padding: 16px 20px; background: #181818; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; }
+        .forward-header h2 { font-size: 1.1rem; font-weight: 600; color: #fff; }
+        .close-btn { background: transparent; border: none; color: #888; font-size: 1.5rem; cursor: pointer; }
+        .preview-box { background: #161616; margin: 14px 16px; padding: 12px 16px; border-left: 4px solid var(--green); border-radius: 8px; }
+        .preview-title { font-size: 0.75rem; color: var(--green); font-weight: 700; margin-bottom: 4px; text-transform: uppercase; }
+        .preview-text { font-size: 0.9rem; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .search-box { padding: 0 16px 12px 16px; }
+        .search-box input { width: 100%; background: #1a1a1a; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; padding: 10px 16px; color: #fff; outline: none; font-size: 0.88rem; }
+        .search-box input:focus { border-color: var(--green); }
+        .targets-list { max-height: 50vh; overflow-y: auto; padding: 0 16px 16px 16px; display: flex; flex-direction: column; gap: 8px; }
+        .target-card { display: flex; align-items: center; justify-content: space-between; background: #181818; padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; transition: all 0.2s ease; }
+        .target-card.selected { border: 2px solid var(--green); background: rgba(92, 255, 114, 0.05); }
+        .target-info { display: flex; align-items: center; gap: 12px; }
+        .target-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid var(--green); }
+        .checkbox-indicator { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #555; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #000; font-weight: bold; }
+        .target-card.selected .checkbox-indicator { background: var(--green); border-color: var(--green); }
+        .forward-footer { padding: 14px 16px; background: #181818; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; }
+        .selected-count { font-size: 0.85rem; color: #aaa; }
+        .send-forward-btn { background: var(--green); color: #000; border: none; padding: 10px 24px; border-radius: 30px; font-weight: 800; font-size: 0.88rem; cursor: pointer; }
+        .send-forward-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+    <div class="forward-container">
+        <div class="forward-header">
+            <h2>Forward Message</h2>
+            <button class="close-btn" id="cancelBtn">✕</button>
+        </div>
+
+        <div class="preview-box">
+            <div class="preview-title" id="previewAuthor">Forwarding Message</div>
+            <div class="preview-text" id="previewText">Loading message...</div>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search chats...">
+        </div>
+
+        <div class="targets-list" id="targetsList">
+            <p style="color:#666; text-align:center; padding:20px;">Loading...</p>
+        </div>
+
+        <div class="forward-footer">
+            <span class="selected-count" id="selectedCount">0 selected</span>
+            <button class="send-forward-btn" id="sendForwardBtn" disabled>SEND ➔</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { 
+            getFirestore, collection, addDoc, doc, getDoc, getDocs, updateDoc, query, where, serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+            authDomain: "urbannoir-13ce8.firebaseapp.com",
+            projectId: "urbannoir-13ce8",
+            storageBucket: "urbannoir-13ce8.firebasestorage.app",
+            messagingSenderId: "1059246827383",
+            appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
+            measurementId: "G-CEPWKZXQVF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        const defaultAvatar = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
+
+        const forwardDataRaw = localStorage.getItem("forwardMessage");
+        if (!forwardDataRaw) {
+            alert("No message selected to forward!");
+            window.history.back();
+        }
+
+        const forwardMessage = JSON.parse(forwardDataRaw);
+
+        document.getElementById("previewAuthor").textContent = `Forwarding from ${forwardMessage.senderName || 'Chat'}`;
+        document.getElementById("previewText").textContent = forwardMessage.text || (forwardMessage.imageURL ? "[Image]" : "[File]");
+
+        let currentUserId = localStorage.getItem("ug_current_user_id");
+        let selectedTargets = new Map();
+        let allTargetsList = [];
+
+        const targetsList = document.getElementById("targetsList");
+        const searchInput = document.getElementById("searchInput");
+        const selectedCount = document.getElementById("selectedCount");
+        const sendForwardBtn = document.getElementById("sendForwardBtn");
+        const cancelBtn = document.getElementById("cancelBtn");
+
+        cancelBtn.addEventListener("click", () => window.history.back());
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                loadForwardTargets();
+            } else if (currentUserId) {
+                loadForwardTargets();
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        async function loadForwardTargets() {
+            try {
+                targetsList.innerHTML = "";
+                allTargetsList = [];
+
+                const chatsQ = query(collection(db, "chats"), where("members", "array-contains", currentUserId));
+                const chatsSnap = await getDocs(chatsQ);
+
+                for (const chatDoc of chatsSnap.docs) {
+                    const data = chatDoc.data();
+                    const peerUid = data.members.find(id => id !== currentUserId);
+                    if (!peerUid) continue;
+
+                    const peerSnap = await getDoc(doc(db, "users", peerUid));
+                    const peerData = peerSnap.exists() ? peerSnap.data() : {};
+
+                    allTargetsList.push({
+                        targetId: chatDoc.id,
+                        peerUid: peerUid,
+                        name: peerData.fullName || peerData.name || "User",
+                        photo: peerData.photo || defaultAvatar,
+                        isGroup: false
+                    });
+                }
+
+                renderTargets(allTargetsList);
+            } catch (err) {
+                console.error("Error loading targets:", err);
+            }
+        }
+
+        function renderTargets(list) {
+            targetsList.innerHTML = "";
+            if (list.length === 0) {
+                targetsList.innerHTML = `<p style="color:#666; text-align:center; padding:20px;">No chats found.</p>`;
+                return;
+            }
+
+            list.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "target-card" + (selectedTargets.has(item.targetId) ? " selected" : "");
+
+                card.innerHTML = `
+                    <div class="target-info">
+                        <img class="target-avatar" src="${item.photo}">
+                        <span class="target-name">${item.name}</span>
+                    </div>
+                    <div class="checkbox-indicator">${selectedTargets.has(item.targetId) ? '✓' : ''}</div>
+                `;
+
+                card.addEventListener("click", () => {
+                    if (selectedTargets.has(item.targetId)) {
+                        selectedTargets.delete(item.targetId);
+                        card.classList.remove("selected");
+                        card.querySelector(".checkbox-indicator").textContent = "";
+                    } else {
+                        selectedTargets.set(item.targetId, item);
+                        card.classList.add("selected");
+                        card.querySelector(".checkbox-indicator").textContent = "✓";
+                    }
+                    updateUIState();
+                });
+
+                targetsList.appendChild(card);
+            });
+        }
+
+        function updateUIState() {
+            const count = selectedTargets.size;
+            selectedCount.textContent = `${count} selected`;
+            sendForwardBtn.disabled = count === 0;
+        }
+
+        searchInput.addEventListener("input", () => {
+            const queryText = searchInput.value.trim().toLowerCase();
+            const filtered = allTargetsList.filter(t => t.name.toLowerCase().includes(queryText));
+            renderTargets(filtered);
+        });
+
+        // FIXED: Re-generating serverTimestamp() per iteration in loop
+        sendForwardBtn.addEventListener("click", async () => {
+            if (selectedTargets.size === 0) return;
+
+            sendForwardBtn.disabled = true;
+            sendForwardBtn.textContent = "SENDING...";
+
+            try {
+                for (const [targetId, item] of selectedTargets) {
+                    const messagePayload = {
+                        text: forwardMessage.text || "",
+                        senderId: currentUserId,
+                        type: forwardMessage.imageURL ? "image" : (forwardMessage.fileURL ? "file" : "text"),
+                        isForwarded: true,
+                        forwardedFrom: {
+                            senderName: forwardMessage.senderName || "Unknown",
+                            originalMessageId: forwardMessage.id || null
+                        },
+                        status: "sent",
+                        createdAt: serverTimestamp() // FIXED
+                    };
+
+                    if (forwardMessage.imageURL) messagePayload.imageURL = forwardMessage.imageURL;
+                    if (forwardMessage.fileURL) messagePayload.fileURL = forwardMessage.fileURL;
+
+                    await addDoc(collection(db, "chats", targetId, "messages"), messagePayload);
+                    await updateDoc(doc(db, "chats", targetId), {
+                        lastMessage: `↪ Forwarded: ${forwardMessage.text || 'Media'}`,
+                        lastSenderId: currentUserId,
+                        isRead: false,
+                        updatedAt: serverTimestamp() // FIXED
+                    });
+                }
+
+                localStorage.removeItem("forwardMessage");
+                alert("Message forwarded successfully!");
+                window.history.back();
+
+            } catch (err) {
+                console.error("Forward Error:", err);
+                alert("Failed to forward message.");
+                sendForwardBtn.disabled = false;
+                sendForwardBtn.textContent = "SEND ➔";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -46,12 +46,6 @@
             }
         }
 
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 5px rgba(255, 77, 77, 0.2); }
-            50% { box-shadow: 0 0 15px rgba(255, 77, 77, 0.5); }
-            100% { box-shadow: 0 0 5px rgba(255, 77, 77, 0.2); }
-        }
-
         /* Thinner Top Navigation Header */
         header {
             width: 100%;
@@ -123,46 +117,6 @@
             color: var(--green);
             background: rgba(92, 255, 114, 0.08);
             transform: translateY(-2px);
-        }
-
-        .nav-btn-group {
-            display: flex;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        /* Animated Thin Top Logout Button */
-        .btn-logout {
-            background: rgba(255, 77, 77, 0.08);
-            border: 1px solid rgba(255, 77, 77, 0.35);
-            color: #ff4d4d;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            white-space: nowrap;
-        }
-
-        .btn-logout svg {
-            width: 15px;
-            height: 15px;
-            transition: transform 0.3s ease;
-        }
-
-        .btn-logout:hover {
-            background: rgba(255, 77, 77, 0.2);
-            border-color: #ff4d4d;
-            transform: translateY(-1px);
-            animation: pulseGlow 1.5s infinite;
-        }
-
-        .btn-logout:hover svg {
-            transform: translateX(3px);
         }
 
         /* Bottom Navigation Bar */
@@ -315,6 +269,8 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             cursor: pointer;
             transition: all 0.2s ease;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .chat-card:hover {
@@ -351,23 +307,6 @@
             margin: 0;
         }
 
-        .start-chat-btn {
-            background: transparent;
-            border: 1px solid var(--green, #5CFF72);
-            color: var(--green, #5CFF72);
-            padding: 6px 14px;
-            border-radius: 18px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .start-chat-btn:hover {
-            background: var(--green, #5CFF72);
-            color: #000;
-        }
-
         @media (max-width: 768px) {
             header {
                 padding: 8px 12px;
@@ -385,6 +324,63 @@
                 margin-top: 75px;
                 margin-bottom: 80px;
             }
+        }
+
+        .group-create-area {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
+
+        #createGroupBtn {
+            background: #5CFF72;
+            color: #000;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        #createGroupBtn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Selection Bar Styles */
+        #selectionBar {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            display: flex;
+            gap: 10px;
+            background: rgba(20, 20, 20, 0.95);
+            padding: 8px 16px;
+            border-radius: 30px;
+            border: 1px solid rgba(92, 255, 114, 0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        #createSelectedGroup {
+            background: #5CFF72;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        #cancelSelection {
+            background: #222;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -405,17 +401,6 @@
                 <li><a href="notification.html">🔔 Notifications</a></li>
                 <li><a href="settings.html">⚙ Settings</a></li>
             </ul>
-
-            <div class="nav-btn-group">
-                <button id="logoutBtn" class="btn-logout" title="Logout">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ff4d4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" />
-                        <line x1="21" y1="12" x2="9" y2="12" />
-                    </svg>
-                    <span>Logout</span>
-                </button>
-            </div>
         </nav>
     </header>
 
@@ -424,13 +409,29 @@
             <h2>Underground <span>Messages</span></h2>
         </div>
 
+        <div class="group-create-area">
+            <button id="createGroupBtn">
+                ➕ Create Group
+            </button>
+        </div>
+
+        <!-- Floating Selection Bar -->
+        <div id="selectionBar" style="display:none;">
+            <button id="createSelectedGroup">
+                Create Group
+            </button>
+            <button id="cancelSelection">
+                Cancel
+            </button>
+        </div>
+
         <!-- 🔍 Search Box -->
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="Type Name or 8-digit ID..." autocomplete="off">
             <button id="searchBtn" class="search-btn">SEARCH</button>
         </div>
 
-        <div class="section-title" id="listTitle">Recent Conversations</div>
+        <div class="section-title" id="listTitle">Chats & Groups</div>
 
         <div class="user-list" id="userList">
             <!-- Dynamic Users/Chats -->
@@ -485,7 +486,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, setDoc, query, where, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
@@ -500,6 +501,17 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+
+        // Selection State
+        let selectedUsers = new Set();
+        let selectionMode = false;
+
+        // Unsubscribe Listeners Tracking
+        let unsubscribeChats;
+        let unsubscribeGroups;
+
+        // Displayed Cards Tracker for Group & User Uniqueness Check
+        let displayedCards = new Set();
 
         // Default Avatar Fallback
         const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235CFF72'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>";
@@ -522,65 +534,179 @@
             }
         });
 
-        // Top Navigation Logout Handler
-        document.getElementById("logoutBtn").addEventListener("click", async () => {
-            try {
-                await signOut(auth);
-                localStorage.removeItem("ug_current_user_id");
-                window.location.href = "login.html";
-            } catch (err) {
-                console.error("Logout failed:", err);
-            }
-        });
-
-        // 1. Load Recent Messenger List
+        // 1. Load Recent Chats & Groups
         function loadRecentChats() {
-            listTitle.textContent = "Recent Conversations";
-            userList.innerHTML = `<p style="color:#666; text-align:center; padding: 15px;">Loading...</p>`;
+            // Clean up previous listeners
+            if (unsubscribeChats) unsubscribeChats();
+            if (unsubscribeGroups) unsubscribeGroups();
 
+            displayedCards.clear();
+
+            listTitle.textContent = "Chats & Groups";
+            userList.innerHTML = `<p style="color:#666;text-align:center;padding:15px">Loading chats...</p>`;
+
+            let loadedChatIds = new Set();
+
+            // PRIVATE CHAT LOAD
             const chatsRef = collection(db, "chats");
             const q = query(chatsRef, where("members", "array-contains", currentUserId));
 
-            onSnapshot(q, async (snapshot) => {
-                if (snapshot.empty) {
-                    userList.innerHTML = `<p style="color:#666; text-align:center; padding: 15px;">No chats. Search users above!</p>`;
-                    return;
-                }
-
+            unsubscribeChats = onSnapshot(q, (snapshot) => {
                 userList.innerHTML = "";
-                for (let chatDoc of snapshot.docs) {
+                loadedChatIds.clear();
+
+                snapshot.forEach((chatDoc) => {
+                    if (loadedChatIds.has(chatDoc.id)) return;
+                    loadedChatIds.add(chatDoc.id);
+
                     const data = chatDoc.data();
                     const peerUid = data.members.find(id => id !== currentUserId);
 
-                    if (peerUid) {
-                        const userDoc = await getDoc(doc(db, "users", peerUid));
-                        const peerData = userDoc.exists() ? userDoc.data() : {};
+                    if (!peerUid) return;
 
-                        const displayName = peerData.fullName || peerData.name || peerData.displayName || peerData.username || `User (${peerUid.slice(0, 5)})`;
-                        const avatarUrl = peerData.photo || peerData.photoURL || peerData.avatar || defaultAvatar;
+                    getDoc(doc(db, "users", peerUid)).then(userSnap => {
+                        const userData = userSnap.exists() ? userSnap.data() : {};
 
-                        const card = document.createElement('div');
-                        card.className = 'chat-card';
-                        card.innerHTML = `
-                            <div class="user-info">
-                                <img class="user-avatar" src="${avatarUrl}" alt="User">
-                                <div class="user-details">
-                                    <h4>${displayName}</h4>
-                                    <p class="last-msg">${data.lastMessage || 'Message now'}</p>
-                                </div>
-                            </div>
-                        `;
-                        card.addEventListener('click', () => {
-                            window.location.href = `chat.html?chatId=${chatDoc.id}&peerUid=${peerUid}`;
-                        });
-                        userList.appendChild(card);
-                    }
-                }
+                        addChatCard({
+                            id: peerUid,
+                            chatId: chatDoc.id,
+                            name: userData.fullName || "User",
+                            photo: userData.photo || defaultAvatar,
+                            last: data.lastMessage || "Message"
+                        }, false);
+                    });
+                });
+            });
+
+            // GROUP CHAT LOAD
+            const groupsRef = collection(db, "groups");
+            const groupQuery = query(groupsRef, where("members", "array-contains", currentUserId));
+
+            unsubscribeGroups = onSnapshot(groupQuery, (snapshot) => {
+                snapshot.forEach(groupDoc => {
+                    const group = groupDoc.data();
+
+                    addChatCard({
+                        id: groupDoc.id,
+                        name: "👥 " + group.groupName,
+                        photo: group.groupPhoto || defaultAvatar,
+                        last: group.lastMessage || "Group created"
+                    }, true);
+                });
             });
         }
 
-        // 2. Realtime Search Logic (With Debounce & Duplicate Prevention)
+        // Add Chat Card Function
+        function addChatCard(data, isGroup) {
+            let uniqueKey = isGroup ? "group_" + data.id : "user_" + data.id;
+
+            if (displayedCards.has(uniqueKey)) {
+                return;
+            }
+
+            displayedCards.add(uniqueKey);
+
+            const card = document.createElement("div");
+            card.className = "chat-card";
+
+            card.innerHTML = `
+                <div class="user-info">
+                    <img class="user-avatar" src="${data.photo}">
+                    <div class="user-details">
+                        <h4>${data.name}</h4>
+                        <p class="last-msg">${data.last}</p>
+                    </div>
+                </div>
+            `;
+
+            let pressTimer;
+
+            // Long Press Handlers
+            card.addEventListener("mousedown", startPress);
+            card.addEventListener("mouseup", cancelPress);
+            card.addEventListener("mouseleave", cancelPress);
+
+            card.addEventListener("touchstart", startPress);
+            card.addEventListener("touchend", cancelPress);
+
+            function startPress() {
+                pressTimer = setTimeout(() => {
+                    if (!isGroup) {
+                        selectionMode = true;
+                        toggleSelect(card, data.id);
+                    }
+                }, 600);
+            }
+
+            function cancelPress() {
+                clearTimeout(pressTimer);
+            }
+
+            // Click Handler with Selection Mode Fix
+            card.addEventListener("click", () => {
+                if (selectionMode && !isGroup) {
+                    toggleSelect(card, data.id);
+                    return;
+                }
+
+                if (isGroup) {
+                    location.href = "groupchat.html?groupId=" + data.id;
+                } else {
+                    const chatId = data.chatId || (currentUserId < data.id ? `${currentUserId}_${data.id}` : `${data.id}_${currentUserId}`);
+                    location.href = `chat.html?chatId=${chatId}&peerUid=${data.id}`;
+                }
+            });
+
+            userList.appendChild(card);
+        }
+
+        // Toggle Selection Handler
+        function toggleSelect(card, id) {
+            if (selectedUsers.has(id)) {
+                selectedUsers.delete(id);
+                card.style.border = "";
+            } else {
+                selectedUsers.add(id);
+                card.style.border = "2px solid #5CFF72";
+            }
+
+            if (selectedUsers.size === 0) {
+                selectionMode = false;
+                document.getElementById("selectionBar").style.display = "none";
+            } else {
+                document.getElementById("selectionBar").style.display = "flex";
+            }
+        }
+
+        // Cancel Selection Listener
+        document.getElementById("cancelSelection").onclick = () => {
+            selectedUsers.clear();
+            selectionMode = false;
+            document.querySelectorAll(".chat-card").forEach(c => {
+                c.style.border = "";
+            });
+            document.getElementById("selectionBar").style.display = "none";
+        };
+
+        // Create Selected Group Listener
+        document.getElementById("createSelectedGroup").addEventListener("click", () => {
+            if (selectedUsers.size < 1) {
+                alert("Select members first");
+                return;
+            }
+
+            localStorage.setItem(
+                "selectedGroupMembers",
+                JSON.stringify(Array.from(selectedUsers))
+            );
+
+            window.location.href = "create-group.html";
+        });
+
+        // Search Handlers
         async function performSearch() {
+            displayedCards.clear();
+
             const queryText = searchInput.value.trim().toLowerCase();
 
             if (!queryText) {
@@ -611,7 +737,13 @@
                     if (name.includes(queryText) || versityId.includes(queryText)) {
                         foundCount++;
                         addedUids.add(targetUid);
-                        renderUserSearchResult(targetUid, userData);
+                        
+                        addChatCard({
+                            id: targetUid,
+                            name: userData.fullName || "Anonymous",
+                            photo: userData.photo || defaultAvatar,
+                            last: `ID: ${userData.versityId || 'N/A'}`
+                        }, false);
                     }
                 });
 
@@ -624,51 +756,15 @@
             }
         }
 
-        function renderUserSearchResult(targetUid, userData) {
-            const displayName = userData.fullName || userData.name || userData.displayName || userData.username || 'Anonymous';
-            const avatarUrl = userData.photo || userData.photoURL || userData.avatar || defaultAvatar;
-
-            const card = document.createElement('div');
-            card.className = 'chat-card';
-            card.innerHTML = `
-                <div class="user-info">
-                    <img class="user-avatar" src="${avatarUrl}" alt="User">
-                    <div class="user-details">
-                        <h4>${displayName}</h4>
-                        <p class="last-msg">ID: ${userData.versityId || 'N/A'}</p>
-                    </div>
-                </div>
-                <button class="start-chat-btn">MESSAGE</button>
-            `;
-
-            card.addEventListener('click', () => startChat(targetUid));
-            userList.appendChild(card);
-        }
-
-        async function startChat(targetUid) {
-            const chatId = currentUserId < targetUid ? `${currentUserId}_${targetUid}` : `${targetUid}_${currentUserId}`;
-            const chatRef = doc(db, "chats", chatId);
-            const chatSnap = await getDoc(chatRef);
-
-            if (!chatSnap.exists()) {
-                await setDoc(chatRef, {
-                    chatId: chatId,
-                    members: [currentUserId, targetUid],
-                    lastMessage: "",
-                    lastSenderId: "",
-                    isRead: true,
-                    updatedAt: serverTimestamp()
-                });
-            }
-            window.location.href = `chat.html?chatId=${chatId}&peerUid=${targetUid}`;
-        }
-
         searchBtn.addEventListener('click', performSearch);
 
-        // Smooth search input debouncing
         searchInput.addEventListener('input', () => {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(performSearch, 300);
+        });
+
+        document.getElementById("createGroupBtn").addEventListener("click", () => {
+            window.location.href = "create-group.html";
         });
     </script>
 

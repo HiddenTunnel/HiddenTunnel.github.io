@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Underground Chat - Login</title>
-  <meta name="theme-color" content="#050505">
+  <meta name="theme-color" content="#000000">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,13 +12,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
 
   <!-- External Stylesheet -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="login.css">
 </head>
-<body style="display: flex; align-items: center; justify-content: center; overflow: hidden;">
+<body>
 
-  <!-- Ambient FX -->
-  <div id="mouse-glow"></div>
-  <canvas id="particles-canvas"></canvas>
+  <!-- Real Concrete Background Layer -->
+  <div class="concrete-bg">
+<img src ="assets/svg/graffiti-wall.svg"
+> </div>
+  <!-- Real Graffiti Wall SVG Layer -->
+  <img src="assets/svg/graffiti-wall.svg" class="graffiti-bg" alt="Graffiti Art">
 
   <!-- Login Modal Box -->
   <div class="login-card">
@@ -40,181 +43,8 @@
     </div>
   </div>
 
-  <!-- Interactive Visual Scripts -->
-  <script>
-    // Mouse Glow Track
-    const glow = document.getElementById('mouse-glow');
-    window.addEventListener('mousemove', (e) => {
-      glow.style.left = e.clientX + 'px';
-      glow.style.top = e.clientY + 'px';
-    });
-
-    // Background Particle Canvas
-    const canvas = document.getElementById('particles-canvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    class Particle {
-      constructor() { this.reset(); }
-      reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 1;
-        this.speedX = (Math.random() - 0.5) * 0.5;
-        this.speedY = (Math.random() - 0.5) * 0.5 - 0.2;
-        this.opacity = Math.random() * 0.6 + 0.2;
-        this.color = Math.random() > 0.5 ? '#5CFF72' : '#FF7A00';
-      }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-          this.reset();
-        }
-      }
-      draw() {
-        ctx.fillStyle = this.color;
-        ctx.globalAlpha = this.opacity;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    for (let i = 0; i < 40; i++) particles.push(new Particle());
-
-    function animateParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => { p.update(); p.draw(); });
-      requestAnimationFrame(animateParticles);
-    }
-    animateParticles();
-  </script>
-
-  <!-- Firebase Auth & Persistence Logic -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-        getAuth,
-        GoogleAuthProvider,
-        signInWithPopup,
-        setPersistence,
-        browserLocalPersistence,
-        onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-    import {
-      getFirestore,
-      doc,
-      getDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
-        authDomain: "urbannoir-13ce8.firebaseapp.com",
-        projectId: "urbannoir-13ce8",
-        storageBucket: "urbannoir-13ce8.firebasestorage.app",
-        messagingSenderId: "1059246827383",
-        appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
-        measurementId: "G-CEPWKZXQVF"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
-
-    const googleLoginBtn = document.getElementById("googleLoginBtn");
-    let isLoginLocked = false;
-
-    // 1️⃣ FAST AUTO-RECOVERY & SESSION CHECK
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            googleLoginBtn.textContent = "Recognizing user...";
-            googleLoginBtn.style.opacity = "0.7";
-            googleLoginBtn.style.cursor = "wait";
-            isLoginLocked = true;
-
-            localStorage.setItem("ug_current_user_id", user.uid);
-            
-            try {
-                const snap = await getDoc(doc(db, "users", user.uid));
-                if (snap.exists()) {
-                    window.location.href = "index.html";
-                } else {
-                    window.location.href = "createaccount.html";
-                }
-            } catch (err) {
-                console.error("Auto login check error:", err);
-                isLoginLocked = false;
-                googleLoginBtn.textContent = "Continue with Google";
-                googleLoginBtn.style.opacity = "1";
-                googleLoginBtn.style.cursor = "pointer";
-            }
-        }
-    });
-
-    // 2️⃣ GOOGLE LOGIN WITH 7s COOLDOWN LOCK & FAST FEEDBACK
-    googleLoginBtn.addEventListener("click", async () => {
-        if (isLoginLocked) return;
-
-        isLoginLocked = true;
-        googleLoginBtn.style.opacity = "0.6";
-        googleLoginBtn.style.cursor = "not-allowed";
-
-        let countdown = 7;
-        const originalText = googleLoginBtn.textContent;
-        
-        const lockTimer = setInterval(() => {
-            if (countdown > 0) {
-                googleLoginBtn.textContent = `Please wait (${countdown}s)...`;
-                countdown--;
-            } else {
-                clearInterval(lockTimer);
-                isLoginLocked = false;
-                googleLoginBtn.textContent = originalText;
-                googleLoginBtn.style.opacity = "1";
-                googleLoginBtn.style.cursor = "pointer";
-            }
-        }, 1000);
-
-        try {
-            googleLoginBtn.textContent = "Connecting to tunnel...";
-            await setPersistence(auth, browserLocalPersistence);
-            
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-
-            localStorage.setItem("ug_current_user_id", user.uid);
-
-            const snap = await getDoc(doc(db, "users", user.uid));
-
-            if (snap.exists()) {
-                window.location.href = "index.html";
-            } else {
-                window.location.href = "createaccount.html";
-            }
-
-        } catch (error) {
-            console.error("Login Error:", error);
-            if (error.code !== 'auth/popup-closed-by-user') {
-                alert(error.message);
-            }
-            clearInterval(lockTimer);
-            isLoginLocked = false;
-            googleLoginBtn.textContent = originalText;
-            googleLoginBtn.style.opacity = "1";
-            googleLoginBtn.style.cursor = "pointer";
-        }
-    });
-  </script>
+  <!-- External Authentication Script -->
+  <script type="module" src="login.js"></script>
 
 </body>
 </html>
