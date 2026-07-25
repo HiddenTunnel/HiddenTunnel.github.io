@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Underground Tunnel - Leave Your Mark</title>
+  <title>Underground Chat - Login</title>
   <meta name="theme-color" content="#050505">
 
   <!-- Google Fonts -->
@@ -11,837 +11,45 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
 
+  <!-- External Stylesheet -->
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* Base resets & theme colors */
-    :root {
-      --green: #5CFF72;
-      --orange: #FF7A00;
-      --red: #FF4D4D;
-      --bg: #050505;
-      --nav-bg: rgba(5, 5, 5, 0.85);
-      --transition-smooth: cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background-color: var(--bg);
-      color: #ffffff;
-      font-family: 'Outfit', sans-serif;
-      overflow-x: hidden;
-      min-height: 100vh;
-      position: relative;
-      padding-bottom: 80px;
-    }
-
-    /* Ambient FX & Backgrounds */
-    #graffiti-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-image: url('assets/svg/graffiti-wall.svg');
-      background-size: cover;
-      background-position: center;
-      opacity: 0.18;
-      pointer-events: none;
-      z-index: 0;
-      transition: transform 0.2s var(--transition-smooth);
-      will-change: transform;
-    }
-
-    #mouse-glow {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 450px;
-      height: 450px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(92, 255, 114, 0.12) 0%, rgba(255, 122, 0, 0.05) 45%, transparent 70%);
-      pointer-events: none;
-      z-index: 2;
-      transform: translate(-50%, -50%);
-      transition: transform 0.05s linear;
-    }
-
-    #particles-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    /* 📱 MOBILE FLOATING TOP BAR */
-    .mobile-top-bar {
-      display: none;
-      position: fixed;
-      top: 14px;
-      left: 0;
-      width: 100%;
-      padding: 0 16px;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 1000;
-      pointer-events: none;
-    }
-
-    .mobile-top-bar * {
-      pointer-events: auto;
-    }
-
-    /* Mobile Profile Pic (Top Left) */
-    .mobile-profile-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      border: 2px solid var(--green);
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-      transition: transform 0.3s var(--transition-smooth);
-      text-decoration: none;
-    }
-
-    .mobile-profile-btn img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .mobile-profile-btn:active {
-      transform: scale(0.92);
-    }
-
-    /* Mobile Logout Button (Top Right) */
-    .mobile-logout-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: rgba(18, 18, 18, 0.85);
-      border: 1px solid rgba(255, 77, 77, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-      transition: all 0.3s var(--transition-smooth);
-    }
-
-    .mobile-logout-btn img {
-      width: 20px;
-      height: 20px;
-    }
-
-    .mobile-logout-btn:active {
-      transform: scale(0.92);
-      background: rgba(255, 77, 77, 0.25);
-    }
-
-    /* 💻 DESKTOP NAVIGATION HEADER */
-    header {
-      width: 100%;
-      padding: 16px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--nav-bg);
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 100;
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    nav {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .brand-container {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    /* Desktop Profile Avatar (Top Left) */
-    .desktop-profile-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 2px solid var(--green);
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
-      transition: transform 0.3s var(--transition-smooth), box-shadow 0.3s ease;
-    }
-
-    .desktop-profile-btn img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .desktop-profile-btn:hover {
-      transform: scale(1.08);
-      box-shadow: 0 0 15px rgba(92, 255, 114, 0.4);
-    }
-
-    .logo {
-      font-family: 'Permanent Marker', cursive;
-      font-size: 1.7rem;
-      color: #fff;
-      text-decoration: none;
-      letter-spacing: 1px;
-      transition: transform 0.3s var(--transition-smooth);
-    }
-
-    .logo:hover {
-      transform: scale(1.05) rotate(-1deg);
-    }
-
-    .logo span {
-      color: var(--green);
-    }
-
-    /* Desktop Nav Links */
-    .desktop-nav {
-      display: flex;
-      gap: 12px;
-      list-style: none;
-      align-items: center;
-    }
-
-    .desktop-nav li a {
-      color: #aaa;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      border-radius: 20px;
-      transition: all 0.3s var(--transition-smooth);
-    }
-
-    .desktop-nav li a .nav-icon {
-      width: 18px;
-      height: 18px;
-      opacity: 0.7;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-
-    .desktop-nav li a:hover .nav-icon,
-    .desktop-nav li a.active .nav-icon {
-      opacity: 1;
-      transform: scale(1.1);
-    }
-
-    .desktop-nav li a:hover,
-    .desktop-nav li a.active {
-      color: var(--green);
-      background: rgba(92, 255, 114, 0.08);
-      transform: translateY(-2px);
-    }
-
-    /* Desktop Right Actions */
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .nav-btn .join {
-      background: var(--green);
-      color: #050505;
-      padding: 10px 22px;
-      border-radius: 30px;
-      font-weight: 800;
-      text-decoration: none;
-      transition: all 0.3s var(--transition-smooth);
-      box-shadow: 0 0 15px rgba(92, 255, 114, 0.3);
-      display: inline-block;
-    }
-
-    .nav-btn .join:hover {
-      transform: translateY(-3px) scale(1.03);
-      box-shadow: 0 0 25px rgba(92, 255, 114, 0.6);
-    }
-
-    .desktop-logout-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(255, 77, 77, 0.1);
-      border: 1px solid rgba(255, 77, 77, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s var(--transition-smooth);
-    }
-
-    .desktop-logout-btn img {
-      width: 18px;
-      height: 18px;
-    }
-
-    .desktop-logout-btn:hover {
-      background: rgba(255, 77, 77, 0.25);
-      border-color: var(--red);
-      transform: scale(1.08);
-      box-shadow: 0 0 15px rgba(255, 77, 77, 0.4);
-    }
-
-    /* Hero Section */
-    .hero {
-      max-width: 1100px;
-      margin: 140px auto 60px auto;
-      padding: 0 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      position: relative;
-      z-index: 10;
-      animation: fadeInUp 0.8s var(--transition-smooth);
-    }
-
-    .badge-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .badge {
-      border: 1px solid var(--orange);
-      color: var(--orange);
-      font-size: 0.78rem;
-      font-weight: 800;
-      padding: 5px 14px;
-      border-radius: 20px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      background: rgba(255, 122, 0, 0.08);
-      transition: all 0.3s ease;
-    }
-
-    .badge:hover {
-      background: rgba(255, 122, 0, 0.2);
-      transform: scale(1.05);
-    }
-
-    .rating-box {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      transition: all 0.3s ease;
-    }
-
-    .rating-box:hover {
-      border-color: rgba(255, 255, 255, 0.3);
-      transform: translateY(-2px);
-    }
-
-    .rating-stars { color: #FFD400; }
-    .rating-score { color: #fff; }
-
-    .hero-title {
-      font-size: clamp(2.5rem, 8vw, 5.2rem);
-      font-weight: 900;
-      line-height: 1.05;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-      letter-spacing: -1px;
-    }
-
-    .hero-title .desktop-title { display: inline; }
-    .hero-title .mobile-title { display: none; }
-
-    .hero-title .highlight {
-      font-family: 'Permanent Marker', cursive;
-      color: var(--green);
-      text-shadow: 0 0 20px rgba(92, 255, 114, 0.4);
-      display: inline-block;
-      transition: transform 0.3s var(--transition-smooth);
-    }
-
-    .hero-title .highlight:hover {
-      transform: scale(1.08) rotate(-2deg);
-    }
-
-    .hero-description {
-      color: #a5a5a5;
-      font-size: 1.1rem;
-      max-width: 580px;
-      margin-bottom: 36px;
-      line-height: 1.6;
-    }
-
-    .hero-buttons {
-      display: flex;
-      gap: 16px;
-      width: 100%;
-      max-width: 420px;
-      margin-bottom: 60px;
-    }
-
-    .btn-primary {
-      flex: 1;
-      background: var(--green);
-      color: #050505;
-      padding: 15px 28px;
-      font-size: 1rem;
-      font-weight: 800;
-      border-radius: 40px;
-      text-decoration: none;
-      box-shadow: 0 0 25px rgba(92, 255, 114, 0.35);
-      transition: all 0.3s var(--transition-smooth);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 0 35px rgba(92, 255, 114, 0.65);
-    }
-
-    .btn-secondary {
-      flex: 1;
-      background: transparent;
-      color: #fff;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      padding: 15px 28px;
-      font-size: 1rem;
-      font-weight: 700;
-      border-radius: 40px;
-      text-decoration: none;
-      transition: all 0.3s var(--transition-smooth);
-    }
-
-    .btn-secondary:hover {
-      border-color: #fff;
-      background: rgba(255, 255, 255, 0.05);
-      transform: translateY(-4px) scale(1.02);
-    }
-
-    /* Chat Mockup Card */
-    .chat-mockup {
-      width: 100%;
-      max-width: 420px;
-      background: #111111;
-      border: 2px solid rgba(255, 255, 255, 0.1);
-      border-radius: 24px;
-      padding: 24px;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(92, 255, 114, 0.1);
-      position: relative;
-      transition: transform 0.4s var(--transition-smooth), border-color 0.3s ease, box-shadow 0.3s ease;
-      will-change: transform;
-    }
-
-    .chat-mockup:hover {
-      transform: translateY(-8px) scale(1.02);
-      border-color: rgba(92, 255, 114, 0.4);
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9), 0 0 45px rgba(92, 255, 114, 0.25);
-    }
-
-    .crown-badge {
-      position: absolute;
-      top: -20px;
-      right: 24px;
-      width: 44px;
-      height: 44px;
-      background: #050505;
-      border: 2px solid var(--green);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 15px rgba(92, 255, 114, 0.4);
-      transition: transform 0.3s ease;
-    }
-
-    .chat-mockup:hover .crown-badge {
-      transform: rotate(15deg) scale(1.1);
-    }
-
-    .crown-badge img {
-      width: 24px;
-      height: 24px;
-    }
-
-    .chat-messages {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      text-align: left;
-    }
-
-    .msg {
-      padding: 12px 16px;
-      border-radius: 16px;
-      font-size: 0.92rem;
-      max-width: 85%;
-      position: relative;
-      transition: transform 0.2s ease;
-    }
-
-    .msg:hover { transform: scale(1.02); }
-
-    .msg-incoming {
-      background: #1e1e1e;
-      color: #ddd;
-      align-self: flex-start;
-      border-bottom-left-radius: 4px;
-    }
-
-    .msg-outgoing {
-      background: var(--green);
-      color: #000;
-      font-weight: 700;
-      align-self: flex-end;
-      border-bottom-right-radius: 4px;
-    }
-
-    /* Mobile Bottom Navigation Bar */
-    .mobile-bottom-nav {
-      display: none;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: rgba(18, 18, 18, 0.95);
-      backdrop-filter: blur(15px);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      justify-content: space-around;
-      align-items: center;
-      padding: 10px 0;
-      z-index: 1000;
-      animation: slideUp 0.5s var(--transition-smooth);
-    }
-
-    .mobile-bottom-nav a {
-      color: #888;
-      text-decoration: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      transition: all 0.3s var(--transition-smooth);
-    }
-
-    .mobile-bottom-nav a .nav-icon {
-      width: 22px;
-      height: 22px;
-      transition: transform 0.3s var(--transition-smooth);
-    }
-
-    .mobile-bottom-nav a:hover,
-    .mobile-bottom-nav a.active {
-      color: var(--green);
-    }
-
-    .mobile-bottom-nav a:hover .nav-icon,
-    .mobile-bottom-nav a.active .nav-icon {
-      transform: translateY(-3px) scale(1.1);
-    }
-
-    /* Keyframes */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-
-    /* Responsive Queries */
-    @media (max-width: 768px) {
-      header { display: none !important; }
-      .mobile-top-bar { display: flex; }
-      .hero-title .desktop-title { display: none; }
-      .hero-title .mobile-title {
-        display: inline;
-        font-family: 'Permanent Marker', cursive;
-        letter-spacing: 0.5px;
-      }
-      .mobile-bottom-nav { display: flex; }
-      .hero { margin-top: 70px; }
-      .hero-buttons { flex-direction: column; }
-    }
-  </style>
 </head>
-<body>
-  <!-- Ambient FX & SVG Background -->
-  <div id="graffiti-bg"></div>
+<body style="display: flex; align-items: center; justify-content: center; overflow: hidden;">
+
+  <!-- Ambient FX -->
   <div id="mouse-glow"></div>
   <canvas id="particles-canvas"></canvas>
 
-  <!-- 📱 MOBILE TOP BAR (Top-Left Profile Pic, Top-Right Logout) -->
-  <div class="mobile-top-bar">
-    <a href="id.html" class="mobile-profile-btn" title="View Profile">
-      <img src="assets/svg/user.svg" alt="Profile ID" id="mobileProfilePic">
+  <!-- Login Modal Box -->
+  <div class="login-card">
+    <a href="index.html" class="brand-logo">
+      UNDERGROUND <span>CHAT</span>
     </a>
+    <p class="subtitle">Enter your ID credentials to unlock the tunnel</p>
 
-    <button type="button" class="mobile-logout-btn" id="logoutBtnMobile" title="Logout">
-      <img src="assets/svg/logout.svg" alt="Logout">
+    <div class="divider">
+      <span>OR DIRECT</span>
+    </div>
+
+    <button id="googleLoginBtn" class="btn-submit">
+      Continue with Google
     </button>
+
+    <div class="register-prompt">
+      Don't have a tag yet? <a href="createaccount.html">Create Account</a>
+    </div>
   </div>
 
-  <!-- 💻 DESKTOP HEADER NAVIGATION -->
-  <header>
-    <nav>
-      <div class="brand-container">
-        <!-- Desktop Profile Avatar (Top Left) -->
-        <a href="id.html" class="desktop-profile-btn" title="View Profile">
-          <img src="assets/svg/user.svg" alt="Profile ID" id="desktopProfilePic">
-        </a>
-        <a href="index.html" class="logo">
-          UNDERGROUND <span>CHAT</span>
-        </a>
-      </div>
-
-      <!-- Desktop Nav Options -->
-      <ul class="desktop-nav">
-        <li>
-          <a href="index.html" class="active">
-            <img src="assets/svg/home.svg" class="nav-icon" alt="Home">
-            <span>Home</span>
-          </a>
-        </li>
-        <li>
-          <a href="user.html">
-            <img src="assets/svg/chat.svg" class="nav-icon" alt="Chats">
-            <span>Chats</span>
-          </a>
-        </li>
-        <li>
-          <a href="friends.html">
-            <img src="assets/svg/friends.svg" class="nav-icon" alt="Friends">
-            <span>Friends</span>
-          </a>
-        </li>
-        <li>
-          <a href="notification.html">
-            <img src="assets/svg/notification.svg" class="nav-icon" alt="Notifications">
-            <span>Notifications</span>
-          </a>
-        </li>
-        <li>
-          <a href="settings.html">
-            <img src="assets/svg/setting.svg" class="nav-icon" alt="Settings">
-            <span>Settings</span>
-          </a>
-        </li>
-      </ul>
-
-      <!-- Desktop Right Actions -->
-      <div class="header-actions">
-        <div class="nav-btn">
-          <a href="user.html" class="join">Enter Tunnel</a>
-        </div>
-        <button type="button" class="desktop-logout-btn" id="logoutBtnDesktop" title="Logout">
-          <img src="assets/svg/logout.svg" alt="Logout">
-        </button>
-      </div>
-    </nav>
-  </header>
-
-  <!-- Mobile Bottom Navigation Bar -->
-  <div class="mobile-bottom-nav">
-    <a href="index.html" class="active">
-      <img src="assets/svg/home.svg" class="nav-icon" alt="Home">
-      <span>Home</span>
-    </a>
-    <a href="user.html">
-      <img src="assets/svg/chat.svg" class="nav-icon" alt="Chats">
-      <span>Chats</span>
-    </a>
-    <a href="friends.html">
-      <img src="assets/svg/friends.svg" class="nav-icon" alt="Friends">
-      <span>Friends</span>
-    </a>
-    <a href="notification.html">
-      <img src="assets/svg/notification.svg" class="nav-icon" alt="Alerts">
-      <span>Alerts</span>
-    </a>
-    <a href="settings.html">
-      <img src="assets/svg/setting.svg" class="nav-icon" alt="Settings">
-      <span>Settings</span>
-    </a>
-  </div>
-
-  <!-- Hero Section -->
-  <main class="hero">
-    <div class="badge-wrapper">
-      <span class="badge">// Signal Active</span>
-      <div class="rating-box">
-        <span class="rating-stars">★★★★★</span>
-        <span class="rating-score">4.9 Avg</span>
-      </div>
-    </div>
-
-    <h1 class="hero-title">
-      <span class="desktop-title">Leave Your <span class="highlight">Mark.</span></span>
-      <span class="mobile-title">Underground <span class="highlight">Tunnel</span></span>
-    </h1>
-
-    <p class="hero-description">
-      An authentic street-inspired chat platform built for crews, taggers, and subterranean conversations. Encrypted, instant, and raw.
-    </p>
-
-    <div class="hero-buttons">
-      <a href="user.html" class="btn-primary">Spray Message</a>
-      <a href="friends.html" class="btn-secondary">Find Crew</a>
-    </div>
-
-    <!-- Chat Mockup -->
-    <div class="chat-mockup" id="interactiveCard">
-      <div class="crown-badge">
-        <img src="assets/svg/graffiti-crown.svg" alt="Crown">
-      </div>
-
-      <div class="chat-messages">
-        <div class="msg msg-incoming">Yo, you active in the tunnel?</div>
-        <div class="msg msg-outgoing">Always. Just dropped a new tag on the wall.</div>
-        <div class="msg msg-incoming">Catch you underground at 00:00.</div>
-      </div>
-    </div>
-  </main>
-
-  <!-- 🚀 AUTH GUARD & DYNAMIC PHOTO SCRIPT -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
-      authDomain: "urbannoir-13ce8.firebaseapp.com",
-      projectId: "urbannoir-13ce8",
-      storageBucket: "urbannoir-13ce8.firebasestorage.app",
-      messagingSenderId: "1059246827383",
-      appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
-      measurementId: "G-CEPWKZXQVF"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    // Apply photo to profile elements
-    function setProfilePhoto(photoUrl) {
-      if (!photoUrl) return;
-      const mPic = document.getElementById("mobileProfilePic");
-      const dPic = document.getElementById("desktopProfilePic");
-      if (mPic) mPic.src = photoUrl;
-      if (dPic) dPic.src = photoUrl;
-    }
-
-    // 🔒 Auth Guard and Profile Sync
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        // Redirect unauthenticated / logged-out users to login.html
-        window.location.href = "login.html";
-        return;
-      }
-
-      try {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          if (data.photo && data.photo.trim() !== "") {
-            setProfilePhoto(data.photo);
-          }
-        }
-      } catch (e) {
-        console.error("Error fetching photo for header:", e);
-      }
-    });
-
-    // Logout handling
-    async function handleLogout() {
-      try {
-        await signOut(auth);
-        window.location.href = "login.html";
-      } catch (err) {
-        console.error("Logout Error:", err);
-      }
-    }
-
-    document.getElementById("logoutBtnDesktop")?.addEventListener("click", handleLogout);
-    document.getElementById("logoutBtnMobile")?.addEventListener("click", handleLogout);
-  </script>
-
-  <!-- Parallax Background & Canvas FX -->
+  <!-- Interactive Visual Scripts -->
   <script>
+    // Mouse Glow Track
     const glow = document.getElementById('mouse-glow');
-    const graffitiBg = document.getElementById('graffiti-bg');
-    const interactiveCard = document.getElementById('interactiveCard');
-
     window.addEventListener('mousemove', (e) => {
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-
-      glow.style.left = mouseX + 'px';
-      glow.style.top = mouseY + 'px';
-
-      const moveX = (mouseX / window.innerWidth - 0.5) * -25;
-      const moveY = (mouseY / window.innerHeight - 0.5) * -25;
-      graffitiBg.style.transform = `translate(${moveX}px, ${moveY}px) scale(1.02)`;
-
-      if (interactiveCard) {
-        const rect = interactiveCard.getBoundingClientRect();
-        const cardCenterX = rect.left + rect.width / 2;
-        const cardCenterY = rect.top + rect.height / 2;
-        
-        const cardX = (mouseX - cardCenterX) / 20;
-        const cardY = (mouseY - cardCenterY) / 20;
-
-        if (
-          mouseX >= rect.left - 50 && mouseX <= rect.right + 50 &&
-          mouseY >= rect.top - 50 && mouseY <= rect.bottom + 50
-        ) {
-          interactiveCard.style.transform = `translate(${cardX}px, ${cardY - 8}px) scale(1.02)`;
-        } else {
-          interactiveCard.style.transform = `translate(0px, 0px) scale(1)`;
-        }
-      }
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
     });
 
-    /* Particle FX */
+    // Background Particle Canvas
     const canvas = document.getElementById('particles-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
@@ -880,7 +88,7 @@
       }
     }
 
-    for (let i = 0; i < 50; i++) particles.push(new Particle());
+    for (let i = 0; i < 40; i++) particles.push(new Particle());
 
     function animateParticles() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -889,5 +97,124 @@
     }
     animateParticles();
   </script>
+
+  <!-- Firebase Auth & Persistence Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+        getAuth,
+        GoogleAuthProvider,
+        signInWithPopup,
+        setPersistence,
+        browserLocalPersistence,
+        onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    import {
+      getFirestore,
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+        authDomain: "urbannoir-13ce8.firebaseapp.com",
+        projectId: "urbannoir-13ce8",
+        storageBucket: "urbannoir-13ce8.firebasestorage.app",
+        messagingSenderId: "1059246827383",
+        appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
+        measurementId: "G-CEPWKZXQVF"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    const googleLoginBtn = document.getElementById("googleLoginBtn");
+    let isLoginLocked = false;
+
+    // 1️⃣ FAST AUTO-RECOVERY & SESSION CHECK
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            googleLoginBtn.textContent = "Recognizing user...";
+            googleLoginBtn.style.opacity = "0.7";
+            googleLoginBtn.style.cursor = "wait";
+            isLoginLocked = true;
+
+            localStorage.setItem("ug_current_user_id", user.uid);
+            
+            try {
+                const snap = await getDoc(doc(db, "users", user.uid));
+                if (snap.exists()) {
+                    window.location.href = "index.html";
+                } else {
+                    window.location.href = "createaccount.html";
+                }
+            } catch (err) {
+                console.error("Auto login check error:", err);
+                isLoginLocked = false;
+                googleLoginBtn.textContent = "Continue with Google";
+                googleLoginBtn.style.opacity = "1";
+                googleLoginBtn.style.cursor = "pointer";
+            }
+        }
+    });
+
+    // 2️⃣ GOOGLE LOGIN WITH 7s COOLDOWN LOCK & FAST FEEDBACK
+    googleLoginBtn.addEventListener("click", async () => {
+        if (isLoginLocked) return;
+
+        isLoginLocked = true;
+        googleLoginBtn.style.opacity = "0.6";
+        googleLoginBtn.style.cursor = "not-allowed";
+
+        let countdown = 7;
+        const originalText = googleLoginBtn.textContent;
+        
+        const lockTimer = setInterval(() => {
+            if (countdown > 0) {
+                googleLoginBtn.textContent = `Please wait (${countdown}s)...`;
+                countdown--;
+            } else {
+                clearInterval(lockTimer);
+                isLoginLocked = false;
+                googleLoginBtn.textContent = originalText;
+                googleLoginBtn.style.opacity = "1";
+                googleLoginBtn.style.cursor = "pointer";
+            }
+        }, 1000);
+
+        try {
+            googleLoginBtn.textContent = "Connecting to tunnel...";
+            await setPersistence(auth, browserLocalPersistence);
+            
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+
+            localStorage.setItem("ug_current_user_id", user.uid);
+
+            const snap = await getDoc(doc(db, "users", user.uid));
+
+            if (snap.exists()) {
+                window.location.href = "index.html";
+            } else {
+                window.location.href = "createaccount.html";
+            }
+
+        } catch (error) {
+            console.error("Login Error:", error);
+            if (error.code !== 'auth/popup-closed-by-user') {
+                alert(error.message);
+            }
+            clearInterval(lockTimer);
+            isLoginLocked = false;
+            googleLoginBtn.textContent = originalText;
+            googleLoginBtn.style.opacity = "1";
+            googleLoginBtn.style.cursor = "pointer";
+        }
+    });
+  </script>
+
 </body>
 </html>
