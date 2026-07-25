@@ -392,6 +392,8 @@
         } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+        const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
+
         // Back Button Logic
         const backBtn = document.getElementById('backBtn');
         backBtn.addEventListener('click', () => {
@@ -422,7 +424,8 @@
 
         const currentUserId = localStorage.getItem("ug_current_user_id");
         let currentUserProfile = null;
-        let activeReplyTarget = null; // Store reply context { id, senderName, text }
+        let usersCache = {}; // Cache profiles to display up-to-date avatars/names
+        let activeReplyTarget = null; 
 
         const messagesList = document.getElementById('messagesList');
         const chatForm = document.getElementById('chatForm');
@@ -451,33 +454,39 @@
             }
 
             if (peerUid) {
-                loadPeerProfile(peerUid);
+                listenToPeerProfile(peerUid);
             }
 
             listenForMessages(chatId);
         });
 
+        // Realtime sync for current user profile edited in id.html
         async function loadCurrentUser(uid) {
             try {
                 const userRef = doc(db, "users", uid);
-                const userSnap = await getDoc(userRef);
-                if (userSnap.exists()) {
-                    currentUserProfile = userSnap.data();
-                }
+                onSnapshot(userRef, (userSnap) => {
+                    if (userSnap.exists()) {
+                        currentUserProfile = userSnap.data();
+                        usersCache[uid] = currentUserProfile;
+                    }
+                });
             } catch (error) {
                 console.error("Error loading profile:", error);
             }
         }
 
-        async function loadPeerProfile(pUid) {
+        // Realtime sync for chat peer profile
+        function listenToPeerProfile(pUid) {
             try {
                 const peerRef = doc(db, "users", pUid);
-                const peerSnap = await getDoc(peerRef);
-                if (peerSnap.exists()) {
-                    const data = peerSnap.data();
-                    peerName.innerHTML = `${data.fullName || 'Tagger'} <span>SIGNAL</span>`;
-                    if (data.photo) peerAvatar.src = data.photo;
-                }
+                onSnapshot(peerRef, (peerSnap) => {
+                    if (peerSnap.exists()) {
+                        const data = peerSnap.data();
+                        usersCache[pUid] = data;
+                        peerName.innerHTML = `${data.fullName || 'Tagger'} <span>SIGNAL</span>`;
+                        peerAvatar.src = data.photo || DEFAULT_AVATAR;
+                    }
+                });
             } catch (err) {
                 console.error("Peer Profile Load Error:", err);
             }
@@ -503,7 +512,16 @@
         function renderMessage(msg, docId) {
             const myUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
             const isMine = msg.senderId === myUid;
-            const senderName = isMine ? "You" : (msg.senderName || "Tagger");
+
+            // Fetch live cached user profile info if available to display newly updated photo
+            const senderProfile = usersCache[msg.senderId] || {};
+            const displayPhoto = isMine 
+                ? (currentUserProfile?.photo || msg.senderPhoto || DEFAULT_AVATAR)
+                : (senderProfile.photo || msg.senderPhoto || DEFAULT_AVATAR);
+            
+            const displayName = isMine 
+                ? "You" 
+                : (senderProfile.fullName || msg.senderName || "Tagger");
 
             let replyBlock = '';
             if (msg.replyTo) {
@@ -516,7 +534,7 @@
             }
 
             const escapedText = (msg.text || '').replace(/"/g, '&quot;');
-            const escapedName = senderName.replace(/"/g, '&quot;');
+            const escapedName = displayName.replace(/"/g, '&quot;');
 
             return `
                 <div class="message-row ${isMine ? 'mine-row' : ''}" data-id="${docId}" data-sender="${escapedName}" data-text="${escapedText}">
@@ -526,11 +544,11 @@
                     
                     <div class="message-bubble ${isMine ? "mine" : ""}">
                         <img class="message-avatar" 
-                             src="${msg.senderPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}" 
+                             src="${displayPhoto}" 
                              alt="Avatar">
                         <div class="message-content">
                             ${replyBlock}
-                            <div class="message-sender">${senderName}</div>
+                            <div class="message-sender">${displayName}</div>
                             <div>${msg.text || ""}</div>
                         </div>
                     </div>
@@ -565,7 +583,6 @@
                     currentX = e.touches[0].clientX;
                     const diffX = currentX - startX;
 
-                    // Limit drag movement distance
                     if (Math.abs(diffX) < 80) {
                         row.style.transform = `translateX(${diffX}px)`;
                     }
@@ -576,7 +593,6 @@
                     isSwiping = false;
                     const diffX = currentX - startX;
 
-                    // Trigger reply if swiped beyond threshold
                     if (Math.abs(diffX) > 50) {
                         const id = row.getAttribute('data-id');
                         const sender = row.getAttribute('data-sender');
@@ -625,6 +641,13 @@
                 const now = serverTimestamp();
                 const activeUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
                 
+                // Fetch direct update from Firestore before dispatching message payload to ensure latest profile photo is attached
+                const userDocRef = doc(db, "users", activeUid);
+                const updatedUserSnap = await getDoc(userDocRef);
+                if (updatedUserSnap.exists()) {
+                    currentUserProfile = updatedUserSnap.data();
+                }
+
                 const messagePayload = {
                     text: text,
                     senderId: activeUid,
