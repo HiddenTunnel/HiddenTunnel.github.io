@@ -173,6 +173,30 @@
             text-align: right;
         }
 
+        /* Message Status Indicator Styles */
+        .message-status {
+            font-size: 0.68rem;
+            margin-top: 4px;
+            text-align: right;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 3px;
+        }
+
+        .message-status.sent {
+            color: #555;
+        }
+
+        .message-status.delivered {
+            color: #333;
+        }
+
+        .message-status.seen {
+            color: #007aff;
+        }
+
         /* Quoted/Replied Message Block Inside Bubble */
         .reply-quote {
             background: rgba(0, 0, 0, 0.25);
@@ -392,8 +416,6 @@
         } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-        const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
-
         // Back Button Logic
         const backBtn = document.getElementById('backBtn');
         backBtn.addEventListener('click', () => {
@@ -424,8 +446,7 @@
 
         const currentUserId = localStorage.getItem("ug_current_user_id");
         let currentUserProfile = null;
-        let usersCache = {}; // Cache profiles to display up-to-date avatars/names
-        let activeReplyTarget = null; 
+        let activeReplyTarget = null; // Store reply context { id, senderName, text }
 
         const messagesList = document.getElementById('messagesList');
         const chatForm = document.getElementById('chatForm');
@@ -454,39 +475,33 @@
             }
 
             if (peerUid) {
-                listenToPeerProfile(peerUid);
+                loadPeerProfile(peerUid);
             }
 
             listenForMessages(chatId);
         });
 
-        // Realtime sync for current user profile edited in id.html
         async function loadCurrentUser(uid) {
             try {
                 const userRef = doc(db, "users", uid);
-                onSnapshot(userRef, (userSnap) => {
-                    if (userSnap.exists()) {
-                        currentUserProfile = userSnap.data();
-                        usersCache[uid] = currentUserProfile;
-                    }
-                });
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    currentUserProfile = userSnap.data();
+                }
             } catch (error) {
                 console.error("Error loading profile:", error);
             }
         }
 
-        // Realtime sync for chat peer profile
-        function listenToPeerProfile(pUid) {
+        async function loadPeerProfile(pUid) {
             try {
                 const peerRef = doc(db, "users", pUid);
-                onSnapshot(peerRef, (peerSnap) => {
-                    if (peerSnap.exists()) {
-                        const data = peerSnap.data();
-                        usersCache[pUid] = data;
-                        peerName.innerHTML = `${data.fullName || 'Tagger'} <span>SIGNAL</span>`;
-                        peerAvatar.src = data.photo || DEFAULT_AVATAR;
-                    }
-                });
+                const peerSnap = await getDoc(peerRef);
+                if (peerSnap.exists()) {
+                    const data = peerSnap.data();
+                    peerName.innerHTML = `${data.fullName || 'Tagger'} <span>SIGNAL</span>`;
+                    if (data.photo) peerAvatar.src = data.photo;
+                }
             } catch (err) {
                 console.error("Peer Profile Load Error:", err);
             }
@@ -512,16 +527,7 @@
         function renderMessage(msg, docId) {
             const myUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
             const isMine = msg.senderId === myUid;
-
-            // Fetch live cached user profile info if available to display newly updated photo
-            const senderProfile = usersCache[msg.senderId] || {};
-            const displayPhoto = isMine 
-                ? (currentUserProfile?.photo || msg.senderPhoto || DEFAULT_AVATAR)
-                : (senderProfile.photo || msg.senderPhoto || DEFAULT_AVATAR);
-            
-            const displayName = isMine 
-                ? "You" 
-                : (senderProfile.fullName || msg.senderName || "Tagger");
+            const senderName = isMine ? "You" : (msg.senderName || "Tagger");
 
             let replyBlock = '';
             if (msg.replyTo) {
@@ -533,8 +539,30 @@
                 `;
             }
 
+            // Status Indicator Display Logic
+            let statusHtml = '';
+            if (isMine) {
+                const status = msg.status || 'sent';
+                let icon = '✓';
+                let label = 'Sent';
+
+                if (status === 'delivered') {
+                    icon = '✓✓';
+                    label = 'Delivered';
+                } else if (status === 'seen') {
+                    icon = '✓✓';
+                    label = 'Seen';
+                }
+
+                statusHtml = `
+                    <div class="message-status ${status}">
+                        <span>${label}</span> <span>${icon}</span>
+                    </div>
+                `;
+            }
+
             const escapedText = (msg.text || '').replace(/"/g, '&quot;');
-            const escapedName = displayName.replace(/"/g, '&quot;');
+            const escapedName = senderName.replace(/"/g, '&quot;');
 
             return `
                 <div class="message-row ${isMine ? 'mine-row' : ''}" data-id="${docId}" data-sender="${escapedName}" data-text="${escapedText}">
@@ -544,12 +572,13 @@
                     
                     <div class="message-bubble ${isMine ? "mine" : ""}">
                         <img class="message-avatar" 
-                             src="${displayPhoto}" 
+                             src="${msg.senderPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}" 
                              alt="Avatar">
                         <div class="message-content">
                             ${replyBlock}
-                            <div class="message-sender">${displayName}</div>
+                            <div class="message-sender">${senderName}</div>
                             <div>${msg.text || ""}</div>
+                            ${statusHtml}
                         </div>
                     </div>
 
@@ -583,6 +612,7 @@
                     currentX = e.touches[0].clientX;
                     const diffX = currentX - startX;
 
+                    // Limit drag movement distance
                     if (Math.abs(diffX) < 80) {
                         row.style.transform = `translateX(${diffX}px)`;
                     }
@@ -593,6 +623,7 @@
                     isSwiping = false;
                     const diffX = currentX - startX;
 
+                    // Trigger reply if swiped beyond threshold
                     if (Math.abs(diffX) > 50) {
                         const id = row.getAttribute('data-id');
                         const sender = row.getAttribute('data-sender');
@@ -613,14 +644,25 @@
                 orderBy("createdAt", "asc")
             );
 
+            const activeUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
+
             onSnapshot(messagesQuery, (snapshot) => {
                 messagesList.innerHTML = "";
                 if (snapshot.empty) {
                     messagesList.innerHTML = `<p style="color:#555; text-align:center; margin: auto;">No signals yet. Leave your mark!</p>`;
                 }
-                snapshot.forEach((doc) => {
-                    const msg = doc.data();
-                    messagesList.insertAdjacentHTML("beforeend", renderMessage(msg, doc.id));
+                
+                snapshot.forEach((docSnap) => {
+                    const msg = docSnap.data();
+                    
+                    // Update status to 'seen' when the recipient loads the incoming messages
+                    if (msg.senderId !== activeUid && msg.status !== 'seen') {
+                        updateDoc(doc(db, "chats", cId, "messages", docSnap.id), {
+                            status: 'seen'
+                        }).catch(err => console.error("Error updating status to seen:", err));
+                    }
+
+                    messagesList.insertAdjacentHTML("beforeend", renderMessage(msg, docSnap.id));
                 });
                 
                 attachSwipeGestures();
@@ -641,19 +683,13 @@
                 const now = serverTimestamp();
                 const activeUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
                 
-                // Fetch direct update from Firestore before dispatching message payload to ensure latest profile photo is attached
-                const userDocRef = doc(db, "users", activeUid);
-                const updatedUserSnap = await getDoc(userDocRef);
-                if (updatedUserSnap.exists()) {
-                    currentUserProfile = updatedUserSnap.data();
-                }
-
                 const messagePayload = {
                     text: text,
                     senderId: activeUid,
                     senderName: currentUserProfile?.fullName || "Anonymous",
                     senderPhoto: currentUserProfile?.photo || "",
                     type: "text",
+                    status: "sent", // Initial status when message is sent
                     createdAt: now
                 };
 
