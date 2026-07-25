@@ -240,8 +240,8 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
             color: #fff;
             border-radius: 50%;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -249,8 +249,13 @@
             opacity: 0;
             visibility: hidden;
             transition: all 0.2s ease;
-            font-size: 0.85rem;
             flex-shrink: 0;
+        }
+
+        .desktop-reply-btn img {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
         }
 
         .message-row:hover .desktop-reply-btn {
@@ -260,7 +265,6 @@
 
         .desktop-reply-btn:hover {
             background: var(--green, #5CFF72);
-            color: #000;
             border-color: var(--green, #5CFF72);
         }
 
@@ -449,7 +453,7 @@
         let currentUserProfile = null;
         let activeReplyTarget = null;
         
-        // Caching user profiles globally to prevent duplicate lookups/renders
+        // Caching user profiles to dynamically load current photo/name
         const userProfilesCache = {};
 
         const messagesList = document.getElementById('messagesList');
@@ -491,7 +495,7 @@
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
                     currentUserProfile = userSnap.data();
-                    userProfilesCache[uid] = currentUserProfile; 
+                    userProfilesCache[uid] = currentUserProfile; // Cache self profile
                 }
             } catch (error) {
                 console.error("Error loading profile:", error);
@@ -504,7 +508,7 @@
                 const peerSnap = await getDoc(peerRef);
                 if (peerSnap.exists()) {
                     const data = peerSnap.data();
-                    userProfilesCache[pUid] = data; 
+                    userProfilesCache[pUid] = data; // Cache peer profile
                     peerName.innerHTML = `${data.fullName || 'Tagger'} <span>SIGNAL</span>`;
                     if (data.photo) peerAvatar.src = data.photo;
                 }
@@ -513,6 +517,7 @@
             }
         }
 
+        // Fetch user profile dynamically (realtime check if updated)
         async function getSenderProfile(senderId) {
             if (userProfilesCache[senderId]) {
                 return userProfilesCache[senderId];
@@ -527,9 +532,7 @@
             } catch (e) {
                 console.error("Error fetching sender profile:", e);
             }
-            const fallback = { fullName: "Anonymous", photo: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" };
-            userProfilesCache[senderId] = fallback;
-            return fallback;
+            return { fullName: "Anonymous", photo: "" };
         }
 
         function setReplyTarget(id, senderName, text) {
@@ -551,6 +554,7 @@
             const myUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
             const isMine = msg.senderId === myUid;
             
+            // Fetch latest sender profile live from cache/DB so photo updates instantly everywhere!
             const senderProfile = await getSenderProfile(msg.senderId);
             const senderName = isMine ? "You" : (senderProfile.fullName || msg.senderName || "Tagger");
             const senderPhoto = senderProfile.photo || msg.senderPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80';
@@ -565,9 +569,10 @@
                 `;
             }
 
+            // Messenger Status Indicators logic
             let statusHTML = '';
             if (isMine) {
-                let ticks = '✓';
+                let ticks = '✓'; // sent
                 let statusClass = '';
                 if (msg.status === 'delivered') {
                     ticks = '✓✓';
@@ -584,7 +589,9 @@
             return `
                 <div class="message-row ${isMine ? 'mine-row' : ''}" data-id="${docId}" data-sender="${escapedName}" data-text="${escapedText}">
                     ${isMine ? `
-                        <button class="desktop-reply-btn" title="Reply" onclick="window.triggerReply('${docId}', '${escapedName}', '${escapedText}')">↩</button>
+                        <button class="desktop-reply-btn" title="Reply" onclick="window.triggerReply('${docId}', '${escapedName}', '${escapedText}')">
+                            <img src="asset/svg/reply.svg" alt="Reply">
+                        </button>
                     ` : ''}
                     
                     <div class="message-bubble ${isMine ? "mine" : ""}">
@@ -600,7 +607,9 @@
                     </div>
 
                     ${!isMine ? `
-                        <button class="desktop-reply-btn" title="Reply" onclick="window.triggerReply('${docId}', '${escapedName}', '${escapedText}')">↩</button>
+                        <button class="desktop-reply-btn" title="Reply" onclick="window.triggerReply('${docId}', '${escapedName}', '${escapedText}')">
+                            <img src="asset/svg/reply.svg" alt="Reply">
+                        </button>
                     ` : ''}
                 </div>
             `;
@@ -690,21 +699,19 @@
             );
 
             onSnapshot(messagesQuery, async (snapshot) => {
+                messagesList.innerHTML = "";
                 if (snapshot.empty) {
                     messagesList.innerHTML = `<p style="color:#555; text-align:center; margin: auto;">No signals yet. Leave your mark!</p>`;
-                    return;
                 } else {
                     await markMessagesAsSeenOrDelivered(snapshot, activeUid);
                 }
 
-                const messagePromises = snapshot.docs.map(async (docSnap) => {
+                // Render all messages with dynamic live profiles
+                for (const docSnap of snapshot.docs) {
                     const msg = docSnap.data();
-                    return await renderMessage(msg, docSnap.id);
-                });
-
-                const renderedMessagesHTML = await Promise.all(messagePromises);
-                
-                messagesList.innerHTML = renderedMessagesHTML.join('');
+                    const renderedHTML = await renderMessage(msg, docSnap.id);
+                    messagesList.insertAdjacentHTML("beforeend", renderedHTML);
+                }
                 
                 attachSwipeGestures();
                 messagesList.scrollTop = messagesList.scrollHeight;
