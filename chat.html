@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Chat - Underground Chat</title>
+    <title>Versity ID Card - Underground Chat</title>
     <meta name="theme-color" content="#050505">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,419 +12,220 @@
     
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 🔴 Remove Top Navigation Header injected by navbar.js */
-        header, nav, .top-nav, #navbar-container > header {
-            display: none !important;
-        }
-
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden; /* Prevent page scrolling */
-            background-color: #080808;
-            color: #fff;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        /* Back Button Styling */
-        .back-btn {
-            background: transparent;
-            border: none;
-            color: var(--green, #5CFF72);
-            font-size: 1.4rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4px 8px;
-            margin-right: 6px;
-            border-radius: 50%;
-            transition: background 0.2s ease;
-        }
-
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* 📱 Fixed Mobile Chat Box Layout */
-        .chat-container {
-            max-width: 700px;
-            margin: 5px auto 0 auto;
-            /* dynamically adjusts screen height leaving space for bottom nav */
-            height: calc(100dvh - 85px); 
-            background: #111;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+        .id-wrapper {
+            max-width: 440px;
+            margin: 110px auto 40px auto;
+            padding: 0 20px;
             position: relative;
             z-index: 10;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
-        .chat-header {
-            padding: 10px 14px;
-            background: #181818;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
+        .id-card {
+            background: linear-gradient(145deg, #181818 0%, #0d0d0d 100%);
+            border: 2px solid rgba(92, 255, 114, 0.4);
+            border-radius: 24px;
+            padding: 28px 24px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 35px rgba(92, 255, 114, 0.15);
+            position: relative;
+            overflow: hidden;
         }
 
-        .chat-header-user {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .id-card::before {
+            content: "OFFICIAL TAGGER";
+            position: absolute;
+            top: 18px;
+            right: -30px;
+            background: var(--orange, #FF7A00);
+            color: #000;
+            font-size: 0.65rem;
+            font-weight: 900;
+            padding: 4px 35px;
+            transform: rotate(45deg);
+            letter-spacing: 1px;
         }
 
-        .chat-header-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid var(--green, #5CFF72);
+        .id-header {
+            text-align: center;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+            padding-bottom: 16px;
+            margin-bottom: 22px;
         }
 
-        .chat-header h2 {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
+        .id-header h2 {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 1.6rem;
             color: #fff;
+            letter-spacing: 1px;
             margin: 0;
         }
 
-        .chat-header h2 span {
+        .id-header h2 span {
             color: var(--green, #5CFF72);
         }
 
-        .chat-messages {
-            flex: 1;
-            padding: 14px;
-            overflow-y: auto;
+        .id-header p {
+            font-size: 0.75rem;
+            color: var(--orange, #FF7A00);
+            letter-spacing: 2px;
+            margin-top: 2px;
+            font-weight: 700;
+        }
+
+        .id-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .id-photo-container {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 3px solid var(--green, #5CFF72);
+            padding: 3px;
+            background: #000;
+            box-shadow: 0 0 20px rgba(92, 255, 114, 0.3);
+            overflow: hidden;
+        }
+
+        .id-photo {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .id-details {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
             gap: 12px;
-            touch-action: pan-y;
+            box-sizing: border-box;
         }
 
-        /* Message Bubble Container & Reply Button Wrapper */
-        .message-row {
+        .detail-row {
             display: flex;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-            position: relative;
-            transition: transform 0.15s ease-out;
-            will-change: transform;
-        }
-
-        .message-row.mine-row {
-            justify-content: flex-end;
-        }
-
-        .message-bubble {
-            display: flex;
-            gap: 10px;
-            max-width: 82%;
-            position: relative;
-        }
-
-        .message-bubble.mine {
-            flex-direction: row-reverse;
-        }
-
-        .message-avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid var(--green, #5CFF72);
-            flex-shrink: 0;
-        }
-
-        .message-content {
-            background: #1e1e1e;
-            padding: 8px 12px;
-            border-radius: 14px;
-            color: #ddd;
-            font-size: 0.88rem;
-            position: relative;
-            word-break: break-word;
-        }
-
-        .message-bubble.mine .message-content {
-            background: var(--green, #5CFF72);
-            color: #000;
-            font-weight: 600;
-        }
-
-        .message-sender {
-            font-size: 0.7rem;
-            color: var(--orange, #FF7A00);
-            font-weight: 700;
-            margin-bottom: 2px;
-        }
-
-        .message-bubble.mine .message-sender {
-            color: #222;
-            text-align: right;
-        }
-
-        /* Message Status Indicator Styles */
-        .message-status {
-            font-size: 0.68rem;
-            margin-top: 4px;
-            text-align: right;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 3px;
-        }
-
-        .message-status.sent {
-            color: #555;
-        }
-
-        .message-status.delivered {
-            color: #333;
-        }
-
-        .message-status.seen {
-            color: #007aff;
-        }
-
-        /* Quoted/Replied Message Block Inside Bubble */
-        .reply-quote {
-            background: rgba(0, 0, 0, 0.25);
-            border-left: 3px solid var(--green, #5CFF72);
-            padding: 4px 8px;
-            border-radius: 6px;
-            margin-bottom: 6px;
-            font-size: 0.78rem;
-        }
-
-        .message-bubble.mine .reply-quote {
-            background: rgba(0, 0, 0, 0.12);
-            border-left-color: #000;
-        }
-
-        .reply-quote-author {
-            font-weight: 700;
-            font-size: 0.7rem;
-            color: var(--green, #5CFF72);
-        }
-
-        .message-bubble.mine .reply-quote-author {
-            color: #000;
-        }
-
-        .reply-quote-text {
-            color: #ccc;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 200px;
-        }
-
-        .message-bubble.mine .reply-quote-text {
-            color: #222;
-        }
-
-        /* Desktop Reply Hover Button */
-        .desktop-reply-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #fff;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s ease;
-            font-size: 0.85rem;
-            flex-shrink: 0;
-        }
-
-        .message-row:hover .desktop-reply-btn {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .desktop-reply-btn:hover {
-            background: var(--green, #5CFF72);
-            color: #000;
-            border-color: var(--green, #5CFF72);
-        }
-
-        /* Chat Input Area & Active Reply Preview Banner */
-        .chat-input-wrapper {
-            background: #181818;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-        }
-
-        .reply-banner {
-            display: none;
-            background: #141414;
-            padding: 8px 14px;
-            border-left: 4px solid var(--green, #5CFF72);
-            align-items: center;
             justify-content: space-between;
-            gap: 8px;
-            font-size: 0.8rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            align-items: center;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 8px;
         }
 
-        .reply-banner.active {
-            display: flex;
+        .detail-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
         }
 
-        .reply-banner-info {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .reply-banner-author {
-            color: var(--green, #5CFF72);
-            font-weight: 700;
-            font-size: 0.72rem;
-        }
-
-        .reply-banner-text {
-            color: #aaa;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .cancel-reply-btn {
-            background: transparent;
-            border: none;
+        .detail-label {
             color: #888;
-            font-size: 1.1rem;
-            cursor: pointer;
-            padding: 0 4px;
-        }
-
-        .cancel-reply-btn:hover {
-            color: #ff4d4d;
-        }
-
-        .chat-input-area {
-            padding: 10px;
-            display: flex;
-            gap: 8px;
-        }
-
-        .chat-input-area input {
-            flex: 1;
-            background: #0d0d0d;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 30px;
-            padding: 10px 16px;
-            color: #fff;
-            outline: none;
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.88rem;
-        }
-
-        .chat-input-area input:focus {
-            border-color: var(--green, #5CFF72);
-        }
-
-        .send-btn {
-            background: var(--green, #5CFF72);
-            color: #000;
-            border: none;
-            border-radius: 30px;
-            padding: 0 18px;
-            font-weight: 800;
+            font-weight: 500;
             font-size: 0.82rem;
-            cursor: pointer;
+        }
+
+        .detail-value {
+            color: #fff;
+            font-weight: 700;
+            text-align: right;
+            word-break: break-all;
+        }
+
+        .detail-value.highlight {
+            color: var(--green, #5CFF72);
+            font-family: monospace;
+            font-size: 1rem;
+        }
+
+        .card-actions {
+            margin-top: 25px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 12px;
+            border-radius: 40px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
             transition: all 0.3s;
         }
 
-        .send-btn:hover {
-            transform: scale(1.03);
+        .btn-chat {
+            background: var(--green, #5CFF72);
+            color: #000;
+        }
+
+        .btn-edit {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
     <div class="noise"></div>
- 
-    <!-- Dynamic Navigation Container -->
+
+    <!-- Dynamic Navigation Container (Loaded by navbar.js) -->
     <div id="navbar-container"></div>
 
-    <div class="chat-container">
-        <div class="chat-header">
-            <div class="chat-header-user">
-                <!-- ⬅️ Back Button -->
-                <button id="backBtn" class="back-btn" aria-label="Go Back">❮</button>
-                
-                <img id="peerAvatar" class="chat-header-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Peer">
-                <h2 id="peerName">TUNNEL <span>CHAT</span></h2>
+    <div class="id-wrapper">
+        <div class="id-card">
+            <div class="id-header">
+                <h2>UNDERGROUND <span>ID</span></h2>
+                <p>VERSITY PASSPORT</p>
             </div>
-            <small style="color: #888; font-size: 0.72rem;">Encrypted</small>
-        </div>
 
-        <div class="chat-messages" id="messagesList">
-            <!-- Messages load here -->
-        </div>
-
-        <div class="chat-input-wrapper">
-            <!-- Reply Banner Preview -->
-            <div id="replyBanner" class="reply-banner">
-                <div class="reply-banner-info">
-                    <span id="replyBannerAuthor" class="reply-banner-author">Replying to User</span>
-                    <span id="replyBannerText" class="reply-banner-text">Sample message snippet...</span>
+            <div class="id-body">
+                <div class="id-photo-container">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" id="displayPhoto" class="id-photo" alt="Student Photo">
                 </div>
-                <button id="cancelReplyBtn" class="cancel-reply-btn" aria-label="Cancel Reply">✕</button>
+
+                <div class="id-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Full Name</span>
+                        <span class="detail-value" id="displayName">Loading...</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Versity ID</span>
+                        <span class="detail-value highlight" id="displayVersityId">Loading...</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email</span>
+                        <span class="detail-value" id="displayEmail">Loading...</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Phone</span>
+                        <span class="detail-value" id="displayPhone">Loading...</span>
+                    </div>
+                </div>
             </div>
 
-            <form class="chat-input-area" id="chatForm">
-                <input type="text" id="messageInput" placeholder="Type a message..." required autocomplete="off">
-                <button type="submit" class="send-btn">SEND</button>
-            </form>
+            <div class="card-actions">
+                <a href="createaccount.html" class="btn-action btn-edit">Edit Profile</a>
+                <a href="user.html" class="btn-action btn-chat">Enter Chat</a>
+            </div>
         </div>
     </div>
 
-    <!-- FIREBASE SDKs & LOGIC -->
+    <!-- FIREBASE SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { 
-            getFirestore, 
-            collection, 
-            addDoc, 
-            doc, 
-            getDoc, 
-            updateDoc, 
-            query, 
-            orderBy, 
-            onSnapshot, 
-            serverTimestamp 
-        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-        // Back Button Logic
-        const backBtn = document.getElementById('backBtn');
-        backBtn.addEventListener('click', () => {
-            if (document.referrer && (document.referrer.includes("user.html") || document.referrer.includes("friends.html"))) {
-                window.history.back();
-            } else {
-                window.location.href = "user.html";
-            }
-        });
+        const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
 
         const firebaseConfig = {
             apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
@@ -440,289 +241,39 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const chatId = urlParams.get('chatId');
-        const peerUid = urlParams.get('peerUid');
-
         const currentUserId = localStorage.getItem("ug_current_user_id");
-        let currentUserProfile = null;
-        let activeReplyTarget = null; // Store reply context { id, senderName, text }
 
-        const messagesList = document.getElementById('messagesList');
-        const chatForm = document.getElementById('chatForm');
-        const messageInput = document.getElementById('messageInput');
-        const peerName = document.getElementById('peerName');
-        const peerAvatar = document.getElementById('peerAvatar');
-        
-        const replyBanner = document.getElementById('replyBanner');
-        const replyBannerAuthor = document.getElementById('replyBannerAuthor');
-        const replyBannerText = document.getElementById('replyBannerText');
-        const cancelReplyBtn = document.getElementById('cancelReplyBtn');
+        onAuthStateChanged(auth, (user) => {
+            const uid = user ? user.uid : currentUserId;
 
-        onAuthStateChanged(auth, async (user) => {
-            if (!user && !currentUserId) {
+            if (!uid) {
+                alert("Please login first.");
                 window.location.href = "login.html";
                 return;
             }
 
-            const activeUid = user ? user.uid : currentUserId;
-            await loadCurrentUser(activeUid);
+            // Realtime listener so any updates in Firestore immediately reflect on the ID card
+            const docRef = doc(db, "users", uid);
+            onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
 
-            if (!chatId) {
-                messagesList.innerHTML = `<p style="color:#888; text-align:center; margin: auto;">Select a conversation to start chatting.</p>`;
-                chatForm.style.display = "none";
-                return;
-            }
-
-            if (peerUid) {
-                loadPeerProfile(peerUid);
-            }
-
-            listenForMessages(chatId);
-        });
-
-        async function loadCurrentUser(uid) {
-            try {
-                const userRef = doc(db, "users", uid);
-                const userSnap = await getDoc(userRef);
-                if (userSnap.exists()) {
-                    currentUserProfile = userSnap.data();
+                    document.getElementById("displayName").textContent = data.fullName || "N/A";
+                    document.getElementById("displayVersityId").textContent = data.versityId || "N/A";
+                    document.getElementById("displayEmail").textContent = data.email || user?.email || "N/A";
+                    document.getElementById("displayPhone").textContent = data.phone || "N/A";
+                    document.getElementById("displayPhoto").src = data.photo || DEFAULT_AVATAR;
+                } else {
+                    alert("Profile not found.");
+                    window.location.href = "createaccount.html";
                 }
-            } catch (error) {
-                console.error("Error loading profile:", error);
-            }
-        }
-
-        async function loadPeerProfile(pUid) {
-            try {
-                const peerRef = doc(db, "users", pUid);
-                const peerSnap = await getDoc(peerRef);
-                if (peerSnap.exists()) {
-                    const data = peerSnap.data();
-                    peerName.innerHTML = `${data.fullName || 'Tagger'} <span>SIGNAL</span>`;
-                    if (data.photo) peerAvatar.src = data.photo;
-                }
-            } catch (err) {
-                console.error("Peer Profile Load Error:", err);
-            }
-        }
-
-        // Set active reply state
-        function setReplyTarget(id, senderName, text) {
-            activeReplyTarget = { id, senderName, text };
-            replyBannerAuthor.textContent = `Replying to ${senderName}`;
-            replyBannerText.textContent = text;
-            replyBanner.classList.add('active');
-            messageInput.focus();
-        }
-
-        // Clear active reply state
-        function clearReplyTarget() {
-            activeReplyTarget = null;
-            replyBanner.classList.remove('active');
-        }
-
-        cancelReplyBtn.addEventListener('click', clearReplyTarget);
-
-        function renderMessage(msg, docId) {
-            const myUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
-            const isMine = msg.senderId === myUid;
-            const senderName = isMine ? "You" : (msg.senderName || "Tagger");
-
-            let replyBlock = '';
-            if (msg.replyTo) {
-                replyBlock = `
-                    <div class="reply-quote">
-                        <div class="reply-quote-author">${msg.replyTo.senderName || 'Signal'}</div>
-                        <div class="reply-quote-text">${msg.replyTo.text || ''}</div>
-                    </div>
-                `;
-            }
-
-            // Status Indicator Display Logic
-            let statusHtml = '';
-            if (isMine) {
-                const status = msg.status || 'sent';
-                let icon = '✓';
-                let label = 'Sent';
-
-                if (status === 'delivered') {
-                    icon = '✓✓';
-                    label = 'Delivered';
-                } else if (status === 'seen') {
-                    icon = '✓✓';
-                    label = 'Seen';
-                }
-
-                statusHtml = `
-                    <div class="message-status ${status}">
-                        <span>${label}</span> <span>${icon}</span>
-                    </div>
-                `;
-            }
-
-            const escapedText = (msg.text || '').replace(/"/g, '&quot;');
-            const escapedName = senderName.replace(/"/g, '&quot;');
-
-            return `
-                <div class="message-row ${isMine ? 'mine-row' : ''}" data-id="${docId}" data-sender="${escapedName}" data-text="${escapedText}">
-                    ${isMine ? `
-                        <button class="desktop-reply-btn" title="Reply" onclick="window.triggerReply('${docId}', '${escapedName}', '${escapedText}')">↩</button>
-                    ` : ''}
-                    
-                    <div class="message-bubble ${isMine ? "mine" : ""}">
-                        <img class="message-avatar" 
-                             src="${msg.senderPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}" 
-                             alt="Avatar">
-                        <div class="message-content">
-                            ${replyBlock}
-                            <div class="message-sender">${senderName}</div>
-                            <div>${msg.text || ""}</div>
-                            ${statusHtml}
-                        </div>
-                    </div>
-
-                    ${!isMine ? `
-                        <button class="desktop-reply-btn" title="Reply" onclick="window.triggerReply('${docId}', '${escapedName}', '${escapedText}')">↩</button>
-                    ` : ''}
-                </div>
-            `;
-        }
-
-        // Global Desktop Reply Click Handler
-        window.triggerReply = function(id, senderName, text) {
-            setReplyTarget(id, senderName, text);
-        };
-
-        // Mobile Touch Swipe Gesture Implementation
-        function attachSwipeGestures() {
-            const rows = document.querySelectorAll('.message-row');
-            rows.forEach(row => {
-                let startX = 0;
-                let currentX = 0;
-                let isSwiping = false;
-
-                row.addEventListener('touchstart', (e) => {
-                    startX = e.touches[0].clientX;
-                    isSwiping = true;
-                }, { passive: true });
-
-                row.addEventListener('touchmove', (e) => {
-                    if (!isSwiping) return;
-                    currentX = e.touches[0].clientX;
-                    const diffX = currentX - startX;
-
-                    // Limit drag movement distance
-                    if (Math.abs(diffX) < 80) {
-                        row.style.transform = `translateX(${diffX}px)`;
-                    }
-                }, { passive: true });
-
-                row.addEventListener('touchend', () => {
-                    if (!isSwiping) return;
-                    isSwiping = false;
-                    const diffX = currentX - startX;
-
-                    // Trigger reply if swiped beyond threshold
-                    if (Math.abs(diffX) > 50) {
-                        const id = row.getAttribute('data-id');
-                        const sender = row.getAttribute('data-sender');
-                        const text = row.getAttribute('data-text');
-                        setReplyTarget(id, sender, text);
-                    }
-
-                    row.style.transform = 'translateX(0px)';
-                    startX = 0;
-                    currentX = 0;
-                });
-            });
-        }
-
-        function listenForMessages(cId) {
-            const messagesQuery = query(
-                collection(db, "chats", cId, "messages"),
-                orderBy("createdAt", "asc")
-            );
-
-            const activeUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
-
-            onSnapshot(messagesQuery, (snapshot) => {
-                messagesList.innerHTML = "";
-                if (snapshot.empty) {
-                    messagesList.innerHTML = `<p style="color:#555; text-align:center; margin: auto;">No signals yet. Leave your mark!</p>`;
-                }
-                
-                snapshot.forEach((docSnap) => {
-                    const msg = docSnap.data();
-                    
-                    // Update status to 'seen' when the recipient loads the incoming messages
-                    if (msg.senderId !== activeUid && msg.status !== 'seen') {
-                        updateDoc(doc(db, "chats", cId, "messages", docSnap.id), {
-                            status: 'seen'
-                        }).catch(err => console.error("Error updating status to seen:", err));
-                    }
-
-                    messagesList.insertAdjacentHTML("beforeend", renderMessage(msg, docSnap.id));
-                });
-                
-                attachSwipeGestures();
-                messagesList.scrollTop = messagesList.scrollHeight;
             }, (error) => {
-                console.error("Realtime Messages Error:", error);
+                console.error("Firestore Error:", error);
             });
-        }
-
-        chatForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const text = messageInput.value.trim();
-            if (!text || !chatId) return;
-
-            messageInput.disabled = true;
-
-            try {
-                const now = serverTimestamp();
-                const activeUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
-                
-                const messagePayload = {
-                    text: text,
-                    senderId: activeUid,
-                    senderName: currentUserProfile?.fullName || "Anonymous",
-                    senderPhoto: currentUserProfile?.photo || "",
-                    type: "text",
-                    status: "sent", // Initial status when message is sent
-                    createdAt: now
-                };
-
-                if (activeReplyTarget) {
-                    messagePayload.replyTo = {
-                        id: activeReplyTarget.id,
-                        senderName: activeReplyTarget.senderName,
-                        text: activeReplyTarget.text
-                    };
-                }
-
-                await addDoc(collection(db, "chats", chatId, "messages"), messagePayload);
-
-                const chatRef = doc(db, "chats", chatId);
-                await updateDoc(chatRef, {
-                    lastMessage: text,
-                    lastSenderId: activeUid,
-                    isRead: false,
-                    updatedAt: now
-                });
-
-                messageInput.value = "";
-                clearReplyTarget();
-                messageInput.focus();
-            } catch (error) {
-                console.error("Error sending message:", error);
-            } finally {
-                messageInput.disabled = false;
-            }
         });
     </script>
 
-    <!-- Bottom Nav Injector -->
+    <!-- Bottom/Desktop Nav Injector -->
     <script src="navbar.js"></script>
 </body>
 </html>
