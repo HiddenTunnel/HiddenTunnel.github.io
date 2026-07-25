@@ -51,7 +51,6 @@
         .chat-container {
             max-width: 700px;
             margin: 5px auto 0 auto;
-            /* dynamically adjusts screen height leaving space for bottom nav */
             height: calc(100dvh - 85px); 
             background: #111;
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -173,28 +172,29 @@
             text-align: right;
         }
 
-        /* Message Status Indicator Styles */
-        .message-status {
-            font-size: 0.68rem;
-            margin-top: 4px;
-            text-align: right;
-            font-weight: 700;
+        /* Message Meta (Time & Status Ticks) */
+        .message-meta {
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 3px;
+            gap: 4px;
+            font-size: 0.65rem;
+            color: #888;
+            margin-top: 3px;
         }
 
-        .message-status.sent {
-            color: #555;
-        }
-
-        .message-status.delivered {
+        .message-bubble.mine .message-meta {
             color: #333;
         }
 
-        .message-status.seen {
-            color: #007aff;
+        .msg-status {
+            font-weight: bold;
+            font-size: 0.75rem;
+            letter-spacing: -1px;
+        }
+
+        .msg-status.seen {
+            color: #0084ff; /* Messenger Blue for Seen */
         }
 
         /* Quoted/Replied Message Block Inside Bubble */
@@ -412,7 +412,8 @@
             query, 
             orderBy, 
             onSnapshot, 
-            serverTimestamp 
+            serverTimestamp,
+            writeBatch
         } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -446,7 +447,10 @@
 
         const currentUserId = localStorage.getItem("ug_current_user_id");
         let currentUserProfile = null;
-        let activeReplyTarget = null; // Store reply context { id, senderName, text }
+        let activeReplyTarget = null;
+        
+        // Caching user profiles to dynamically load current photo/name
+        const userProfilesCache = {};
 
         const messagesList = document.getElementById('messagesList');
         const chatForm = document.getElementById('chatForm');
@@ -478,7 +482,7 @@
                 loadPeerProfile(peerUid);
             }
 
-            listenForMessages(chatId);
+            listenForMessages(chatId, activeUid);
         });
 
         async function loadCurrentUser(uid) {
@@ -487,6 +491,7 @@
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
                     currentUserProfile = userSnap.data();
+                    userProfilesCache[uid] = currentUserProfile; // Cache self profile
                 }
             } catch (error) {
                 console.error("Error loading profile:", error);
@@ -499,6 +504,7 @@
                 const peerSnap = await getDoc(peerRef);
                 if (peerSnap.exists()) {
                     const data = peerSnap.data();
+                    userProfilesCache[pUid] = data; // Cache peer profile
                     peerName.innerHTML = `${data.fullName || 'Tagger'} <span>SIGNAL</span>`;
                     if (data.photo) peerAvatar.src = data.photo;
                 }
@@ -507,7 +513,24 @@
             }
         }
 
-        // Set active reply state
+        // Fetch user profile dynamically (realtime check if updated)
+        async function getSenderProfile(senderId) {
+            if (userProfilesCache[senderId]) {
+                return userProfilesCache[senderId];
+            }
+            try {
+                const userRef = doc(db, "users", senderId);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    userProfilesCache[senderId] = userSnap.data();
+                    return userProfilesCache[senderId];
+                }
+            } catch (e) {
+                console.error("Error fetching sender profile:", e);
+            }
+            return { fullName: "Anonymous", photo: "" };
+        }
+
         function setReplyTarget(id, senderName, text) {
             activeReplyTarget = { id, senderName, text };
             replyBannerAuthor.textContent = `Replying to ${senderName}`;
@@ -516,7 +539,6 @@
             messageInput.focus();
         }
 
-        // Clear active reply state
         function clearReplyTarget() {
             activeReplyTarget = null;
             replyBanner.classList.remove('active');
@@ -524,10 +546,14 @@
 
         cancelReplyBtn.addEventListener('click', clearReplyTarget);
 
-        function renderMessage(msg, docId) {
+        async function renderMessage(msg, docId) {
             const myUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
             const isMine = msg.senderId === myUid;
-            const senderName = isMine ? "You" : (msg.senderName || "Tagger");
+            
+            // Fetch latest sender profile live from cache/DB so photo updates instantly everywhere!
+            const senderProfile = await getSenderProfile(msg.senderId);
+            const senderName = isMine ? "You" : (senderProfile.fullName || msg.senderName || "Tagger");
+            const senderPhoto = senderProfile.photo || msg.senderPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80';
 
             let replyBlock = '';
             if (msg.replyTo) {
@@ -539,26 +565,18 @@
                 `;
             }
 
-            // Status Indicator Display Logic
-            let statusHtml = '';
+            // Messenger Status Indicators logic
+            let statusHTML = '';
             if (isMine) {
-                const status = msg.status || 'sent';
-                let icon = '✓';
-                let label = 'Sent';
-
-                if (status === 'delivered') {
-                    icon = '✓✓';
-                    label = 'Delivered';
-                } else if (status === 'seen') {
-                    icon = '✓✓';
-                    label = 'Seen';
+                let ticks = '✓'; // sent
+                let statusClass = '';
+                if (msg.status === 'delivered') {
+                    ticks = '✓✓';
+                } else if (msg.status === 'seen') {
+                    ticks = '✓✓';
+                    statusClass = 'seen';
                 }
-
-                statusHtml = `
-                    <div class="message-status ${status}">
-                        <span>${label}</span> <span>${icon}</span>
-                    </div>
-                `;
+                statusHTML = `<span class="msg-status ${statusClass}" title="${msg.status || 'sent'}">${ticks}</span>`;
             }
 
             const escapedText = (msg.text || '').replace(/"/g, '&quot;');
@@ -571,14 +589,14 @@
                     ` : ''}
                     
                     <div class="message-bubble ${isMine ? "mine" : ""}">
-                        <img class="message-avatar" 
-                             src="${msg.senderPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}" 
-                             alt="Avatar">
+                        <img class="message-avatar" src="${senderPhoto}" alt="Avatar">
                         <div class="message-content">
                             ${replyBlock}
                             <div class="message-sender">${senderName}</div>
                             <div>${msg.text || ""}</div>
-                            ${statusHtml}
+                            <div class="message-meta">
+                                ${statusHTML}
+                            </div>
                         </div>
                     </div>
 
@@ -589,12 +607,10 @@
             `;
         }
 
-        // Global Desktop Reply Click Handler
         window.triggerReply = function(id, senderName, text) {
             setReplyTarget(id, senderName, text);
         };
 
-        // Mobile Touch Swipe Gesture Implementation
         function attachSwipeGestures() {
             const rows = document.querySelectorAll('.message-row');
             rows.forEach(row => {
@@ -612,7 +628,6 @@
                     currentX = e.touches[0].clientX;
                     const diffX = currentX - startX;
 
-                    // Limit drag movement distance
                     if (Math.abs(diffX) < 80) {
                         row.style.transform = `translateX(${diffX}px)`;
                     }
@@ -623,7 +638,6 @@
                     isSwiping = false;
                     const diffX = currentX - startX;
 
-                    // Trigger reply if swiped beyond threshold
                     if (Math.abs(diffX) > 50) {
                         const id = row.getAttribute('data-id');
                         const sender = row.getAttribute('data-sender');
@@ -638,32 +652,58 @@
             });
         }
 
-        function listenForMessages(cId) {
+        async function markMessagesAsSeenOrDelivered(snapshot, activeUid) {
+            const batch = writeBatch(db);
+            let hasUpdates = false;
+
+            snapshot.forEach((docSnap) => {
+                const msgData = docSnap.data();
+                const msgId = docSnap.id;
+
+                if (msgData.senderId !== activeUid) {
+                    if (msgData.status !== 'seen') {
+                        const msgRef = doc(db, "chats", chatId, "messages", msgId);
+                        batch.update(msgRef, { status: 'seen' });
+                        hasUpdates = true;
+                    }
+                } else {
+                    if (msgData.status === 'sent') {
+                        const msgRef = doc(db, "chats", chatId, "messages", msgId);
+                        batch.update(msgRef, { status: 'delivered' });
+                        hasUpdates = true;
+                    }
+                }
+            });
+
+            if (hasUpdates) {
+                try {
+                    await batch.commit();
+                } catch (err) {
+                    console.error("Batch update status error:", err);
+                }
+            }
+        }
+
+        function listenForMessages(cId, activeUid) {
             const messagesQuery = query(
                 collection(db, "chats", cId, "messages"),
                 orderBy("createdAt", "asc")
             );
 
-            const activeUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
-
-            onSnapshot(messagesQuery, (snapshot) => {
+            onSnapshot(messagesQuery, async (snapshot) => {
                 messagesList.innerHTML = "";
                 if (snapshot.empty) {
                     messagesList.innerHTML = `<p style="color:#555; text-align:center; margin: auto;">No signals yet. Leave your mark!</p>`;
+                } else {
+                    await markMessagesAsSeenOrDelivered(snapshot, activeUid);
                 }
-                
-                snapshot.forEach((docSnap) => {
-                    const msg = docSnap.data();
-                    
-                    // Update status to 'seen' when the recipient loads the incoming messages
-                    if (msg.senderId !== activeUid && msg.status !== 'seen') {
-                        updateDoc(doc(db, "chats", cId, "messages", docSnap.id), {
-                            status: 'seen'
-                        }).catch(err => console.error("Error updating status to seen:", err));
-                    }
 
-                    messagesList.insertAdjacentHTML("beforeend", renderMessage(msg, docSnap.id));
-                });
+                // Render all messages with dynamic live profiles
+                for (const docSnap of snapshot.docs) {
+                    const msg = docSnap.data();
+                    const renderedHTML = await renderMessage(msg, docSnap.id);
+                    messagesList.insertAdjacentHTML("beforeend", renderedHTML);
+                }
                 
                 attachSwipeGestures();
                 messagesList.scrollTop = messagesList.scrollHeight;
@@ -686,10 +726,8 @@
                 const messagePayload = {
                     text: text,
                     senderId: activeUid,
-                    senderName: currentUserProfile?.fullName || "Anonymous",
-                    senderPhoto: currentUserProfile?.photo || "",
                     type: "text",
-                    status: "sent", // Initial status when message is sent
+                    status: "sent",
                     createdAt: now
                 };
 
