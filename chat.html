@@ -449,7 +449,7 @@
         let currentUserProfile = null;
         let activeReplyTarget = null;
         
-        // Caching user profiles to dynamically load current photo/name
+        // Caching user profiles globally to prevent duplicate lookups/renders
         const userProfilesCache = {};
 
         const messagesList = document.getElementById('messagesList');
@@ -491,7 +491,7 @@
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
                     currentUserProfile = userSnap.data();
-                    userProfilesCache[uid] = currentUserProfile; // Cache self profile
+                    userProfilesCache[uid] = currentUserProfile; 
                 }
             } catch (error) {
                 console.error("Error loading profile:", error);
@@ -504,7 +504,7 @@
                 const peerSnap = await getDoc(peerRef);
                 if (peerSnap.exists()) {
                     const data = peerSnap.data();
-                    userProfilesCache[pUid] = data; // Cache peer profile
+                    userProfilesCache[pUid] = data; 
                     peerName.innerHTML = `${data.fullName || 'Tagger'} <span>SIGNAL</span>`;
                     if (data.photo) peerAvatar.src = data.photo;
                 }
@@ -513,7 +513,6 @@
             }
         }
 
-        // Fetch user profile dynamically (realtime check if updated)
         async function getSenderProfile(senderId) {
             if (userProfilesCache[senderId]) {
                 return userProfilesCache[senderId];
@@ -528,7 +527,9 @@
             } catch (e) {
                 console.error("Error fetching sender profile:", e);
             }
-            return { fullName: "Anonymous", photo: "" };
+            const fallback = { fullName: "Anonymous", photo: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" };
+            userProfilesCache[senderId] = fallback;
+            return fallback;
         }
 
         function setReplyTarget(id, senderName, text) {
@@ -550,7 +551,6 @@
             const myUid = auth.currentUser ? auth.currentUser.uid : currentUserId;
             const isMine = msg.senderId === myUid;
             
-            // Fetch latest sender profile live from cache/DB so photo updates instantly everywhere!
             const senderProfile = await getSenderProfile(msg.senderId);
             const senderName = isMine ? "You" : (senderProfile.fullName || msg.senderName || "Tagger");
             const senderPhoto = senderProfile.photo || msg.senderPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80';
@@ -565,10 +565,9 @@
                 `;
             }
 
-            // Messenger Status Indicators logic
             let statusHTML = '';
             if (isMine) {
-                let ticks = '✓'; // sent
+                let ticks = '✓';
                 let statusClass = '';
                 if (msg.status === 'delivered') {
                     ticks = '✓✓';
@@ -691,19 +690,21 @@
             );
 
             onSnapshot(messagesQuery, async (snapshot) => {
-                messagesList.innerHTML = "";
                 if (snapshot.empty) {
                     messagesList.innerHTML = `<p style="color:#555; text-align:center; margin: auto;">No signals yet. Leave your mark!</p>`;
+                    return;
                 } else {
                     await markMessagesAsSeenOrDelivered(snapshot, activeUid);
                 }
 
-                // Render all messages with dynamic live profiles
-                for (const docSnap of snapshot.docs) {
+                const messagePromises = snapshot.docs.map(async (docSnap) => {
                     const msg = docSnap.data();
-                    const renderedHTML = await renderMessage(msg, docSnap.id);
-                    messagesList.insertAdjacentHTML("beforeend", renderedHTML);
-                }
+                    return await renderMessage(msg, docSnap.id);
+                });
+
+                const renderedMessagesHTML = await Promise.all(messagePromises);
+                
+                messagesList.innerHTML = renderedMessagesHTML.join('');
                 
                 attachSwipeGestures();
                 messagesList.scrollTop = messagesList.scrollHeight;
