@@ -131,24 +131,62 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // 1️⃣ AUTO-REMEMBER: অটোমেটিক চেক করবে ব্রাউজারে আগে থেকেই লগইন সেভ আছে কিনা
+    const googleLoginBtn = document.getElementById("googleLoginBtn");
+    let isLoginLocked = false;
+
+    // 1️⃣ FAST AUTO-RECOVERY & SESSION CHECK
     onAuthStateChanged(auth, async (user) => {
         if (user) {
+            googleLoginBtn.textContent = "Recognizing user...";
+            googleLoginBtn.style.opacity = "0.7";
+            googleLoginBtn.style.cursor = "wait";
+            isLoginLocked = true;
+
             localStorage.setItem("ug_current_user_id", user.uid);
             
-            const snap = await getDoc(doc(db, "users", user.uid));
-            if (snap.exists()) {
-                window.location.href = "index.html";
+            try {
+                const snap = await getDoc(doc(db, "users", user.uid));
+                if (snap.exists()) {
+                    window.location.href = "index.html";
+                } else {
+                    window.location.href = "createaccount.html";
+                }
+            } catch (err) {
+                console.error("Auto login check error:", err);
+                isLoginLocked = false;
+                googleLoginBtn.textContent = "Continue with Google";
+                googleLoginBtn.style.opacity = "1";
+                googleLoginBtn.style.cursor = "pointer";
             }
         }
     });
 
-    const googleLoginBtn = document.getElementById("googleLoginBtn");
-
-    // 2️⃣ GOOGLE LOGIN WITH PERSISTENCE
+    // 2️⃣ GOOGLE LOGIN WITH 7s COOLDOWN LOCK & FAST FEEDBACK
     googleLoginBtn.addEventListener("click", async () => {
+        if (isLoginLocked) return;
+
+        isLoginLocked = true;
+        googleLoginBtn.style.opacity = "0.6";
+        googleLoginBtn.style.cursor = "not-allowed";
+
+        let countdown = 7;
+        const originalText = googleLoginBtn.textContent;
+        
+        const lockTimer = setInterval(() => {
+            if (countdown > 0) {
+                googleLoginBtn.textContent = `Please wait (${countdown}s)...`;
+                countdown--;
+            } else {
+                clearInterval(lockTimer);
+                isLoginLocked = false;
+                googleLoginBtn.textContent = originalText;
+                googleLoginBtn.style.opacity = "1";
+                googleLoginBtn.style.cursor = "pointer";
+            }
+        }, 1000);
+
         try {
-            // ব্রাউজার বন্ধ করলেও যাতে সেশন ধরে রাখে
+            googleLoginBtn.textContent = "Connecting to tunnel...";
             await setPersistence(auth, browserLocalPersistence);
             
             const result = await signInWithPopup(auth, provider);
@@ -166,7 +204,14 @@
 
         } catch (error) {
             console.error("Login Error:", error);
-            alert(error.message);
+            if (error.code !== 'auth/popup-closed-by-user') {
+                alert(error.message);
+            }
+            clearInterval(lockTimer);
+            isLoginLocked = false;
+            googleLoginBtn.textContent = originalText;
+            googleLoginBtn.style.opacity = "1";
+            googleLoginBtn.style.cursor = "pointer";
         }
     });
   </script>
