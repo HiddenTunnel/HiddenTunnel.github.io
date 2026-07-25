@@ -56,6 +56,7 @@
             font-size: 1.6rem;
             color: #fff;
             letter-spacing: 1px;
+            margin: 0;
         }
 
         .id-header h2 span {
@@ -85,6 +86,7 @@
             padding: 3px;
             background: #000;
             box-shadow: 0 0 20px rgba(92, 255, 114, 0.3);
+            overflow: hidden;
         }
 
         .id-photo {
@@ -103,6 +105,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            box-sizing: border-box;
         }
 
         .detail-row {
@@ -174,19 +177,8 @@
 <body>
     <div class="noise"></div>
 
-    <header>
-        <nav>
-            <a href="index.html" class="logo">
-                UNDERGROUND
-                <span>CHAT</span>
-            </a>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="user.html">Chat</a></li>
-                <li><a href="id.html">My ID</a></li>
-            </ul>
-        </nav>
-    </header>
+    <!-- Dynamic Navigation Container (Loaded by navbar.js) -->
+    <div id="navbar-container"></div>
 
     <div class="id-wrapper">
         <div class="id-card">
@@ -197,7 +189,7 @@
 
             <div class="id-body">
                 <div class="id-photo-container">
-                    <img src="" id="displayPhoto" class="id-photo" alt="Student Photo">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" id="displayPhoto" class="id-photo" alt="Student Photo">
                 </div>
 
                 <div class="id-details">
@@ -228,58 +220,60 @@
     </div>
 
     <!-- FIREBASE SDKs -->
-   <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
-    authDomain: "urbannoir-13ce8.firebaseapp.com",
-    projectId: "urbannoir-13ce8",
-    storageBucket: "urbannoir-13ce8.firebasestorage.app",
-    messagingSenderId: "1059246827383",
-    appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
-    measurementId: "G-CEPWKZXQVF"
-};
+        const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+        const firebaseConfig = {
+            apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+            authDomain: "urbannoir-13ce8.firebaseapp.com",
+            projectId: "urbannoir-13ce8",
+            storageBucket: "urbannoir-13ce8.firebasestorage.app",
+            messagingSenderId: "1059246827383",
+            appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
+            measurementId: "G-CEPWKZXQVF"
+        };
 
-onAuthStateChanged(auth, async (user) => {
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
 
-    console.log("Firebase User:", user);
+        const currentUserId = localStorage.getItem("ug_current_user_id");
 
-    if (!user) {
-        alert("Please login first.");
-        window.location.href = "login.html";
-        return;
-    }
+        onAuthStateChanged(auth, (user) => {
+            const uid = user ? user.uid : currentUserId;
 
-    try {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
+            if (!uid) {
+                alert("Please login first.");
+                window.location.href = "login.html";
+                return;
+            }
 
-        if (docSnap.exists()) {
-            const data = docSnap.data();
+            // Realtime listener so any updates in Firestore immediately reflect on the ID card
+            const docRef = doc(db, "users", uid);
+            onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
 
-            document.getElementById("displayName").textContent = data.fullName || "N/A";
-            document.getElementById("displayVersityId").textContent = data.versityId || "N/A";
-            document.getElementById("displayEmail").textContent = data.email || "N/A";
-            document.getElementById("displayPhone").textContent = data.phone || "N/A";
-            document.getElementById("displayPhoto").src = data.photo || "";
-        } else {
-            alert("Profile not found.");
-            window.location.href = "createaccount.html";
-        }
+                    document.getElementById("displayName").textContent = data.fullName || "N/A";
+                    document.getElementById("displayVersityId").textContent = data.versityId || "N/A";
+                    document.getElementById("displayEmail").textContent = data.email || user?.email || "N/A";
+                    document.getElementById("displayPhone").textContent = data.phone || "N/A";
+                    document.getElementById("displayPhoto").src = data.photo || DEFAULT_AVATAR;
+                } else {
+                    alert("Profile not found.");
+                    window.location.href = "createaccount.html";
+                }
+            }, (error) => {
+                console.error("Firestore Error:", error);
+            });
+        });
+    </script>
 
-    } catch (e) {
-        console.error(e);
-        alert(e.message);
-    }
-
-});
-</script>
+    <!-- Bottom/Desktop Nav Injector -->
+    <script src="navbar.js"></script>
 </body>
 </html>
