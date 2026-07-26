@@ -90,29 +90,15 @@
   </header>
 
   <!-- Mobile Bottom Navigation Bar -->
-  <div class="mobile-bottom-nav">
-    <a href="index.html" class="active">
-      <img src="assets/svg/home.svg" class="nav-icon" alt="Home">
-      <span>Home</span>
-    </a>
-    <a href="user.html">
-      <img src="assets/svg/chat.svg" class="nav-icon" alt="Chats">
-      <span>Chats</span>
-    </a>
-    <a href="friends.html">
-      <img src="assets/svg/friends.svg" class="nav-icon" alt="Friends">
-      <span>Friends</span>
-    </a>
-    <a href="notification.html">
-      <img src="assets/svg/notification.svg" class="nav-icon" alt="Alerts">
-      <span>Alerts</span>
-    </a>
-    <a href="settings.html">
-      <img src="assets/svg/setting.svg" class="nav-icon" alt="Settings">
-      <span>Settings</span>
-    </a>
-  </div>
+<div id="bottom-nav-container"></div>
 
+<script>
+  fetch("bottom-nav.html")
+    .then(r => r.text())
+    .then(html => {
+      document.getElementById("bottom-nav-container").innerHTML = html;
+    });
+</script>
   <!-- Hero Section -->
   <main class="hero">
     <div class="badge-wrapper">

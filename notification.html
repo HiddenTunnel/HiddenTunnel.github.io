@@ -551,7 +551,12 @@
                 chatAlerts = [];
                 for (let docSnap of snapshot.docs) {
                     const data = docSnap.data();
-                    if (data.lastSenderId && data.lastSenderId !== currentUserId && data.isRead === false) {
+                    if (
+                        data.lastSenderId &&
+                        data.lastSenderId !== currentUserId &&
+                        data.unreadBy &&
+                        data.unreadBy.includes(currentUserId)
+                    ) {
                         let senderData = {};
                         try {
                             const senderDoc = await getDoc(doc(db, "users", data.lastSenderId));

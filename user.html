@@ -244,13 +244,35 @@
             transform: scale(1.03);
         }
 
+        /* Section Header and Title Styles */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
         .section-title {
-            font-size: 0.78rem;
+            font-size: .78rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #666;
-            margin-bottom: 12px;
             font-weight: 600;
+            margin: 0;
+        }
+
+        .create-group-text {
+            color: #7a7a7a;
+            font-size: .82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .25s ease;
+            user-select: none;
+        }
+
+        .create-group-text:hover,
+        .create-group-text:active {
+            color: #5CFF72;
         }
 
         .user-list {
@@ -259,6 +281,9 @@
             gap: 8px;
         }
 
+        /* ------------------------------------------------------------------ */
+        /* FIX: Overflow issues for long URLs or text in Chat Cards           */
+        /* ------------------------------------------------------------------ */
         .chat-card {
             display: flex;
             align-items: center;
@@ -271,6 +296,7 @@
             transition: all 0.2s ease;
             user-select: none;
             -webkit-user-select: none;
+            overflow: hidden; /* Ensures child elements don't spill outside */
         }
 
         .chat-card:hover {
@@ -283,6 +309,7 @@
             align-items: center;
             gap: 12px;
             flex: 1;
+            min-width: 0; /* Critical for Flexbox text-truncation */
         }
 
         .user-avatar {
@@ -292,20 +319,44 @@
             object-fit: cover;
             border: 1px solid rgba(92, 255, 114, 0.4);
             background: #222;
+            flex-shrink: 0; /* Prevents avatar from shrinking */
+        }
+
+        .user-details {
+            flex: 1;
+            min-width: 0; /* Critical for Flexbox text-truncation */
         }
 
         .user-details h4 {
             color: #eee;
             font-size: 0.95rem;
-            font-weight: 600;
+            font-weight: 400;
             margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .user-details .last-msg {
             font-size: 0.83rem;
             color: #888;
             margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+
+        /* Unread Styles */
+        .user-details h4.unread {
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .user-details .last-msg.unread {
+            font-weight: 700;
+            color: #fff;
+        }
+        /* ------------------------------------------------------------------ */
 
         @media (max-width: 768px) {
             header {
@@ -321,29 +372,9 @@
                 display: flex;
             }
             .search-container {
-                margin-top: 75px;
+                margin-top: 10px;
                 margin-bottom: 80px;
             }
-        }
-
-        .group-create-area {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 15px;
-        }
-
-        #createGroupBtn {
-            background: #5CFF72;
-            color: #000;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 25px;
-            font-weight: 800;
-            cursor: pointer;
-        }
-
-        #createGroupBtn:hover {
-            transform: scale(1.05);
         }
 
         /* Selection Bar Styles */
@@ -409,12 +440,6 @@
             <h2>Underground <span>Messages</span></h2>
         </div>
 
-        <div class="group-create-area">
-            <button id="createGroupBtn">
-                ➕ Create Group
-            </button>
-        </div>
-
         <!-- Floating Selection Bar -->
         <div id="selectionBar" style="display:none;">
             <button id="createSelectedGroup">
@@ -431,7 +456,15 @@
             <button id="searchBtn" class="search-btn">SEARCH</button>
         </div>
 
-        <div class="section-title" id="listTitle">Chats & Groups</div>
+        <div class="section-header">
+            <div class="section-title" id="listTitle">
+                Chats & Groups
+            </div>
+
+            <span id="createGroupBtn" class="create-group-text">
+                Create Group
+            </span>
+        </div>
 
         <div class="user-list" id="userList">
             <!-- Dynamic Users/Chats -->
@@ -439,48 +472,15 @@
     </div>
 
     <!-- Bottom Navigation Bar for Mobile -->
-    <nav class="bottom-nav">
-        <a href="index.html" class="bottom-nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
-                <path d="M12 2.5L2 11h3v10.5a.5.5 0 00.5.5h5.5v-6h2v6h5.5a.5.5 0 00.5-.5V11h3L12 2.5z" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M12 18v2.5M10.5 20.5v1.5" stroke="#FF7A00" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            <span>Home</span>
-        </a>
-        <a href="chat.html" class="bottom-nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
-                <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="9" cy="11.5" r="1" fill="#FF7A00"/>
-                <circle cx="12" cy="11.5" r="1" fill="#5CFF72"/>
-                <circle cx="15" cy="11.5" r="1" fill="#FF7A00"/>
-            </svg>
-            <span>Chats</span>
-        </a>
-        <a href="friends.html" class="bottom-nav-item active">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
-                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" fill="none" stroke="#5CFF72" stroke-width="2" stroke-linecap="round"/>
-                <circle cx="8.5" cy="7" r="4" fill="none" stroke="#5CFF72" stroke-width="2"/>
-                <path d="M23 21v-2a4 4 0 00-3-3.87" fill="none" stroke="#FF7A00" stroke-width="2" stroke-linecap="round"/>
-                <path d="M16 3.13a4 4 0 010 7.75" fill="none" stroke="#FF7A00" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <span>Friends</span>
-        </a>
-        <a href="notification.html" class="bottom-nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
-                <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M13.73 21a2 2 0 01-3.46 0" stroke="#FF7A00" stroke-width="2" stroke-linecap="round"/>
-                <path d="M12 2V1M20 4l-1 1M4 4l1 1" stroke="#FF7A00" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            <span>Alerts</span>
-        </a>
-        <a href="settings.html" class="bottom-nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
-                <circle cx="12" cy="12" r="3" fill="none" stroke="#FF7A00" stroke-width="2"/>
-                <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span>Settings</span>
-        </a>
-    </nav>
+<div id="bottom-nav-container"></div>
+
+<script>
+    fetch("bottom-nav.html")
+        .then(r => r.text())
+        .then(html => {
+            document.getElementById("bottom-nav-container").innerHTML = html;
+        });
+</script>
 
     <!-- FIREBASE SDKs -->
     <script type="module">
@@ -572,7 +572,8 @@
                             chatId: chatDoc.id,
                             name: userData.fullName || "User",
                             photo: userData.photo || defaultAvatar,
-                            last: data.lastMessage || "Message"
+                            last: data.lastMessage || "Message",
+                            unread: data.unreadBy === currentUserId || false
                         }, false);
                     });
                 });
@@ -590,7 +591,8 @@
                         id: groupDoc.id,
                         name: "👥 " + group.groupName,
                         photo: group.groupPhoto || defaultAvatar,
-                        last: group.lastMessage || "Group created"
+                        last: group.lastMessage || "Group created",
+                        unread: (group.unreadBy && group.unreadBy.includes(currentUserId)) || false
                     }, true);
                 });
             });
@@ -613,8 +615,12 @@
                 <div class="user-info">
                     <img class="user-avatar" src="${data.photo}">
                     <div class="user-details">
-                        <h4>${data.name}</h4>
-                        <p class="last-msg">${data.last}</p>
+                        <h4 class="${data.unread ? 'unread' : ''}">
+                            ${data.name}
+                        </h4>
+                        <p class="last-msg ${data.unread ? 'unread' : ''}">
+                            ${data.last}
+                        </p>
                     </div>
                 </div>
             `;
@@ -650,7 +656,7 @@
                 }
 
                 if (isGroup) {
-                    location.href = "groupchat.html?groupId=" + data.id;
+                    location.href = "group.html?groupId=" + data.id;
                 } else {
                     const chatId = data.chatId || (currentUserId < data.id ? `${currentUserId}_${data.id}` : `${data.id}_${currentUserId}`);
                     location.href = `chat.html?chatId=${chatId}&peerUid=${data.id}`;
@@ -742,7 +748,8 @@
                             id: targetUid,
                             name: userData.fullName || "Anonymous",
                             photo: userData.photo || defaultAvatar,
-                            last: `ID: ${userData.versityId || 'N/A'}`
+                            last: `ID: ${userData.versityId || 'N/A'}`,
+                            unread: false
                         }, false);
                     }
                 });

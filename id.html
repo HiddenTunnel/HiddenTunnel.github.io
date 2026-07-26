@@ -189,7 +189,10 @@
 
             <div class="id-body">
                 <div class="id-photo-container">
-                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" id="displayPhoto" class="id-photo" alt="Student Photo">
+                    <img id="displayPhoto"
+                         class="id-photo"
+                         src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='8' r='4' fill='%235CFF72'/><path d='M4 20c0-4 3.5-7 8-7s8 3 8 7' fill='%235CFF72'/></svg>"
+                         alt="Profile">
                 </div>
 
                 <div class="id-details">
@@ -225,7 +228,7 @@
         import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-        const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
+        const DEFAULT_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='8' r='4' fill='%235CFF72'/><path d='M4 20c0-4 3.5-7 8-7s8 3 8 7' fill='%235CFF72'/></svg>";
 
         const firebaseConfig = {
             apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",

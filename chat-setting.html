@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chat Settings</title>
+    <meta name="theme-color" content="#111111">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --green: #5CFF72;
+            --orange: #FF7A00;
+            --bg: #050505;
+            --card-bg: #141414;
+            --danger: #ff4d4d;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        header, nav, .top-nav, #navbar-container > header, .bottom-nav {
+            display: none !important;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            background-image: radial-gradient(circle at 50% 0%, #152517 0%, #050505 70%);
+            min-height: 100dvh;
+        }
+
+        .settings-container {
+            width: 100%;
+            max-width: 700px;
+            min-height: 100dvh;
+            margin: 0 auto;
+            background: #111;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Header Layout */
+        .settings-header {
+            height: 60px;
+            flex-shrink: 0;
+            background: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 0 16px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: none;
+            color: var(--green);
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 4px;
+        }
+
+        .settings-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .settings-content {
+            flex: 1;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        /* Profile Banner Section */
+        .profile-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile-avatar {
+            width: 95px;
+            height: 95px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--green);
+            box-shadow: 0 0 15px rgba(92, 255, 114, 0.2);
+            display: block;
+        }
+
+        .change-photo-badge {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--green);
+            color: #000;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: 2.5px solid #141414;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        .change-photo-badge svg {
+            width: 15px;
+            height: 15px;
+            fill: #000;
+        }
+
+        .group-name-edit-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .group-name-input {
+            background: #0a0a0a;
+            border: 1px solid rgba(92, 255, 114, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            padding: 6px 12px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            text-align: center;
+            outline: none;
+        }
+
+        .save-name-btn {
+            background: var(--green);
+            border: none;
+            color: #000;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .profile-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .profile-card p {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        /* Section Layout */
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--green);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            padding-left: 4px;
+        }
+
+        .section-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .member-item:last-child {
+            border-bottom: none;
+        }
+
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .member-details h4 {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .member-details span {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .admin-badge {
+            background: rgba(92, 255, 114, 0.15);
+            color: var(--green);
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(92, 255, 114, 0.3);
+        }
+
+        .kick-btn {
+            background: rgba(255, 77, 77, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .kick-btn:active {
+            transform: scale(0.95);
+            background: var(--danger);
+            color: #fff;
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background 0.2s ease;
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .action-btn.danger {
+            background: rgba(255, 77, 77, 0.1);
+            border-color: rgba(255, 77, 77, 0.3);
+            color: var(--danger);
+        }
+
+        .skeleton {
+            opacity: 0.6;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.4; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="settings-container">
+        <!-- Header -->
+        <div class="settings-header">
+            <button class="back-btn" id="backBtn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <h2 id="settingsTitle">Chat Info</h2>
+        </div>
+
+        <!-- Hidden File Input for Group Photo -->
+        <input type="file" id="groupPhotoInput" accept="image/*" style="display: none;">
+
+        <!-- Main Content -->
+        <div class="settings-content">
+            
+            <!-- Banner Section -->
+            <div class="profile-card">
+                <div class="avatar-wrapper" id="avatarWrapper">
+                    <img id="displayAvatar" class="profile-avatar skeleton" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235CFF72'></svg>" alt="Avatar">
+                    <span class="change-photo-badge" id="photoBadge">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 15.2a3.2 3.2 0 100-6.4 3.2 3.2 0 000 6.4z"/>
+                            <path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+                        </svg>
+                    </span>
+                </div>
+
+                <!-- Editable Group Name for Admin -->
+                <div id="groupNameContainer">
+                    <h3 id="displayName">Loading...</h3>
+                </div>
+                
+                <p id="displaySubtext">...</p>
+            </div>
+
+            <!-- Group Members Section -->
+            <div id="membersGroupSection" style="display: none;">
+                <div class="section-title">Members</div>
+                <div class="section-card" id="membersList">
+                    <!-- Dynamic Members Render -->
+                </div>
+            </div>
+
+            <!-- Action Area -->
+            <div id="actionsSection">
+                <button class="action-btn danger" id="primaryActionBtn" style="display: none;"></button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { 
+            getFirestore, doc, getDoc, updateDoc, arrayRemove, deleteDoc, collection, getDocs 
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+            authDomain: "urbannoir-13ce8.firebaseapp.com",
+            projectId: "urbannoir-13ce8",
+            storageBucket: "urbannoir-13ce8.firebasestorage.app",
+            messagingSenderId: "1059246827383",
+            appId: "1:1059246827383:web:caa91c40c408d46e3b6372"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const peerId = urlParams.get('peerId');
+        const groupId = urlParams.get('groupId');
+
+        const backBtn = document.getElementById('backBtn');
+        const settingsTitle = document.getElementById('settingsTitle');
+        const displayAvatar = document.getElementById('displayAvatar');
+        const displayName = document.getElementById('displayName');
+        const displaySubtext = document.getElementById('displaySubtext');
+        const membersGroupSection = document.getElementById('membersGroupSection');
+        const membersList = document.getElementById('membersList');
+        const primaryActionBtn = document.getElementById('primaryActionBtn');
+        const avatarWrapper = document.getElementById('avatarWrapper');
+        const photoBadge = document.getElementById('photoBadge');
+        const groupPhotoInput = document.getElementById('groupPhotoInput');
+        const groupNameContainer = document.getElementById('groupNameContainer');
+
+        let currentUserId = null;
+        let isCurrentAdmin = false;
+
+        backBtn.onclick = () => {
+            if (groupId) {
+                window.location.href = `group.html?groupId=${groupId}`;
+            } else if (peerId) {
+                window.location.href = `chat.html?peerId=${peerId}`;
+            } else {
+                window.location.href = "friends.html";
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                if (groupId) {
+                    loadGroupSettings();
+                } else if (peerId) {
+                    loadPersonalChatSettings();
+                } else {
+                    window.location.href = "friends.html";
+                }
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        // 1. Personal Chat Info
+        async function loadPersonalChatSettings() {
+            settingsTitle.textContent = "User Info";
+            try {
+                const userSnap = await getDoc(doc(db, "users", peerId));
+                displayAvatar.classList.remove('skeleton');
+                
+                if (userSnap.exists()) {
+                    const data = userSnap.data();
+                    displayName.textContent = data.fullName || data.name || "User";
+                    displaySubtext.textContent = data.status || data.email || "Underground User";
+                    if (data.photoURL || data.avatar || data.photo) {
+                        displayAvatar.src = data.photoURL || data.avatar || data.photo;
+                    } else {
+                        displayAvatar.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235CFF72'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>";
+                    }
+                } else {
+                    displayName.textContent = "Unknown User";
+                    displaySubtext.textContent = "User not found";
+                }
+            } catch (err) {
+                console.error("Error loading peer profile:", err);
+            }
+        }
+
+        // 2. Group Settings
+        async function loadGroupSettings() {
+            settingsTitle.textContent = "Group Settings";
+            membersGroupSection.style.display = "block";
+
+            try {
+                const groupSnap = await getDoc(doc(db, "groups", groupId));
+                displayAvatar.classList.remove('skeleton');
+
+                if (groupSnap.exists()) {
+                    const data = groupSnap.data();
+                    const members = data.members || [];
+                    const adminId = data.adminId || data.createdBy;
+
+                    isCurrentAdmin = (adminId === currentUserId);
+
+                    displaySubtext.textContent = `${members.length} Members`;
+
+                    if (data.groupPhoto) {
+                        displayAvatar.src = data.groupPhoto;
+                    } else {
+                        displayAvatar.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235CFF72'><path d='M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z'/></svg>";
+                    }
+
+                    if (isCurrentAdmin) {
+                        photoBadge.style.display = "flex";
+                        avatarWrapper.onclick = () => groupPhotoInput.click();
+
+                        groupNameContainer.innerHTML = `
+                            <div class="group-name-edit-wrap">
+                                <input type="text" id="groupNameInput" class="group-name-input" value="${escapeHTML(data.groupName || '')}">
+                                <button class="save-name-btn" id="saveNameBtn">Save</button>
+                            </div>
+                        `;
+
+                        document.getElementById('saveNameBtn').onclick = async () => {
+                            const newName = document.getElementById('groupNameInput').value.trim();
+                            if (newName) {
+                                await updateDoc(doc(db, "groups", groupId), { groupName: newName });
+                                alert("Group name updated!");
+                            }
+                        };
+
+                    } else {
+                        displayName.textContent = data.groupName || "Group Chat";
+                    }
+
+                    renderMemberList(members, adminId);
+
+                    primaryActionBtn.style.display = "flex";
+                    if (isCurrentAdmin) {
+                        primaryActionBtn.textContent = "🗑️ Delete Group Permanently";
+                        primaryActionBtn.onclick = () => deleteGroupPermanently();
+                    } else {
+                        primaryActionBtn.textContent = "🚪 Leave Group";
+                        primaryActionBtn.onclick = () => leaveGroup();
+                    }
+
+                } else {
+                    displayName.textContent = "Group Not Found";
+                    displaySubtext.textContent = "This group does not exist";
+                }
+            } catch (err) {
+                console.error("Error loading group info:", err);
+            }
+        }
+
+        groupPhotoInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file || !isCurrentAdmin) return;
+
+            if (file.size > 2 * 1024 * 1024) {
+                alert("File size too large! Please choose an image under 2MB.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const base64Photo = event.target.result;
+                displayAvatar.src = base64Photo;
+
+                try {
+                    await updateDoc(doc(db, "groups", groupId), {
+                        groupPhoto: base64Photo
+                    });
+                    alert("Group photo updated!");
+                } catch (err) {
+                    console.error("Photo update failed:", err);
+                    alert("Failed to update group photo.");
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+
+        async function renderMemberList(memberIds, adminId) {
+            membersList.innerHTML = "";
+
+            for (const uid of memberIds) {
+                let name = "Member";
+                let photo = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235CFF72'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>";
+
+                try {
+                    const uSnap = await getDoc(doc(db, "users", uid));
+                    if (uSnap.exists()) {
+                        const uData = uSnap.data();
+                        name = uData.fullName || uData.name || "Member";
+                        if (uData.photoURL || uData.avatar || uData.photo) photo = uData.photoURL || uData.avatar || uData.photo;
+                    }
+                } catch(e) {}
+
+                const item = document.createElement("div");
+                item.className = "member-item";
+                
+                const isMemberAdmin = (uid === adminId);
+                const canKick = isCurrentAdmin && !isMemberAdmin;
+
+                item.innerHTML = `
+                    <div class="member-info">
+                        <img class="member-avatar" src="${photo}" alt="Member">
+                        <div class="member-details">
+                            <h4>${escapeHTML(name)} ${uid === currentUserId ? ' (You)' : ''}</h4>
+                        </div>
+                    </div>
+                    ${isMemberAdmin ? `<span class="admin-badge">Admin</span>` : ''}
+                    ${canKick ? `<button class="kick-btn" data-uid="${uid}">Kick</button>` : ''}
+                `;
+
+                membersList.appendChild(item);
+            }
+
+            document.querySelectorAll('.kick-btn').forEach(btn => {
+                btn.onclick = async (e) => {
+                    const kickUid = e.target.getAttribute('data-uid');
+                    if (confirm("Are you sure you want to kick this member?")) {
+                        await kickMember(kickUid);
+                    }
+                };
+            });
+        }
+
+        async function kickMember(kickUid) {
+            try {
+                await updateDoc(doc(db, "groups", groupId), {
+                    members: arrayRemove(kickUid)
+                });
+                alert("Member kicked!");
+                loadGroupSettings();
+            } catch (err) {
+                alert("Failed to kick member: " + err.message);
+            }
+        }
+
+        async function leaveGroup() {
+            if (!confirm("Are you sure you want to leave this group?")) return;
+            try {
+                await updateDoc(doc(db, "groups", groupId), {
+                    members: arrayRemove(currentUserId)
+                });
+                window.location.href = "friends.html";
+            } catch (err) {
+                alert("Failed to leave group: " + err.message);
+            }
+        }
+
+        async function deleteGroupPermanently() {
+            if (!confirm("⚠️ PERMANENT DELETE WARNING!\nThis will delete the entire group and all message history permanently from Firebase. Proceed?")) return;
+
+            try {
+                const msgsRef = collection(db, "groups", groupId, "messages");
+                const msgsSnap = await getDocs(msgsRef);
+                
+                const deletePromises = msgsSnap.docs.map(msgDoc => deleteDoc(doc(db, "groups", groupId, "messages", msgDoc.id)));
+                await Promise.all(deletePromises);
+
+                await deleteDoc(doc(db, "groups", groupId));
+
+                alert("Group deleted permanently!");
+                window.location.href = "friends.html";
+
+            } catch (err) {
+                console.error("Permanent delete error:", err);
+                alert("Failed to delete group permanently: " + err.message);
+            }
+        }
+
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+    </script>
+</body>
+</html>
