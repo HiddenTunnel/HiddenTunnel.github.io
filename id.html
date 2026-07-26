@@ -108,10 +108,12 @@
             box-sizing: border-box;
         }
 
+        /* Fixed Row & Layout Alignment */
         .detail-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 12px;
             font-size: 0.9rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             padding-bottom: 8px;
@@ -126,19 +128,39 @@
             color: #888;
             font-weight: 500;
             font-size: 0.82rem;
+            flex-shrink: 0;
         }
 
+        /* Fixed Value Overflow with Ellipsis */
         .detail-value {
             color: #fff;
             font-weight: 700;
+            flex: 1;
+            min-width: 0;
             text-align: right;
-            word-break: break-all;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .detail-value.highlight {
             color: var(--green, #5CFF72);
             font-family: monospace;
             font-size: 1rem;
+        }
+
+        .add-phone-link {
+            color: var(--green, #5CFF72);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 700;
+            margin-left: 5px;
+            transition: opacity 0.2s;
+        }
+
+        .add-phone-link:hover {
+            opacity: 0.8;
+            text-decoration: underline;
         }
 
         .card-actions {
@@ -171,6 +193,17 @@
 
         .btn-action:hover {
             transform: translateY(-2px);
+        }
+
+        /* Bottom Nav Responsive CSS */
+        #bottom-nav-container {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            #bottom-nav-container {
+                display: block;
+            }
         }
     </style>
 </head>
@@ -211,6 +244,10 @@
                     <div class="detail-row">
                         <span class="detail-label">Phone</span>
                         <span class="detail-value" id="displayPhone">Loading...</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Status</span>
+                        <span class="detail-value" id="displayStatus">Loading...</span>
                     </div>
                 </div>
             </div>
@@ -261,11 +298,19 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
 
-                    document.getElementById("displayName").textContent = data.fullName || "N/A";
+                    document.getElementById("displayName").textContent = data.fullName || data.name || "N/A";
                     document.getElementById("displayVersityId").textContent = data.versityId || "N/A";
                     document.getElementById("displayEmail").textContent = data.email || user?.email || "N/A";
-                    document.getElementById("displayPhone").textContent = data.phone || "N/A";
-                    document.getElementById("displayPhoto").src = data.photo || DEFAULT_AVATAR;
+                    document.getElementById("displayStatus").textContent = data.bio || data.status || "Underground Operator";
+                    
+                    const phoneElement = document.getElementById("displayPhone");
+                    if (data.phone && data.phone.trim() !== "") {
+                        phoneElement.textContent = data.phone;
+                    } else {
+                        phoneElement.innerHTML = `Not Added <a href="createaccount.html" class="add-phone-link">(+ Add)</a>`;
+                    }
+
+                    document.getElementById("displayPhoto").src = data.photo || data.avatar || DEFAULT_AVATAR;
                 } else {
                     alert("Profile not found.");
                     window.location.href = "createaccount.html";
@@ -278,5 +323,18 @@
 
     <!-- Bottom/Desktop Nav Injector -->
     <script src="navbar.js"></script>
+
+    <!-- Mobile Bottom Nav -->
+    <div id="bottom-nav-container"></div>
+
+    <script>
+        if (window.innerWidth <= 768) {
+            fetch("bottom-nav.html")
+                .then(res => res.text())
+                .then(data => {
+                    document.getElementById("bottom-nav-container").innerHTML = data;
+                });
+        }
+    </script>
 </body>
 </html>

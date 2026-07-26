@@ -327,6 +327,11 @@
             transition: border-color 0.2s;
         }
 
+        .form-group input[type="file"] {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
         .form-group input:focus, 
         .form-group textarea:focus {
             border-color: var(--green);
@@ -556,8 +561,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="photoInput">Avatar Image URL</label>
-                    <input type="url" id="photoInput" placeholder="https://example.com/avatar.jpg">
+                    <label for="photoUpload">Profile Photo</label>
+                    <input type="file" id="photoUpload" accept="image/*">
+                    <small style="color:#888; display: block; margin-top: 6px;">
+                        Default photo is your Google account photo.
+                        Uploading a new image will replace it everywhere.
+                    </small>
                 </div>
 
                 <div class="form-group">
@@ -653,6 +662,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
@@ -667,6 +677,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
         // Elements
         const settingsAvatar = document.getElementById('settingsAvatar');
@@ -676,7 +687,7 @@
         const settingsDisplayTag = document.getElementById('settingsDisplayTag');
         
         const fullNameInput = document.getElementById('fullNameInput');
-        const photoInput = document.getElementById('photoInput');
+        const photoUpload = document.getElementById('photoUpload');
         const bioInput = document.getElementById('bioInput');
         const settingsForm = document.getElementById('settingsForm');
         const statusMessage = document.getElementById('statusMessage');
@@ -722,7 +733,6 @@
                     if (desktopTopAvatar) desktopTopAvatar.src = photo;
 
                     fullNameInput.value = name;
-                    photoInput.value = data.photo || "";
                     bioInput.value = bio;
 
                     // Load preferences from local storage or database
@@ -738,6 +748,33 @@
                 console.error("Error loading user settings:", err);
             }
         }
+
+        // Photo Upload Listener
+        photoUpload.addEventListener("change", async (e) => {
+            const file = e.target.files[0];
+            if (!file || !currentUser) return;
+
+            statusMessage.textContent = "Uploading new image...";
+            try {
+                const storageRef = ref(storage, "avatars/" + currentUser.uid);
+                await uploadBytes(storageRef, file);
+                const url = await getDownloadURL(storageRef);
+
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    photo: url
+                });
+
+                settingsAvatar.src = url;
+                if (mobileTopAvatar) mobileTopAvatar.src = url;
+                if (desktopTopAvatar) desktopTopAvatar.src = url;
+
+                statusMessage.textContent = "Profile photo updated successfully!";
+                setTimeout(() => { statusMessage.textContent = ""; }, 3000);
+            } catch (err) {
+                console.error("Error uploading photo:", err);
+                statusMessage.textContent = "Failed to upload image.";
+            }
+        });
 
         // Handle preference toggles
         notificationsToggle?.addEventListener('change', () => {
@@ -763,24 +800,16 @@
             try {
                 const userRef = doc(db, "users", currentUser.uid);
                 const newName = fullNameInput.value.trim();
-                const newPhoto = photoInput.value.trim();
                 const newBio = bioInput.value.trim();
 
                 await updateDoc(userRef, {
                     fullName: newName,
                     username: newName,
-                    photo: newPhoto,
                     bio: newBio,
                     status: newBio
                 });
 
                 localStorage.setItem('ug_username', newName);
-                if (newPhoto) {
-                    localStorage.setItem('ug_user_photo', newPhoto);
-                    settingsAvatar.src = newPhoto;
-                    if (mobileTopAvatar) mobileTopAvatar.src = newPhoto;
-                    if (desktopTopAvatar) desktopTopAvatar.src = newPhoto;
-                }
 
                 settingsDisplayName.textContent = newName;
                 statusMessage.textContent = "Signal updated successfully!";

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Underground Chat - Profile Card</title>
+    <title>Underground Chat - Friend ID Card</title>
     <meta name="theme-color" content="#050505">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,185 +44,203 @@
             transform: translate(-50%, -50%);
         }
 
-        #particles-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        header {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 100;
-            background: rgba(5, 5, 5, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 18px 32px;
-        }
-
-        nav {
-            max-width: 1100px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            font-family: 'Permanent Marker', cursive;
-            font-size: 1.3rem;
-            color: #fff;
-            text-decoration: none;
-        }
-
-        .logo span { color: var(--green); }
-
-        nav ul {
-            display: flex;
-            gap: 20px;
-            list-style: none;
-        }
-
-        nav ul li a {
-            text-decoration: none;
-            color: #b0b0b0;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
-        .profile-container {
-            position: relative;
-            z-index: 5;
-            max-width: 500px;
-            margin: 110px auto 60px auto;
+        .id-wrapper {
+            max-width: 440px;
+            margin: 110px auto 40px auto;
             padding: 0 20px;
+            position: relative;
+            z-index: 10;
         }
 
         .id-card {
-            background: #111111;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 28px;
-            padding: 40px 25px;
-            text-align: center;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+            background: linear-gradient(145deg, #181818 0%, #0d0d0d 100%);
+            border: 2px solid rgba(92, 255, 114, 0.4);
+            border-radius: 24px;
+            padding: 28px 24px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 35px rgba(92, 255, 114, 0.15);
             position: relative;
             overflow: hidden;
         }
 
-        .avatar-wrapper {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 20px auto;
+        .id-card::before {
+            content: "OFFICIAL TAGGER";
+            position: absolute;
+            top: 18px;
+            right: -30px;
+            background: var(--orange, #FF7A00);
+            color: #000;
+            font-size: 0.65rem;
+            font-weight: 900;
+            padding: 4px 35px;
+            transform: rotate(45deg);
+            letter-spacing: 1px;
         }
 
-        .profile-avatar {
+        .id-header {
+            text-align: center;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+            padding-bottom: 16px;
+            margin-bottom: 22px;
+        }
+
+        .id-header h2 {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 1.6rem;
+            color: #fff;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        .id-header h2 span {
+            color: var(--green, #5CFF72);
+        }
+
+        .id-header p {
+            font-size: 0.75rem;
+            color: var(--orange, #FF7A00);
+            letter-spacing: 2px;
+            margin-top: 2px;
+            font-weight: 700;
+        }
+
+        .id-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .id-photo-container {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 3px solid var(--green, #5CFF72);
+            padding: 3px;
+            background: #000;
+            box-shadow: 0 0 20px rgba(92, 255, 114, 0.3);
+            overflow: hidden;
+        }
+
+        .id-photo {
             width: 100%;
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid var(--green);
         }
 
-        .user-name {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .user-tag {
-            color: var(--orange);
-            font-family: monospace;
-            font-size: 0.95rem;
-            margin-bottom: 20px;
-        }
-
-        .info-grid {
-            text-align: left;
-            background: rgba(0, 0, 0, 0.4);
+        .id-details {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 16px;
             border-radius: 16px;
-            margin-bottom: 25px;
-            font-size: 0.9rem;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-sizing: border-box;
         }
 
-        .info-item {
+        .detail-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 8px;
         }
 
-        .info-item:last-child { margin-bottom: 0; }
-        .info-label { color: #888; }
-        .info-value { color: #ddd; }
+        .detail-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
 
-        .action-buttons {
+        .detail-label {
+            color: #888;
+            font-weight: 500;
+            font-size: 0.82rem;
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            color: #fff;
+            font-weight: 700;
+            flex: 1;
+            min-width: 0;
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .detail-value.highlight {
+            color: var(--green, #5CFF72);
+            font-family: monospace;
+            font-size: 1rem;
+        }
+
+        .card-actions {
+            margin-top: 25px;
             display: flex;
             gap: 12px;
         }
 
-        .btn {
+        .btn-action {
             flex: 1;
             padding: 12px;
-            border-radius: 50px;
+            border-radius: 40px;
+            text-align: center;
+            text-decoration: none;
             font-weight: 700;
             font-size: 0.9rem;
+            transition: all 0.3s;
             cursor: pointer;
             border: none;
-            text-decoration: none;
             display: inline-flex;
             align-items: center;
             justify-content: center;
         }
 
         .btn-chat {
-            background: var(--green);
-            color: #050505;
+            background: var(--green, #5CFF72);
+            color: #000;
         }
 
-        .btn-friend {
+        .btn-edit {
             background: rgba(255, 255, 255, 0.08);
             color: #fff;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .btn-friend.requested {
+        .btn-edit.requested {
             background: rgba(255, 122, 0, 0.15);
             color: var(--orange);
             border-color: var(--orange);
         }
 
-        .btn-friend.friends {
+        .btn-edit.friends {
             background: rgba(92, 255, 114, 0.15);
             color: var(--green);
             border-color: var(--green);
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
 
     <div id="mouse-glow"></div>
-    <canvas id="particles-canvas"></canvas>
+    <div id="navbar-container"></div>
 
-    <header>
-        <nav>
-            <a href="index.html" class="logo">UNDERGROUND <span>CHAT</span></a>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="user.html">Chats</a></li>
-                <li><a href="notification.html">Alerts</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <main class="profile-container">
+    <main class="id-wrapper">
         <div class="id-card" id="profileCard">
-            <p style="color:#888;">Fetching target signal...</p>
+            <p style="color:#888; text-align:center;">Fetching target signal...</p>
         </div>
     </main>
 
+    <!-- FIREBASE SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -242,51 +260,84 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235CFF72'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>";
+        const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='8' r='4' fill='%235CFF72'/><path d='M4 20c0-4 3.5-7 8-7s8 3 8 7' fill='%235CFF72'/></svg>";
 
         const urlParams = new URLSearchParams(window.location.search);
         const targetUid = urlParams.get('uid');
         const profileCard = document.getElementById('profileCard');
-        let currentUserId = null;
+        let currentUserId = localStorage.getItem("ug_current_user_id");
 
         onAuthStateChanged(auth, async (user) => {
             if (user) currentUserId = user.uid;
             if (!targetUid) {
-                profileCard.innerHTML = `<p style="color:#ff4d4d;">No target user ID provided.</p>`;
+                profileCard.innerHTML = `<p style="color:#ff4d4d; text-align:center;">No target user ID provided.</p>`;
                 return;
             }
             await fetchUserProfile();
         });
 
+        // Helper function to mask email address for privacy
+        function maskEmail(email) {
+            if (!email || !email.includes('@')) return email || 'N/A';
+            const [name, domain] = email.split('@');
+            if (name.length <= 3) return `${name.charAt(0)}***@${domain}`;
+            return `${name.substring(0, 3)}*****@${domain}`;
+        }
+
         async function fetchUserProfile() {
             try {
                 const snap = await getDoc(doc(db, "users", targetUid));
                 if (!snap.exists()) {
-                    profileCard.innerHTML = `<p style="color:#ff4d4d;">User profile does not exist.</p>`;
+                    profileCard.innerHTML = `<p style="color:#ff4d4d; text-align:center;">User profile does not exist.</p>`;
                     return;
                 }
 
                 const u = snap.data();
                 const chatId = currentUserId < targetUid ? `${currentUserId}_${targetUid}` : `${targetUid}_${currentUserId}`;
+                const maskedEmail = maskEmail(u.email);
+                const userBio = u.bio || u.status || "Underground Operator";
 
                 profileCard.innerHTML = `
-                    <div class="avatar-wrapper">
-                        <img src="${u.photo || u.avatar || defaultAvatar}" class="profile-avatar" alt="Avatar">
+                    <div class="id-header">
+                        <h2>UNDERGROUND <span>ID</span></h2>
+                        <p>VERSITY PASSPORT</p>
                     </div>
-                    <h2 class="user-name">${u.fullName || u.name || 'Anonymous'}</h2>
-                    <div class="user-tag">ID: ${u.versityId || targetUid.slice(0, 8)}</div>
 
-                    <div class="info-grid">
-                        <div class="info-item"><span class="info-label">Email</span><span class="info-value">${u.email || 'N/A'}</span></div>
-                        <div class="info-item"><span class="info-label">Status</span><span class="info-value">${u.bio || 'Underground Operator'}</span></div>
+                    <div class="id-body">
+                        <div class="id-photo-container">
+                            <img id="displayPhoto" class="id-photo" src="${u.photo || u.avatar || defaultAvatar}" alt="Profile">
+                        </div>
+
+                        <div class="id-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Full Name</span>
+                                <span class="detail-value" id="displayName">${u.fullName || u.name || 'Anonymous'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Versity ID</span>
+                                <span class="detail-value highlight" id="displayVersityId">${u.versityId || 'N/A'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Email</span>
+                                <span class="detail-value" id="displayEmail">${maskedEmail}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Status</span>
+                                <span class="detail-value" id="displayStatus">${userBio}</span>
+                            </div>
+                        </div>
                     </div>
 
                     ${currentUserId !== targetUid ? `
-                        <div class="action-buttons">
-                            <a href="chat.html?chatId=${chatId}&peerUid=${targetUid}" class="btn btn-chat">💬 Chat</a>
-                            <button id="friendBtn" class="btn btn-friend">➕ Connect</button>
+                        <div class="card-actions">
+                            <a href="chat.html?chatId=${chatId}&peerUid=${targetUid}" class="btn-action btn-chat">
+                                Chat
+                            </a>
+                            <button id="friendBtn" class="btn-action btn-edit">
+                                Add Friend
+                            </button>
                         </div>
-                    ` : `<p style="color:#666;">This is your card.</p>`}
+                    ` : `<p style="color:#888; text-align:center; margin-top:20px; font-size:0.85rem;">This is your card.</p>`}
                 `;
 
                 if (currentUserId && currentUserId !== targetUid) {
@@ -299,29 +350,43 @@
 
         function setupFriendButton() {
             const friendBtn = document.getElementById('friendBtn');
+            if (!friendBtn) return;
+
             const requestRef = doc(db, "friendRequests", `${currentUserId}_${targetUid}`);
             const friendRef = doc(db, "friends", `${currentUserId}_${targetUid}`);
 
             onSnapshot(requestRef, (reqSnap) => {
                 if (reqSnap.exists()) {
-                    friendBtn.textContent = "⏳ Signal Sent";
-                    friendBtn.className = "btn btn-friend requested";
+                    friendBtn.textContent = "⏳ Request Sent";
+                    friendBtn.className = "btn-action btn-edit requested";
                     friendBtn.onclick = () => deleteDoc(requestRef);
                 } else {
                     getDoc(friendRef).then((fSnap) => {
                         if (fSnap.exists()) {
-                            friendBtn.textContent = "✔ Crew Member";
-                            friendBtn.className = "btn btn-friend friends";
+                            friendBtn.textContent = "✔ Friend";
+                            friendBtn.className = "btn-action btn-edit friends";
                             friendBtn.onclick = null;
                         } else {
-                            friendBtn.textContent = "➕ Add Crew";
-                            friendBtn.className = "btn btn-friend";
+                            friendBtn.textContent = "Add Friend";
+                            friendBtn.className = "btn-action btn-edit";
                             friendBtn.onclick = () => setDoc(requestRef, { from: currentUserId, to: targetUid, timestamp: Date.now() });
                         }
                     });
                 }
             });
         }
+
+        // Mouse glow tracking effect
+        const glow = document.getElementById('mouse-glow');
+        if (glow) {
+            window.addEventListener('mousemove', (e) => {
+                glow.style.left = e.clientX + 'px';
+                glow.style.top = e.clientY + 'px';
+            });
+        }
     </script>
+
+    <!-- Navigation Injector -->
+    <script src="navbar.js"></script>
 </body>
 </html>

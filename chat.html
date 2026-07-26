@@ -25,7 +25,6 @@
             padding: 0;
         }
 
-        /* Hide top navigation on Chat Page */
         header, nav, .top-nav, #navbar-container > header, .bottom-nav {
             display: none !important;
         }
@@ -37,7 +36,6 @@
             background-image: radial-gradient(circle at 50% 0%, #152517 0%, #050505 70%);
         }
 
-        /* Main Fixed Chat Container */
         .chat-container {
             width: 100%;
             max-width: 700px;
@@ -57,7 +55,6 @@
             z-index: 10;
         }
 
-        /* Header Layout */
         .chat-header {
             height: 60px;
             flex-shrink: 0;
@@ -114,7 +111,6 @@
             color: #888;
         }
 
-        /* Message Scroll Area */
         .chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -157,6 +153,14 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
+        .sender-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--orange);
+            margin-bottom: 3px;
+            display: block;
+        }
+
         .msg-time {
             font-size: 0.65rem;
             display: block;
@@ -165,7 +169,6 @@
             text-align: right;
         }
 
-        /* Input Area Wrapper */
         .chat-input-wrapper {
             flex-shrink: 0;
             padding: 12px 16px;
@@ -220,7 +223,6 @@
             fill: #000;
         }
 
-        /* Profile Modal Styles */
         .profile-modal-overlay {
             position: fixed;
             top: 0;
@@ -408,7 +410,6 @@
         } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-        // Notification Sound Setup
         const messageSound = new Audio("assets/sounds/notification.mp3");
         messageSound.preload = "auto";
 
@@ -437,7 +438,6 @@
         const backBtn = document.getElementById('backBtn');
         const peerInfoTrigger = document.getElementById('peerInfoTrigger');
 
-        // Modal Elements
         const profileModal = document.getElementById('profileModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
         const modalAvatar = document.getElementById('modalAvatar');
@@ -449,7 +449,6 @@
 
         backBtn.onclick = () => window.location.href = "user.html";
 
-        // Open Profile Modal on Header Click
         peerInfoTrigger.onclick = () => {
             profileModal.style.display = "flex";
         };
@@ -476,7 +475,7 @@
                     window.location.href = "user.html";
                     return;
                 }
-                loadPeerInfo();
+                await loadPeerInfo();
                 listenMessages();
             } else {
                 window.location.href = "login.html";
@@ -486,22 +485,38 @@
         async function loadPeerInfo() {
             try {
                 const userSnap = await getDoc(doc(db, "users", peerUid));
+                
                 if (userSnap.exists()) {
                     const data = userSnap.data();
+
+                    // 1. deleted === true চেক
+                    if (data.deleted === true) {
+                        peerName.textContent = "Deleted Account";
+                        peerAvatar.src = "assets/img/deleted-user.png";
+                        modalName.textContent = "Deleted Account";
+                        modalAvatar.src = peerAvatar.src;
+                        modalSub.textContent = "This account no longer exists.";
+                        viewIdBtn.style.display = "none";
+                        return;
+                    }
+
                     const name = data.fullName || data.name || "User";
                     const photo = data.photo || data.photoURL || data.avatar || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235CFF72'><circle cx='12' cy='12' r='10'/></svg>";
                     
                     peerName.textContent = name;
                     peerAvatar.src = photo;
 
-                    // Update Modal Data
+                    // 5. Modal UID / Versity ID Display
                     modalName.textContent = name;
                     modalAvatar.src = photo;
-                    modalSub.textContent = `UID: ${peerUid}`;
+                    modalSub.textContent = data.versityId ? `ID: ${data.versityId}` : `UID: ${peerUid.slice(0, 8)}`;
                 } else {
-                    peerName.textContent = "Unknown User";
-                    modalName.textContent = "Unknown User";
-                    modalSub.textContent = `UID: ${peerUid}`;
+                    peerName.textContent = "Deleted Account";
+                    peerAvatar.src = "assets/img/deleted-user.png";
+                    modalName.textContent = "Deleted Account";
+                    modalAvatar.src = peerAvatar.src;
+                    modalSub.textContent = "This account no longer exists.";
+                    viewIdBtn.style.display = "none";
                 }
             } catch (err) {
                 console.error("Peer details fetch error:", err);
@@ -539,14 +554,29 @@
             });
         }
 
-        function renderMessage(msg) {
+        async function renderMessage(msg) {
             const bubble = document.createElement("div");
             const isSent = msg.senderId === currentUserId;
             bubble.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
             
             const timeStr = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...';
 
+            let senderNameHTML = "";
+
+            // 3. renderMessage-এ sender name সাপোর্ট
+            if (!isSent) {
+                try {
+                    const senderSnap = await getDoc(doc(db, "users", msg.senderId));
+                    if (senderSnap.exists() && senderSnap.data().deleted === true) {
+                        senderNameHTML = `<span class="sender-title">Deleted Account</span>`;
+                    }
+                } catch (e) {
+                    senderNameHTML = `<span class="sender-title">Deleted Account</span>`;
+                }
+            }
+
             bubble.innerHTML = `
+                ${senderNameHTML}
                 ${escapeHTML(msg.text)}
                 <span class="msg-time">${timeStr}</span>
             `;
@@ -554,8 +584,16 @@
             chatMessages.appendChild(bubble);
         }
 
+        // 2. Message Send Guard Check
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            const peerSnap = await getDoc(doc(db, "users", peerUid));
+            if (!peerSnap.exists() || peerSnap.data().deleted === true) {
+                alert("This account has been deleted.");
+                return;
+            }
+
             const text = messageInput.value.trim();
             if (!text || !currentUserId) return;
 

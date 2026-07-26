@@ -76,6 +76,7 @@ body {
 
 .mobile-top-bar * {
   pointer-events: auto;
+  
 }
 
 /* Mobile Profile Pic (Top Left) */
@@ -582,6 +583,9 @@ nav {
 
 /* Responsive Queries */
 @media (max-width: 768px) {
+  .mobile-top-bar{
+    top: 28px !important;   /* আগে ছিল 14px */
+}
   header { display: none !important; }
   .mobile-top-bar { display: flex; }
   .hero-title .desktop-title { display: none; }
@@ -591,6 +595,6 @@ nav {
     letter-spacing: 0.5px;
   }
   .mobile-bottom-nav { display: flex; }
-  .hero { margin-top: 0px; margin-bottom: 30px; }
+  .hero { margin-top: -70px; margin-bottom: 30px; }
   .hero-buttons { flex-direction: column; }
 }

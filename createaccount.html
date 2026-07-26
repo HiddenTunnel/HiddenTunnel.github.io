@@ -71,7 +71,15 @@
             transition: border-color 0.3s;
         }
 
-        .input-group input:focus {
+        /* Readonly input styling */
+        .input-group input[readonly] {
+            background: #121212;
+            color: #888;
+            border-color: rgba(255, 255, 255, 0.08);
+            cursor: not-allowed;
+        }
+
+        .input-group input:focus:not([readonly]) {
             border-color: var(--green, #5CFF72);
         }
 
@@ -187,17 +195,17 @@
 
             <div class="input-group">
                 <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" placeholder="e.g. Alex Mercer" required>
+                <input type="text" id="fullName" readonly>
             </div>
 
             <div class="input-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="alex@university.edu" required>
+                <input type="email" id="email" readonly>
             </div>
 
             <div class="input-group">
                 <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" placeholder="+880 1700 000000" required>
+                <input type="tel" id="phone" placeholder="Optional">
             </div>
 
             <div class="input-group">
@@ -237,19 +245,29 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                window.location.href = "login.html";
-                return;
-            }
-        });
-
         let uploadedPhotoURL = "";
         const CLOUD_NAME = "z1vtvdmj";
         const UPLOAD_PRESET = "urbaun_chat";
         const photoInput = document.getElementById('photoInput');
         const imagePreview = document.getElementById('imagePreview');
         const previewPlaceholder = document.getElementById('previewPlaceholder');
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            document.getElementById("fullName").value = user.displayName || "";
+            document.getElementById("email").value = user.email || "";
+
+            if (user.photoURL) {
+                imagePreview.src = user.photoURL;
+                imagePreview.style.display = "block";
+                previewPlaceholder.style.display = "none";
+                uploadedPhotoURL = user.photoURL;
+            }
+        });
 
         photoInput.addEventListener("change", async (e) => {
             const file = e.target.files[0];
@@ -334,7 +352,7 @@
                 const profileData = {
                     fullName: document.getElementById('fullName').value.trim(),
                     email: document.getElementById('email').value.trim(),
-                    phone: document.getElementById('phone').value.trim(),
+                    phone: document.getElementById('phone').value.trim() || "",
                     versityId: versityId,
                     photo: uploadedPhotoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80"
                 };
