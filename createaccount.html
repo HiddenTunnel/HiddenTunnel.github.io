@@ -209,8 +209,8 @@
             </div>
 
             <div class="input-group">
-                <label for="versityId">Versity ID No. (Must be 8 digits)</label>
-                <input type="text" id="versityId" placeholder="e.g. 26206037" maxlength="8" minlength="8" pattern="[0-9]{8}" title="ID must be exactly 8 digits (e.g. 26206037)" required>
+                <label for="versityId">Put Your IUBAT VERSITY ID</label>
+                <input type="text" id="versityId" placeholder="e.g. 262060**" maxlength="8" minlength="8" pattern="262060[0-9]{2}" title="ID must start with 262060 followed by 2 digits (e.g. 262060**)" required>
             </div>
 
             <button type="submit" id="submitBtn" class="submit-btn">GENERATE ID CARD</button>
@@ -312,10 +312,10 @@
             const submitBtn = document.getElementById('submitBtn');
             const versityId = document.getElementById('versityId').value.trim();
 
-            // 🔴 1. 8-Digit Format Validation Check Logic
-            const isEightDigits = /^[0-9]{8}$/.test(versityId);
-            if (!isEightDigits) {
-                alert("Invalid ID! Versity ID must be exactly 8 digits (e.g. 26206037).");
+            // 🔴 1. 262060 Prefixed ID Check Logic (Must start with 262060 and end with 2 digits)
+            const isValidIubatFormat = /^262060\d{2}$/.test(versityId);
+            if (!isValidIubatFormat) {
+                alert("Invalid ID! Versity ID must start with 262060 followed by 2 digits (e.g. 262060**).");
                 return;
             }
 
@@ -341,7 +341,7 @@
                 const isDuplicate = querySnapshot.docs.some(doc => doc.id !== user.uid);
 
                 if (isDuplicate) {
-                    alert("This Versity ID is already registered by another account! Please enter a unique 8-digit ID.");
+                    alert("This Versity ID is already registered by another account! Please enter a unique ID.");
                     submitBtn.textContent = "GENERATE ID CARD";
                     submitBtn.disabled = false;
                     return;
