@@ -1,0 +1,34 @@
+{
+  "background_color": "#000000",
+  "description": "An authentic street-inspired chat platform built for crews, taggers, and subterranean conversations. Encrypted, instant, and raw.",
+  "dir": "auto",
+  "display": "standalone",
+  "name": "URBAN NOIR",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "URBAN NOIR",
+  "start_url": "https://urbannoir.github.io/",
+  "theme_color": "#050505",
+  "icons": [
+    {
+      "src": "https://urbannoir.github.io/assets/pic/banner.png",
+      "type": "image/jpeg",
+      "sizes": "2130x1420",
+      "isSquare": false,
+      "isPng": true,
+      "isWebp": false,
+      "isJpg": true,
+      "width": 2130,
+      "is512x512": false,
+      "is256x256": false,
+      "is192x192": false
+    }
+  ],
+  "id": "262060",
+  "lang": "en",
+  "categories": [
+    "social networking"
+  ],
+  "iarc_rating_id": "20",
+  "prefer_related_applications": false
+}
