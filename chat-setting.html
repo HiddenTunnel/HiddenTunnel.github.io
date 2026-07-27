@@ -403,7 +403,7 @@
             } else if (peerId) {
                 window.location.href = `chat.html?peerId=${peerId}`;
             } else {
-                window.location.href = "user.html";
+                window.location.href = "group.html";
             }
         };
 
@@ -415,7 +415,7 @@
                 } else if (peerId) {
                     loadPersonalChatSettings();
                 } else {
-                    window.location.href = "friends.html";
+                    window.location.href = "group.html";
                 }
             } else {
                 window.location.href = "login.html";
@@ -605,7 +605,7 @@
                 await updateDoc(doc(db, "groups", groupId), {
                     members: arrayRemove(currentUserId)
                 });
-                window.location.href = "friends.html";
+                window.location.href = "group.html";
             } catch (err) {
                 alert("Failed to leave group: " + err.message);
             }
@@ -624,7 +624,7 @@
                 await deleteDoc(doc(db, "groups", groupId));
 
                 alert("Group deleted permanently!");
-                window.location.href = "friends.html";
+                window.location.href = "group.html";
 
             } catch (err) {
                 console.error("Permanent delete error:", err);
