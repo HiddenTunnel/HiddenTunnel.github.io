@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Developer Control Panel | Urban Noir</title>
+  <meta name="theme-color" content="#050505">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .dev-container {
+      max-width: 900px;
+      margin: 100px auto 40px auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .dev-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      border-left: 4px solid var(--orange);
+      padding-left: 14px;
+    }
+
+    .dev-header h1 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    .dev-badge {
+      background: rgba(255, 122, 0, 0.15);
+      color: var(--orange);
+      border: 1px solid var(--orange);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .pending-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .dev-card {
+      background: var(--card-bg, #0a0a0a);
+      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .dev-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 10px;
+      background: #141414;
+    }
+
+    .dev-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .dev-card-meta {
+      font-size: 0.82rem;
+      color: #aaa;
+    }
+
+    .dev-card-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .btn-approve {
+      flex: 1;
+      background: var(--green);
+      color: #000;
+      font-weight: 800;
+      padding: 10px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .btn-approve:hover {
+      transform: scale(1.03);
+    }
+
+    .btn-reject {
+      background: rgba(255, 77, 77, 0.15);
+      color: var(--red);
+      border: 1px solid rgba(255, 77, 77, 0.3);
+      font-weight: 700;
+      padding: 10px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    #accessDenied {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+      background: rgba(255, 77, 77, 0.05);
+      border: 1px solid var(--red);
+      border-radius: 20px;
+    }
+
+    #accessDenied h2 {
+      color: var(--red);
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="graffiti-bg"></div>
+  <div id="mouse-glow"></div>
+
+  <main class="dev-container">
+    
+    <!-- DENIED ACCESS NOTICE -->
+    <div id="accessDenied">
+      <h2>🛑 Access Denied</h2>
+      <p style="color: #aaa; margin-bottom: 20px;">You are not authorized to view the developer terminal.</p>
+      <a href="index.html" class="btn-primary" style="display: inline-block; padding: 10px 24px; text-decoration: none;">Return Home</a>
+    </div>
+
+    <!-- AUTHORIZED DEVELOPER PANEL -->
+    <div id="devPanel" style="display: none;">
+      <div class="dev-header">
+        <h1>Pending Permissions</h1>
+        <span class="dev-badge">Dev Access Granted</span>
+      </div>
+
+      <div id="pendingContainer" class="pending-grid">
+        <!-- Pending books loaded via Firebase -->
+      </div>
+    </div>
+
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { 
+      getFirestore, 
+      collection, 
+      query, 
+      where, 
+      getDocs, 
+      doc, 
+      updateDoc, 
+      deleteDoc 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+      authDomain: "urbannoir-13ce8.firebaseapp.com",
+      projectId: "urbannoir-13ce8",
+      storageBucket: "urbannoir-13ce8.firebasestorage.app",
+      messagingSenderId: "1059246827383",
+      appId: "1:1059246827383:web:caa91c40c408d46e3b6372"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const DEV_EMAIL = "mushfiquemonowarnamir2006@gmail.com";
+
+    onAuthStateChanged(auth, async (user) => {
+      // Access Guard: Strict email check
+      if (!user || user.email.toLowerCase() !== DEV_EMAIL.toLowerCase()) {
+        document.getElementById("accessDenied").style.display = "block";
+        document.getElementById("devPanel").style.display = "none";
+        return;
+      }
+
+      // Developer Authorized
+      document.getElementById("accessDenied").style.display = "none";
+      document.getElementById("devPanel").style.display = "block";
+      loadPendingBooks();
+    });
+
+    async function loadPendingBooks() {
+      const container = document.getElementById("pendingContainer");
+      container.innerHTML = `<p style="color: #888;">Loading pending approvals...</p>`;
+
+      try {
+        const q = query(collection(db, "books"), where("status", "==", "pending"));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          container.innerHTML = `<p style="color: #666;">No pending books waiting for approval.</p>`;
+          return;
+        }
+
+        let html = "";
+        snapshot.forEach((docSnap) => {
+          const book = docSnap.data();
+          const id = docSnap.id;
+
+          html += `
+            <div class="dev-card" id="card-${id}">
+              <img src="${book.cover || 'assets/pic/banner.png'}" alt="Cover">
+              <div class="dev-card-title">${book.title || 'Untitled'}</div>
+              <div class="dev-card-meta">By: ${book.uploader || 'Unknown'}</div>
+              <div class="dev-card-meta">Type: ${book.paid ? 'Paid (৳' + book.price + ')' : 'Free'}</div>
+              <p style="font-size: 0.8rem; color: #777;">${book.description || ''}</p>
+              
+              <div class="dev-card-actions">
+                <button class="btn-approve" onclick="approveBook('${id}')">Approve</button>
+                <button class="btn-reject" onclick="rejectBook('${id}')">Reject</button>
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+
+      } catch (err) {
+        console.error("Error fetching pending books:", err);
+        container.innerHTML = `<p style="color: var(--red);">Error loading pending list.</p>`;
+      }
+    }
+
+    // Global Functions for Approval Actions
+    window.approveBook = async (bookId) => {
+      try {
+        const bookRef = doc(db, "books", bookId);
+        await updateDoc(bookRef, { status: "approved" });
+        document.getElementById(`card-${bookId}`)?.remove();
+        alert("Book approved and published to feed!");
+      } catch (err) {
+        console.error("Approve failed:", err);
+        alert("Action failed.");
+      }
+    };
+
+    window.rejectBook = async (bookId) => {
+      if (!confirm("Are you sure you want to reject and delete this submission?")) return;
+      try {
+        await deleteDoc(doc(db, "books", bookId));
+        document.getElementById(`card-${bookId}`)?.remove();
+      } catch (err) {
+        console.error("Delete failed:", err);
+      }
+    };
+  </script>
+</body>
+</html>

@@ -136,6 +136,16 @@
             background: rgba(92, 255, 114, 0.08);
         }
 
+        /* Developer Link Highlight */
+        .dev-nav-btn {
+            color: var(--orange) !important;
+            border: 1px solid rgba(255, 122, 0, 0.4);
+        }
+
+        .dev-nav-btn:hover {
+            background: rgba(255, 122, 0, 0.15) !important;
+        }
+
         .logout-btn {
             background: rgba(255, 77, 77, 0.1);
             border: 1px solid rgba(255, 77, 77, 0.4);
@@ -219,6 +229,7 @@
         }
 
         .mobile-bottom-nav a.active { color: var(--green); }
+        .mobile-bottom-nav a.dev-mobile-link { color: var(--orange); }
 
         .nav-icon {
             width: 20px;
@@ -552,6 +563,10 @@
                 <li><a href="friends.html">Friends</a></li>
                 <li><a href="notification.html">Alerts</a></li>
                 <li><a href="settings.html" class="active">Settings</a></li>
+                <!-- DEVELOPER MODE LINK (Revealed dynamically for mushfiquemonowarnamir2006@gmail.com) -->
+                <li id="devModeNavItem" style="display: none;">
+                    <a href="developer.html" class="dev-nav-btn">Developer Mode</a>
+                </li>
             </ul>
             <div class="header-actions">
                 <button class="logout-btn" id="desktopLogoutBtn">DISCONNECT</button>
@@ -672,7 +687,7 @@
     </div>
 
     <!-- Mobile Bottom Navigation -->
-    <div class="mobile-bottom-nav">
+    <div class="mobile-bottom-nav" id="mobileBottomNav">
         <a href="index.html">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
             Home
@@ -692,6 +707,11 @@
         <a href="settings.html" class="active">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             Settings
+        </a>
+        <!-- MOBILE DEVELOPER LINK (Appears dynamically) -->
+        <a href="developer.html" id="devMobileNavItem" class="dev-mobile-link" style="display: none;">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"></path></svg>
+            Dev
         </a>
     </div>
 
@@ -716,6 +736,8 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const storage = getStorage(app);
+
+        const DEV_EMAIL = "mushfiquemonowarnamir2006@gmail.com";
 
         // Elements
         const settingsAvatar = document.getElementById('settingsAvatar');
@@ -752,7 +774,17 @@
                 window.location.href = "login.html";
                 return;
             }
+
             currentUser = user;
+
+            // Check for Developer Access
+            if (user && user.email && user.email.toLowerCase() === DEV_EMAIL.toLowerCase()) {
+                const devDesktop = document.getElementById('devModeNavItem');
+                const devMobile = document.getElementById('devMobileNavItem');
+                if (devDesktop) devDesktop.style.display = 'block';
+                if (devMobile) devMobile.style.display = 'flex';
+            }
+
             const activeUid = user ? user.uid : fallbackId;
             await loadUserData(activeUid);
         });

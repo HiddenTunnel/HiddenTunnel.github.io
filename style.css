@@ -9,6 +9,8 @@
   --red: #FF4D4D;
   --bg: #000000;
   --nav-bg: rgba(0, 0, 0, 0.85);
+  --card-bg: #0a0a0a;
+  --border-color: rgba(255, 255, 255, 0.1);
   --transition-smooth: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
@@ -76,7 +78,6 @@ body {
 
 .mobile-top-bar * {
   pointer-events: auto;
-  
 }
 
 /* Mobile Profile Pic (Top Left) */
@@ -402,7 +403,7 @@ nav {
   gap: 12px;
   width: 100%;
   max-width: 400px;
-  margin-bottom: 36px;
+  margin-bottom: 20px;
 }
 
 .btn-primary {
@@ -442,6 +443,47 @@ nav {
   border-color: #fff;
   background: rgba(255, 255, 255, 0.05);
   transform: translate3d(0, -4px, 0) scale(1.02);
+}
+
+/* =========================================
+   PUBLISH A BOOK COMPOSER CARD
+========================================= */
+.publish-book-card {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 28px;
+}
+
+.publish-book-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(18, 18, 18, 0.9);
+  border: 1px solid var(--border-color);
+  padding: 12px 18px;
+  border-radius: 30px;
+  text-decoration: none;
+  color: #888;
+  font-size: 0.95rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s var(--transition-smooth);
+}
+
+.publish-book-link:hover {
+  border-color: var(--green);
+  color: #fff;
+  background: rgba(25, 25, 25, 0.95);
+  transform: translate3d(0, -2px, 0);
+  box-shadow: 0 0 20px rgba(92, 255, 114, 0.15);
+}
+
+.publish-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--green);
+  object-fit: cover;
 }
 
 /* Chat Mockup Card (GPU Accelerated) */
@@ -524,6 +566,140 @@ nav {
   border-bottom-right-radius: 4px;
 }
 
+/* =========================================
+   BOOKS SECTIONS & FEED GRID
+========================================= */
+.books-feed,
+.popular-books {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 10;
+}
+
+.feed-header,
+.popular-books h2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  border-left: 4px solid var(--green);
+  padding-left: 12px;
+}
+
+.feed-header h2,
+.popular-books h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#booksContainer,
+#popularBooks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+/* Book Card Component */
+.book-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s var(--transition-smooth);
+  text-decoration: none;
+  color: #fff;
+  position: relative;
+}
+
+.book-card:hover {
+  transform: translate3d(0, -6px, 0);
+  border-color: rgba(92, 255, 114, 0.4);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(92, 255, 114, 0.15);
+}
+
+.book-cover-wrapper {
+  width: 100%;
+  height: 260px;
+  overflow: hidden;
+  position: relative;
+  background: #141414;
+}
+
+.book-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s var(--transition-smooth);
+}
+
+.book-card:hover .book-cover {
+  transform: scale(1.05);
+}
+
+.book-badge-paid {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--orange);
+  color: #000;
+  font-size: 0.75rem;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.book-badge-free {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--green);
+  color: #000;
+  font-size: 0.75rem;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.book-info {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.book-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-author {
+  font-size: 0.82rem;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+.book-stats {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: #aaa;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 10px;
+}
+
 /* Mobile Bottom Navigation Bar */
 .mobile-bottom-nav {
   display: none;
@@ -583,9 +759,9 @@ nav {
 
 /* Responsive Queries */
 @media (max-width: 768px) {
-  .mobile-top-bar{
-    top: 28px !important;   /* আগে ছিল 14px */
-}
+  .mobile-top-bar {
+    top: 28px !important;
+  }
   header { display: none !important; }
   .mobile-top-bar { display: flex; }
   .hero-title .desktop-title { display: none; }
@@ -597,4 +773,14 @@ nav {
   .mobile-bottom-nav { display: flex; }
   .hero { margin-top: -70px; margin-bottom: 30px; }
   .hero-buttons { flex-direction: column; }
+  
+  #booksContainer,
+  #popularBooks {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .book-cover-wrapper {
+    height: 190px;
+  }
 }

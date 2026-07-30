@@ -30,6 +30,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Subtle Developer Mode Link Highlighting */
+    .dev-nav-link {
+      color: #FF7A00 !important;
+    }
+    .dev-nav-link:hover {
+      background: rgba(255, 122, 0, 0.12) !important;
+    }
+  </style>
 </head>
 <body>
   <!-- Ambient FX & SVG Background -->
@@ -93,12 +102,19 @@
             <span>Settings</span>
           </a>
         </li>
+        <!-- DEVELOPER MODE LINK (Revealed dynamically for mushfiquemonowarnamir2006@gmail.com) -->
+        <li id="devModeNavItem" style="display: none;">
+          <a href="developer.html" class="dev-nav-link">
+            <img src="assets/svg/setting.svg" class="nav-icon" alt="Developer Mode">
+            <span>Developer Mode</span>
+          </a>
+        </li>
       </ul>
 
       <!-- Desktop Right Actions -->
       <div class="header-actions">
         <div class="nav-btn">
-          <a href="user.html" class="join">Enter Tunnel</a>
+          <a href="user.html" class="join" id="enterTunnelBtn">Enter Tunnel</a>
         </div>
         <button type="button" class="desktop-logout-btn" id="logoutBtnDesktop" title="Logout">
           <img src="assets/svg/logout.svg" alt="Logout">
@@ -142,6 +158,14 @@
       <a href="friends.html" class="btn-secondary">Find Crew</a>
     </div>
 
+    <!-- PUBLISH A BOOK CARD -->
+    <div class="publish-book-card">
+      <a href="post.html" class="publish-book-link">
+        <img src="assets/svg/user.svg" class="publish-avatar" id="publishAvatar" alt="Profile">
+        <span>Publish a Book...</span>
+      </a>
+    </div>
+
     <!-- Chat Mockup -->
     <div class="chat-mockup" id="interactiveCard">
       <div class="crown-badge">
@@ -155,6 +179,100 @@
       </div>
     </div>
   </main>
+
+  <!-- BOOKS FEEDS -->
+  <!-- 1. Latest Books Feed -->
+  <section class="books-feed">
+    <div class="feed-header">
+      <h2>Latest Books</h2>
+    </div>
+
+    <div id="booksContainer">
+      <!-- Firebase loads books here -->
+    </div>
+  </section>
+
+  <!-- 2. Trending Books Feed (Sorted by downloads DESC) -->
+  <section class="popular-books">
+    <h2>Trending Books</h2>
+    <div id="popularBooks">
+      <!-- Firebase loads trending books here -->
+    </div>
+  </section>
+
+  <!-- Firebase & Developer Dynamic Logic Inline Module -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+      authDomain: "urbannoir-13ce8.firebaseapp.com",
+      projectId: "urbannoir-13ce8",
+      storageBucket: "urbannoir-13ce8.firebasestorage.app",
+      messagingSenderId: "1059246827383",
+      appId: "1:1059246827383:web:caa91c40c408d46e3b6372"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const DEV_EMAIL = "mushfiquemonowarnamir2006@gmail.com";
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Developer Link Injection
+        if (user.email && user.email.toLowerCase() === DEV_EMAIL.toLowerCase()) {
+          const devItem = document.getElementById("devModeNavItem");
+          if (devItem) devItem.style.display = "block";
+
+          // Inject into loaded bottom navigation bar if available
+          const checkBottomNav = setInterval(() => {
+            const bottomNav = document.getElementById("bottom-nav-container");
+            if (bottomNav && bottomNav.children.length > 0) {
+              const devMobile = document.getElementById("devMobileNavItem");
+              if (devMobile) devMobile.style.display = "flex";
+              clearInterval(checkBottomNav);
+            }
+          }, 200);
+        }
+
+        // Sync Avatars across UI
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            const avatarUrl = data.photo || "assets/svg/user.svg";
+            
+            const mobilePic = document.getElementById("mobileProfilePic");
+            const desktopPic = document.getElementById("desktopProfilePic");
+            const publishPic = document.getElementById("publishAvatar");
+
+            if (mobilePic) mobilePic.src = avatarUrl;
+            if (desktopPic) desktopPic.src = avatarUrl;
+            if (publishPic) publishPic.src = avatarUrl;
+          }
+        } catch (e) {
+          console.error("Profile load error:", e);
+        }
+      }
+    });
+
+    // Logout Functionality
+    const handleLogout = async () => {
+      try {
+        await signOut(auth);
+        window.location.href = "login.html";
+      } catch (e) {
+        console.error("Logout error:", e);
+      }
+    };
+
+    document.getElementById("logoutBtnDesktop")?.addEventListener("click", handleLogout);
+    document.getElementById("logoutBtnMobile")?.addEventListener("click", handleLogout);
+  </script>
 
   <!-- External Script Link -->
   <script type="module" src="script.js"></script>
