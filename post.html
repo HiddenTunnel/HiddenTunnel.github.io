@@ -6,247 +6,105 @@
   <title>Publish a Book | Urban Noir</title>
   <meta name="theme-color" content="#050505">
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
-  
   <style>
-    /* Publish Page Styling */
-    .publish-container {
+    .post-container {
       max-width: 650px;
-      margin: 100px auto 40px auto;
-      padding: 0 20px;
-      position: relative;
-      z-index: 10;
-    }
-
-    .form-card {
-      background: var(--card-bg, #0a0a0a);
-      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-      border-radius: 20px;
-      padding: 28px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9);
-    }
-
-    .form-header {
-      margin-bottom: 24px;
-      border-left: 4px solid var(--green);
-      padding-left: 14px;
-    }
-
-    .form-header h1 {
-      font-size: 1.8rem;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .form-group label {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: #ccc;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .form-input, 
-    .form-textarea {
-      background: #121212;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 12px;
-      padding: 12px 16px;
-      color: #fff;
-      font-family: inherit;
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
-    }
-
-    .form-input:focus, 
-    .form-textarea:focus {
-      outline: none;
-      border-color: var(--green);
-      box-shadow: 0 0 12px rgba(92, 255, 114, 0.2);
-    }
-
-    .form-textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
-
-    .toggle-group {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 20px;
-      background: #121212;
-      padding: 14px 18px;
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .toggle-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-
-    .price-input-wrapper {
-      display: none;
-      animation: fadeIn 0.3s ease;
-    }
-
-    /* Pending Screen Notice */
-    .pending-box {
-      background: rgba(255, 122, 0, 0.08);
-      border: 1px solid var(--orange);
+      margin: 40px auto;
+      padding: 24px;
+      background: rgba(18, 18, 18, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 16px;
-      padding: 28px 20px;
-      text-align: center;
-      display: none;
-      animation: fadeIn 0.4s ease;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     }
-
-    .pending-box h2 {
-      color: var(--orange);
-      font-size: 1.4rem;
-      margin-bottom: 12px;
-      text-transform: uppercase;
+    .post-header { margin-bottom: 24px; text-align: center; }
+    .post-header h1 { font-family: 'Permanent Marker', cursive; font-size: 2rem; color: #FF7A00; }
+    .form-group { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .form-group label { font-weight: 600; font-size: 0.9rem; color: #ccc; }
+    .form-group textarea {
+      width: 100%; background: #0a0a0a; border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px; color: #fff; padding: 12px; font-family: 'Outfit', sans-serif; box-sizing: border-box;
     }
-
-    .pending-box p {
-      color: #aaa;
-      font-size: 0.95rem;
-      margin-bottom: 24px;
-      line-height: 1.6;
+    .form-group textarea:focus { outline: none; border-color: #FF7A00; }
+    .file-input-wrapper {
+      position: relative; background: #0a0a0a; border: 2px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s ease;
     }
-
+    .file-input-wrapper:hover { border-color: #FF7A00; background: rgba(255, 122, 0, 0.05); }
+    .file-input-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    .preview-box { margin-top: 10px; max-height: 200px; display: none; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); }
+    .preview-box img { width: 100%; height: 100%; object-fit: cover; }
     .btn-submit {
-      width: 100%;
-      background: var(--green);
-      color: #000;
-      padding: 14px;
-      font-size: 1rem;
-      font-weight: 800;
-      border: none;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 20px rgba(92, 255, 114, 0.3);
+      width: 100%; padding: 14px; background: #FF7A00; color: #000; font-weight: 700;
+      border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; text-transform: uppercase;
     }
-
-    .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 30px rgba(92, 255, 114, 0.6);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .btn-submit:hover { background: #e06c00; }
+    .btn-submit:disabled { background: #555; cursor: not-allowed; }
+    .status-msg { margin-top: 15px; padding: 10px; border-radius: 6px; display: none; text-align: center; font-weight: 600; font-size: 0.9rem; }
+    .status-msg.error { background: rgba(255, 0, 0, 0.2); color: #ff4d4d; border: 1px solid rgba(255, 0, 0, 0.3); }
+    .status-msg.success { background: rgba(0, 255, 0, 0.2); color: #00ff66; border: 1px solid rgba(0, 255, 0, 0.3); }
   </style>
 </head>
 <body>
-
-  <!-- Background Ambient FX -->
   <div id="graffiti-bg"></div>
   <div id="mouse-glow"></div>
+  <canvas id="particles-canvas"></canvas>
 
-  <!-- Mobile Top Bar -->
-  <div class="mobile-top-bar">
-    <a href="id.html" class="mobile-profile-btn" title="View Profile">
-      <img src="assets/svg/user.svg" alt="Profile ID" id="mobileProfilePic">
-    </a>
-    <button type="button" class="mobile-logout-btn" id="logoutBtnMobile" title="Logout">
-      <img src="assets/svg/logout.svg" alt="Logout">
-    </button>
-  </div>
+  <header>
+    <nav>
+      <div class="brand-container">
+        <a href="index.html" class="logo">UNDERGROUND <span>CHAT</span></a>
+      </div>
+      <div class="header-actions">
+        <a href="index.html" class="btn-secondary" style="padding: 8px 16px; text-decoration: none;">← Back</a>
+      </div>
+    </nav>
+  </header>
 
-  <main class="publish-container">
-    <div class="form-card">
-      
-      <!-- Book Creation Form -->
-      <form id="publishForm">
-        <div class="form-header">
-          <h1>Publish a Book</h1>
+  <main class="post-container">
+    <div class="post-header">
+      <h1>Publish to the Tunnel</h1>
+      <p style="color: #888; font-size: 0.9rem;">Share cover art, documents, or texts directly to the network.</p>
+    </div>
+
+    <form id="publishForm">
+      <div class="form-group">
+        <label>Cover Photo (Optional)</label>
+        <div class="file-input-wrapper">
+          <span id="photoLabelText">📷 Click or Drag Cover Image Here</span>
+          <input type="file" id="photoInput" accept="image/*">
         </div>
-
-        <!-- 1. Book Title -->
-        <div class="form-group">
-          <label for="bookTitle">Book Title</label>
-          <input type="text" id="bookTitle" class="form-input" placeholder="Enter book title..." required>
-        </div>
-
-        <!-- 2. Cover Picture -->
-        <div class="form-group">
-          <label for="coverFile">Cover Image File</label>
-          <input type="file" id="coverFile" class="form-input" accept="image/*" required>
-        </div>
-
-        <!-- 3. Upload File (PDF / EPUB) -->
-        <div class="form-group">
-          <label for="bookFile">Upload File (PDF / EPUB File)</label>
-          <input type="file" id="bookFile" class="form-input" accept=".pdf,.epub" required>
-        </div>
-
-        <!-- 4. Description -->
-        <div class="form-group">
-          <label for="bookDescription">Description</label>
-          <textarea id="bookDescription" class="form-textarea" placeholder="Write a short summary or description..." required></textarea>
-        </div>
-
-        <!-- 5. Tags -->
-        <div class="form-group">
-          <label for="bookTags">Tags (Comma Separated)</label>
-          <input type="text" id="bookTags" class="form-input" placeholder="cyberpunk, street, fiction">
-        </div>
-
-        <!-- 6. Free vs Paid Option -->
-        <div class="toggle-group">
-          <label class="toggle-item">
-            <input type="radio" name="accessType" value="free" id="typeFree" checked>
-            <span>Free Download</span>
-          </label>
-          <label class="toggle-item">
-            <input type="radio" name="accessType" value="paid" id="typePaid">
-            <span>Paid Book (bKash)</span>
-          </label>
-        </div>
-
-        <!-- bKash Price Field -->
-        <div class="form-group price-input-wrapper" id="priceWrapper">
-          <label for="bookPrice">Price (BDT / bKash)</label>
-          <input type="number" id="bookPrice" class="form-input" placeholder="Amount in BDT (e.g. 150)">
-        </div>
-
-        <!-- Publish Button -->
-        <button type="submit" class="btn-submit" id="submitBtn">Publish Book</button>
-      </form>
-
-      <!-- Waiting for Permission Notice (Appears After Clicking Publish) -->
-      <div id="pendingNotice" class="pending-box">
-        <h2>⏳ Waiting for Approval</h2>
-        <p>Your book has been submitted! It is currently sitting in the underground queue. You must get permission from the developer to make it public in the library feed.</p>
-        <a href="developer.html" class="btn-primary" style="display: inline-block; padding: 12px 28px; text-decoration: none;">Get Permission from Developer</a>
+        <div class="preview-box" id="photoPreview"><img src="" alt="Preview"></div>
       </div>
 
-    </div>
+      <div class="form-group">
+        <label>Book / Document File (Optional)</label>
+        <div class="file-input-wrapper">
+          <span id="docLabelText">📄 Click or Drag Document / PDF Here</span>
+          <input type="file" id="docInput" accept=".pdf,.epub,.txt,.docx">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="captionInput">Caption / Description</label>
+        <textarea id="captionInput" rows="4" placeholder="Write something underground..."></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">Publish Now</button>
+      <div id="statusMsg" class="status-msg"></div>
+    </form>
   </main>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const WORKER_URL = "https://urbannoir-api.mushfiquemonowarnamir2006.workers.dev/posts";
 
     const firebaseConfig = {
       apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
@@ -258,71 +116,89 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
     const auth = getAuth(app);
 
     let currentUser = null;
 
-    // Price Field Toggle Logic
-    const typeFree = document.getElementById('typeFree');
-    const typePaid = document.getElementById('typePaid');
-    const priceWrapper = document.getElementById('priceWrapper');
-
-    typeFree.addEventListener('change', () => priceWrapper.style.display = 'none');
-    typePaid.addEventListener('change', () => priceWrapper.style.display = 'flex');
-
-    // Auth Protection
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         window.location.href = "login.html";
+      } else {
+        currentUser = user;
+      }
+    });
+
+    const photoInput = document.getElementById("photoInput");
+    const docInput = document.getElementById("docInput");
+    const photoLabelText = document.getElementById("photoLabelText");
+    const docLabelText = document.getElementById("docLabelText");
+    const photoPreview = document.getElementById("photoPreview");
+    const publishForm = document.getElementById("publishForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const statusMsg = document.getElementById("statusMsg");
+
+    photoInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        photoLabelText.textContent = `Selected: ${file.name}`;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          photoPreview.querySelector("img").src = event.target.result;
+          photoPreview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    docInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) docLabelText.textContent = `Selected: ${file.name}`;
+    });
+
+    publishForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const photoFile = photoInput.files[0];
+      const docFile = docInput.files[0];
+      const captionText = document.getElementById("captionInput").value.trim();
+
+      if (!photoFile && !docFile && !captionText) {
+        showStatus("Please attach a photo, document, or enter a caption.", "error");
         return;
       }
-      currentUser = user;
-    });
 
-    // Submission Handler
-    document.getElementById('publishForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const submitBtn = document.getElementById('submitBtn');
       submitBtn.disabled = true;
-      submitBtn.innerText = "Submitting...";
+      submitBtn.textContent = "Publishing...";
+      showStatus("Uploading to subterranean servers...", "success");
 
-      const isPaid = typePaid.checked;
-      const title = document.getElementById('bookTitle').value;
-      const coverFile = document.getElementById('coverFile').files[0];
-      const bookFile = document.getElementById('bookFile').files[0];
-      const description = document.getElementById('bookDescription').value;
-      const price = isPaid ? parseFloat(document.getElementById('bookPrice').value) || 0 : 0;
-      const tags = document.getElementById('bookTags').value.split(',').map(t => t.trim()).filter(Boolean);
+      const formData = new FormData();
+      if (photoFile) formData.append("photo", photoFile);
+      if (docFile) formData.append("document", docFile);
+      if (captionText) formData.append("caption", captionText);
+      if (currentUser) formData.append("publisher_uid", currentUser.uid);
 
       try {
-        // Store in Firebase with status: "pending"
-        await addDoc(collection(db, "books"), {
-          title: title,
-          description: description,
-          tags: tags,
-          downloads: 0,
-          likes: 0,
-          uploader: currentUser.displayName || currentUser.email || "Underground Author",
-          uploaderId: currentUser.uid,
-          paid: isPaid,
-          price: price,
-          status: "pending", // Pending developer approval
-          createdAt: serverTimestamp()
-        });
+        const response = await fetch(WORKER_URL, { method: "POST", body: formData });
+        const data = await response.json();
 
-        // Hide form and show "Wait for Developer Permission" UI
-        document.getElementById('publishForm').style.display = 'none';
-        document.getElementById('pendingNotice').style.display = 'block';
-
+        if (response.ok && data.success) {
+          showStatus("Published successfully! Redirecting...", "success");
+          setTimeout(() => { window.location.href = "index.html"; }, 1500);
+        } else {
+          throw new Error(data.error || "Server response was not OK.");
+        }
       } catch (err) {
-        console.error("Failed to submit book:", err);
-        alert("Submission failed. Please try again.");
+        console.error("Publish error:", err);
+        showStatus("Failed to publish: " + err.message, "error");
         submitBtn.disabled = false;
-        submitBtn.innerText = "Publish Book";
+        submitBtn.textContent = "Publish Now";
       }
     });
+
+    function showStatus(text, type) {
+      statusMsg.textContent = text;
+      statusMsg.className = `status-msg ${type}`;
+      statusMsg.style.display = "block";
+    }
   </script>
 </body>
 </html>

@@ -6,12 +6,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import {
   getFirestore,
   doc,
-  getDoc,
-  collection,
-  query,
-  orderBy,
-  limit,
-  getDocs
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
   getAuth,
@@ -19,7 +14,9 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// Firebase Configuration
+const API_URL = "https://urbannoir-api.mushfiquemonowarnamir2006.workers.dev";
+const DEVELOPER_UID = "YOUR_DEVELOPER_FIREBASE_UID_HERE"; // Update with developer UID
+
 const firebaseConfig = {
   apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
   authDomain: "urbannoir-13ce8.firebaseapp.com",
@@ -30,19 +27,16 @@ const firebaseConfig = {
   measurementId: "G-CEPWKZXQVF"
 };
 
-// Initialize Firebase Services
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Global State Variables
-let mouseX = 0,
-  mouseY = 0;
+let currentFirebaseUser = null;
+let mouseX = 0, mouseY = 0;
 let windowWidth = window.innerWidth;
 let windowHeight = window.innerHeight;
 let ticking = false;
 
-// DOM Element References
 const glow = document.getElementById('mouse-glow');
 const graffitiBg = document.getElementById('graffiti-bg');
 const interactiveCard = document.getElementById('interactiveCard');
@@ -50,42 +44,28 @@ const booksContainer = document.getElementById('booksContainer');
 const popularBooksContainer = document.getElementById('popularBooks');
 
 /*========================================
-    OPTIMIZED INSTANT PROFILE PHOTO SYSTEM
+    INSTANT PROFILE PHOTO SYSTEM
 ========================================*/
 
 const AVATAR_CACHE_KEY = "ug_user_avatar_cache";
 
-// 1. INSTANT EXECUTION: Load from localStorage cache immediately on script execution
 (function loadCachedAvatarImmediately() {
   const cachedPhoto = localStorage.getItem(AVATAR_CACHE_KEY);
-  if (cachedPhoto) {
-    applyProfilePhotoToDOM(cachedPhoto);
-  }
+  if (cachedPhoto) applyProfilePhotoToDOM(cachedPhoto);
 })();
 
-// Helper to update all avatar targets smoothly
 function applyProfilePhotoToDOM(photoUrl) {
   if (!photoUrl) return;
-  
   const targets = [
     document.getElementById("mobileProfilePic"),
     document.getElementById("desktopProfilePic"),
     document.getElementById("publishAvatar")
   ];
-  
   targets.forEach((img) => {
-    if (img && img.src !== photoUrl) {
-      // Pre-cache image in memory to avoid flashing black/white box
-      const preloader = new Image();
-      preloader.src = photoUrl;
-      preloader.onload = () => {
-        img.src = photoUrl;
-      };
-    }
+    if (img && img.src !== photoUrl) img.src = photoUrl;
   });
 }
 
-// Update Local Cache + DOM
 function setProfilePhoto(photoUrl) {
   if (!photoUrl) return;
   localStorage.setItem(AVATAR_CACHE_KEY, photoUrl);
@@ -93,7 +73,7 @@ function setProfilePhoto(photoUrl) {
 }
 
 /*========================================
-        AUTH GUARD & DUAL-FETCH
+        AUTH GUARD & HANDLERS
 ========================================*/
 
 onAuthStateChanged(auth, async (user) => {
@@ -103,29 +83,21 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
   
-  // 2. IMMEDIATE FALLBACK: Use Google account photo right away if available
-  if (user.photoURL) {
-    setProfilePhoto(user.photoURL);
-  }
+  currentFirebaseUser = user;
+  if (user.photoURL) setProfilePhoto(user.photoURL);
   
-  // 3. ASYNC BACKGROUND SYNC: Sync with custom avatar from Firestore
   try {
     const docRef = doc(db, "users", user.uid);
     const docSnap = await getDoc(docRef);
-    
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      if (data.photo && data.photo.trim() !== "") {
-        setProfilePhoto(data.photo);
-      }
+    if (docSnap.exists() && docSnap.data().photo?.trim()) {
+      setProfilePhoto(docSnap.data().photo);
     }
   } catch (e) {
     console.error("Error fetching Firestore photo:", e);
   }
   
-  // Load book feeds in parallel after auth check
-  loadLatestBooks();
-  loadPopularBooks();
+  // Reload feeds to ensure delete button permissions evaluate properly
+  loadBookFeeds();
 });
 
 async function handleLogout() {
@@ -142,91 +114,167 @@ document.getElementById("logoutBtnDesktop")?.addEventListener("click", handleLog
 document.getElementById("logoutBtnMobile")?.addEventListener("click", handleLogout);
 
 /*========================================
-        FIREBASE BOOKS FEED ENGINE
+    CLOUDFLARE WORKER BOOKS FEED ENGINE
 ========================================*/
 
-function createBookCardHTML(id, book) {
-  const isPaid = book.paid || false;
-  const priceTag = isPaid ? `৳${book.price || 0}` : "FREE";
-  const badgeClass = isPaid ? "book-badge-paid" : "book-badge-free";
-  const coverImg = book.cover || "assets/pic/banner.png";
-  const uploader = book.uploader || "Anonymous";
-  const downloads = book.downloads || 0;
-  
-  return `
-    <a href="view-post.html?id=${id}" class="book-card">
+function escapeHTML(str) {
+  if (!str) return "";
+  return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+}
+
+function createBookCardHTML(post) {
+  let mediaHtml = "";
+  if (post.file_id) {
+    const imageUrl = `${API_URL}/image?file_id=${post.file_id}`;
+    mediaHtml = `
       <div class="book-cover-wrapper">
-        <img src="${coverImg}" alt="${book.title || 'Book Cover'}" class="book-cover" loading="lazy">
-        <span class="${badgeClass}">${priceTag}</span>
+        <img src="${imageUrl}" alt="Cover Image" class="book-cover" loading="lazy">
       </div>
+    `;
+  }
+
+  let docBtnHtml = "";
+  if (post.doc_id) {
+    const fileName = post.doc_name || "Download Document";
+    const docDownloadUrl = `${API_URL}/document?doc_id=${post.doc_id}&filename=${encodeURIComponent(fileName)}`;
+    docBtnHtml = `
+      <a href="${docDownloadUrl}" class="doc-download-btn" data-post-id="${post.id}" style="display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 14px; background: #FF7A00; color: #000; font-weight: bold; border-radius: 6px; text-decoration: none; font-size: 0.85rem;">
+        <span>📄 Download ${escapeHTML(fileName)}</span>
+      </a>
+    `;
+  }
+
+  let deleteBtnHtml = "";
+  if (currentFirebaseUser) {
+    const isOwner = post.publisher_uid && post.publisher_uid === currentFirebaseUser.uid;
+    const isDeveloper = currentFirebaseUser.uid === DEVELOPER_UID;
+    if (isOwner || isDeveloper) {
+      deleteBtnHtml = `
+        <button type="button" class="btn-delete-post" data-post-id="${post.id}" style="position: absolute; top: 10px; right: 10px; background: rgba(255, 0, 0, 0.8); color: #fff; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; z-index: 10;">
+           Delete Book
+        </button>
+      `;
+    }
+  }
+
+  const formattedDate = post.date ?
+    new Date(post.date * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) :
+    "Just Now";
+
+  return `
+    <article class="book-card" style="position: relative;">
+      ${deleteBtnHtml}
+      ${mediaHtml}
       <div class="book-info">
-        <h3 class="book-title">${book.title || 'Untitled Book'}</h3>
-        <p class="book-author">By ${uploader}</p>
-        <div class="book-stats">
-          <span>📥 ${downloads} downloads</span>
-          <span>❤️ ${book.likes || 0}</span>
-        </div>
+        <span class="book-date" style="font-size: 0.75rem; color: var(--orange); text-transform: uppercase;">${formattedDate}</span>
+        <p class="book-caption" style="margin: 8px 0; color: #e0e0e0; font-size: 0.95rem;">${escapeHTML(post.caption || "Untitled Signal")}</p>
+        ${docBtnHtml}
       </div>
-    </a>
+    </article>
   `;
 }
 
-// Fetch Latest Books
-async function loadLatestBooks() {
+async function loadBookFeeds() {
   if (!booksContainer) return;
-  
+
   try {
-    const booksQuery = query(
-      collection(db, "books"),
-      orderBy("createdAt", "desc"),
-      limit(10)
-    );
-    const querySnapshot = await getDocs(booksQuery);
-    
-    if (querySnapshot.empty) {
-      booksContainer.innerHTML = `<p style="color: #666; font-size: 0.9rem;">No books published yet.</p>`;
+    const response = await fetch(`${API_URL}/posts?limit=30`);
+    const data = await response.json();
+
+    if (!data.success || !data.posts || data.posts.length === 0) {
+      booksContainer.innerHTML = `<p style="color: #666; font-size: 0.9rem;">No publications found yet.</p>`;
+      if (popularBooksContainer) {
+        popularBooksContainer.innerHTML = `<p style="color: #666; font-size: 0.9rem;">No trending publications right now.</p>`;
+      }
       return;
     }
-    
-    let html = "";
-    querySnapshot.forEach((docSnap) => {
-      html += createBookCardHTML(docSnap.id, docSnap.data());
+
+    // 1. Latest Books Feed ( Chronological Order )
+    let latestHTML = "";
+    data.posts.forEach((post) => {
+      latestHTML += createBookCardHTML(post);
     });
-    booksContainer.innerHTML = html;
-    
+    booksContainer.innerHTML = latestHTML;
+
+    // 2. Trending Books Feed ( Ranked strictly by maximum downloads )
+    if (popularBooksContainer) {
+      const sortedByDownloads = [...data.posts]
+        .filter(p => (p.downloads || 0) > 0)
+        .sort((a, b) => (b.downloads || 0) - (a.downloads || 0))
+        .slice(0, 3);
+
+      if (sortedByDownloads.length > 0) {
+        let popularHTML = "";
+        sortedByDownloads.forEach((post) => {
+          popularHTML += createBookCardHTML(post);
+        });
+        popularBooksContainer.innerHTML = popularHTML;
+      } else {
+        popularBooksContainer.innerHTML = `<p style="color: #666; font-size: 0.9rem;">No downloaded trends yet.</p>`;
+      }
+    }
+
+    attachFeedEventListeners();
+
   } catch (error) {
-    console.error("Error loading latest books:", error);
-    booksContainer.innerHTML = `<p style="color: var(--red); font-size: 0.9rem;">Failed to load books.</p>`;
+    console.error("Error fetching feed from Worker:", error);
+    booksContainer.innerHTML = `<p style="color: #ff4d4d; font-size: 0.9rem;">Failed to load books from tunnel network.</p>`;
   }
 }
 
-// Fetch Popular / Trending Books
-async function loadPopularBooks() {
-  if (!popularBooksContainer) return;
-  
-  try {
-    const popularQuery = query(
-      collection(db, "books"),
-      orderBy("downloads", "desc"),
-      limit(6)
-    );
-    const querySnapshot = await getDocs(popularQuery);
-    
-    if (querySnapshot.empty) {
-      popularBooksContainer.innerHTML = `<p style="color: #666; font-size: 0.9rem;">No trending books right now.</p>`;
-      return;
-    }
-    
-    let html = "";
-    querySnapshot.forEach((docSnap) => {
-      html += createBookCardHTML(docSnap.id, docSnap.data());
+function attachFeedEventListeners() {
+  // Handle PDF/EPUB Download Counts
+  document.querySelectorAll(".doc-download-btn").forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+      const postId = e.currentTarget.getAttribute("data-post-id");
+      if (postId) {
+        try {
+          await fetch(`${API_URL}/download`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ postId })
+          });
+        } catch (err) {
+          console.error("Error updating download count:", err);
+        }
+      }
     });
-    popularBooksContainer.innerHTML = html;
-    
-  } catch (error) {
-    console.error("Error loading popular books:", error);
-    popularBooksContainer.innerHTML = `<p style="color: var(--red); font-size: 0.9rem;">Failed to load trending books.</p>`;
-  }
+  });
+
+  // Handle Owner/Developer Deletions
+  document.querySelectorAll(".btn-delete-post").forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+      const postId = e.currentTarget.getAttribute("data-post-id");
+      if (!confirm("Are you sure you want to delete this signal?")) return;
+
+      try {
+        const response = await fetch(`${API_URL}/posts`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            postId: postId,
+            requestingUid: currentFirebaseUser ? currentFirebaseUser.uid : ""
+          })
+        });
+
+        const resData = await response.json();
+        if (response.ok && resData.success) {
+          loadBookFeeds();
+        } else {
+          alert(`Deletion failed: ${resData.error || 'Unauthorized'}`);
+        }
+      } catch (err) {
+        console.error("Error deleting post:", err);
+        alert("Server communication failed.");
+      }
+    });
+  });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", loadBookFeeds);
+} else {
+  loadBookFeeds();
 }
 
 /*========================================
@@ -234,25 +282,20 @@ async function loadPopularBooks() {
 ========================================*/
 
 function updateParallax() {
-  if (glow) {
-    glow.style.transform = `translate3d(${mouseX - 225}px, ${mouseY - 225}px, 0)`;
-  }
-  
+  if (glow) glow.style.transform = `translate3d(${mouseX - 225}px, ${mouseY - 225}px, 0)`;
+
   const moveX = (mouseX / windowWidth - 0.5) * -25;
   const moveY = (mouseY / windowHeight - 0.5) * -25;
-  
-  if (graffitiBg) {
-    graffitiBg.style.transform = `translate3d(${moveX}px, ${moveY}px, 0) scale(1.02)`;
-  }
-  
+
+  if (graffitiBg) graffitiBg.style.transform = `translate3d(${moveX}px, ${moveY}px, 0) scale(1.02)`;
+
   if (interactiveCard) {
     const rect = interactiveCard.getBoundingClientRect();
     const cardCenterX = rect.left + rect.width / 2;
     const cardCenterY = rect.top + rect.height / 2;
-    
     const cardX = (mouseX - cardCenterX) / 20;
     const cardY = (mouseY - cardCenterY) / 20;
-    
+
     if (
       mouseX >= rect.left - 50 && mouseX <= rect.right + 50 &&
       mouseY >= rect.top - 50 && mouseY <= rect.bottom + 50
@@ -262,7 +305,7 @@ function updateParallax() {
       interactiveCard.style.transform = `translate3d(0, 0, 0) scale(1)`;
     }
   }
-  
+
   ticking = false;
 }
 

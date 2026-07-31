@@ -6,142 +6,71 @@
   <title>Urban Noir</title>
   <meta name="theme-color" content="#050505">
 
-  <!-- ========================================== -->
-  <!-- LINK SHARE PREVIEW META TAGS (HIDDEN BANNER) -->
-  <!-- ========================================== -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="URBAN NOIR">
   <meta property="og:description" content="An authentic street-inspired chat platform built for crews, taggers, and subterranean conversations. Encrypted, instant, and raw.">
   <meta property="og:image" content="https://urbannoir.github.io/assets/pic/banner.png">
-  <meta property="og:image:type" content="image/png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
 
-  <!-- Twitter / X Meta Tags -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="URBAN NOIR">
-  <meta name="twitter:description" content="An authentic street-inspired chat platform built for crews, taggers, and subterranean conversations. Encrypted, instant, and raw.">
-  <meta name="twitter:image" content="https://urbannoir.github.io/assets/pic/banner.png">
-  <!-- ========================================== -->
-
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* Subtle Developer Mode Link Highlighting */
-    .dev-nav-link {
-      color: #FF7A00 !important;
-    }
-    .dev-nav-link:hover {
-      background: rgba(255, 122, 0, 0.12) !important;
-    }
-  </style>
 </head>
 <body>
-  <!-- Ambient FX & SVG Background -->
   <div id="graffiti-bg"></div>
   <div id="mouse-glow"></div>
   <canvas id="particles-canvas"></canvas>
 
-  <!-- 📱 MOBILE TOP BAR (Top-Left Profile Pic, Top-Right Logout) -->
+  <!-- Mobile Top Bar -->
   <div class="mobile-top-bar">
     <a href="id.html" class="mobile-profile-btn" title="View Profile">
       <img src="assets/svg/user.svg" alt="Profile ID" id="mobileProfilePic">
     </a>
-
     <button type="button" class="mobile-logout-btn" id="logoutBtnMobile" title="Logout">
       <img src="assets/svg/logout.svg" alt="Logout">
     </button>
   </div>
 
-  <!-- 💻 DESKTOP HEADER NAVIGATION -->
+  <!-- Desktop Header Navigation -->
   <header>
     <nav>
       <div class="brand-container">
-        <!-- Desktop Profile Avatar (Top Left) -->
         <a href="id.html" class="desktop-profile-btn" title="View Profile">
           <img src="assets/svg/user.svg" alt="Profile ID" id="desktopProfilePic">
         </a>
-        <a href="index.html" class="logo">
-          UNDERGROUND <span>CHAT</span>
-        </a>
+        <a href="index.html" class="logo">UNDERGROUND <span>CHAT</span></a>
       </div>
 
-      <!-- Desktop Nav Options -->
       <ul class="desktop-nav">
-        <li>
-          <a href="index.html" class="active">
-            <img src="assets/svg/home.svg" class="nav-icon" alt="Home">
-            <span>Home</span>
-          </a>
-        </li>
-        <li>
-          <a href="user.html">
-            <img src="assets/svg/chat.svg" class="nav-icon" alt="Chats">
-            <span>Chats</span>
-          </a>
-        </li>
-        <li>
-          <a href="friends.html">
-            <img src="assets/svg/friends.svg" class="nav-icon" alt="Friends">
-            <span>Friends</span>
-          </a>
-        </li>
-        <li>
-          <a href="notification.html">
-            <img src="assets/svg/notification.svg" class="nav-icon" alt="Notifications">
-            <span>Notifications</span>
-          </a>
-        </li>
-        <li>
-          <a href="settings.html">
-            <img src="assets/svg/setting.svg" class="nav-icon" alt="Settings">
-            <span>Settings</span>
-          </a>
-        </li>
-        <!-- DEVELOPER MODE LINK (Revealed dynamically for mushfiquemonowarnamir2006@gmail.com) -->
-        <li id="devModeNavItem" style="display: none;">
-          <a href="developer.html" class="dev-nav-link">
-            <img src="assets/svg/setting.svg" class="nav-icon" alt="Developer Mode">
-            <span>Developer Mode</span>
-          </a>
-        </li>
+        <li><a href="index.html" class="active"><img src="assets/svg/home.svg" class="nav-icon" alt="Home"><span>Home</span></a></li>
+        <li><a href="user.html"><img src="assets/svg/chat.svg" class="nav-icon" alt="Chats"><span>Chats</span></a></li>
+        <li><a href="friends.html"><img src="assets/svg/friends.svg" class="nav-icon" alt="Friends"><span>Friends</span></a></li>
+        <li><a href="notification.html"><img src="assets/svg/notification.svg" class="nav-icon" alt="Notifications"><span>Notifications</span></a></li>
+        <li><a href="settings.html"><img src="assets/svg/setting.svg" class="nav-icon" alt="Settings"><span>Settings</span></a></li>
       </ul>
 
-      <!-- Desktop Right Actions -->
       <div class="header-actions">
-        <div class="nav-btn">
-          <a href="user.html" class="join" id="enterTunnelBtn">Enter Tunnel</a>
-        </div>
-        <button type="button" class="desktop-logout-btn" id="logoutBtnDesktop" title="Logout">
-          <img src="assets/svg/logout.svg" alt="Logout">
-        </button>
+        <div class="nav-btn"><a href="user.html" class="join" id="enterTunnelBtn">Enter Tunnel</a></div>
+        <button type="button" class="desktop-logout-btn" id="logoutBtnDesktop" title="Logout"><img src="assets/svg/logout.svg" alt="Logout"></button>
       </div>
     </nav>
   </header>
 
-  <!-- Mobile Bottom Navigation Bar -->
+  <!-- Bottom Nav -->
   <div id="bottom-nav-container"></div>
-
   <script>
     fetch("bottom-nav.html")
       .then(r => r.text())
-      .then(html => {
-        document.getElementById("bottom-nav-container").innerHTML = html;
-      });
+      .then(html => { document.getElementById("bottom-nav-container").innerHTML = html; })
+      .catch(err => console.error("Could not load bottom-nav.html", err));
   </script>
 
-  <!-- Hero Section -->
+  <!-- Main Hero Section -->
   <main class="hero">
     <div class="badge-wrapper">
       <span class="badge">// Signal Active</span>
-      <div class="rating-box">
-        <span class="rating-stars">★★★★★</span>
-        <span class="rating-score">4.9 Avg</span>
-      </div>
+      <div class="rating-box"><span class="rating-stars">★★★★★</span><span class="rating-score">4.9 Avg</span></div>
     </div>
 
     <h1 class="hero-title">
@@ -149,16 +78,13 @@
       <span class="mobile-title">URBAN <span class="highlight">Noir</span></span>
     </h1>
 
-    <p class="hero-description">
-      An authentic street-inspired chat platform built for crews, taggers, and subterranean conversations. Encrypted, instant, and raw.
-    </p>
+    <p class="hero-description">An authentic street-inspired chat platform built for crews, taggers, and subterranean conversations. Encrypted, instant, and raw.</p>
 
     <div class="hero-buttons">
       <a href="user.html" class="btn-primary">Spray Message</a>
       <a href="friends.html" class="btn-secondary">Find Crew</a>
     </div>
 
-    <!-- PUBLISH A BOOK CARD -->
     <div class="publish-book-card">
       <a href="post.html" class="publish-book-link">
         <img src="assets/svg/user.svg" class="publish-avatar" id="publishAvatar" alt="Profile">
@@ -166,12 +92,8 @@
       </a>
     </div>
 
-    <!-- Chat Mockup -->
     <div class="chat-mockup" id="interactiveCard">
-      <div class="crown-badge">
-        <img src="assets/svg/graffiti-crown.svg" alt="Crown">
-      </div>
-
+      <div class="crown-badge"><img src="assets/svg/graffiti-crown.svg" alt="Crown"></div>
       <div class="chat-messages">
         <div class="msg msg-incoming">Yo, you active in the tunnel?</div>
         <div class="msg msg-outgoing">Always. Just dropped a new tag on the wall.</div>
@@ -181,100 +103,21 @@
   </main>
 
   <!-- BOOKS FEEDS -->
-  <!-- 1. Latest Books Feed -->
   <section class="books-feed">
-    <div class="feed-header">
-      <h2>Latest Books</h2>
-    </div>
-
+    <div class="feed-header"><h2>Latest Books</h2></div>
     <div id="booksContainer">
-      <!-- Firebase loads books here -->
+      <!-- script.js will populate posts here -->
     </div>
   </section>
 
-  <!-- 2. Trending Books Feed (Sorted by downloads DESC) -->
   <section class="popular-books">
-    <h2>Trending Books</h2>
+    <div class="feed-header"><h2>Trending Books</h2></div>
     <div id="popularBooks">
-      <!-- Firebase loads trending books here -->
+      <!-- script.js will populate posts here -->
     </div>
   </section>
 
-  <!-- Firebase & Developer Dynamic Logic Inline Module -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
-      authDomain: "urbannoir-13ce8.firebaseapp.com",
-      projectId: "urbannoir-13ce8",
-      storageBucket: "urbannoir-13ce8.firebasestorage.app",
-      messagingSenderId: "1059246827383",
-      appId: "1:1059246827383:web:caa91c40c408d46e3b6372"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const DEV_EMAIL = "mushfiquemonowarnamir2006@gmail.com";
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Developer Link Injection
-        if (user.email && user.email.toLowerCase() === DEV_EMAIL.toLowerCase()) {
-          const devItem = document.getElementById("devModeNavItem");
-          if (devItem) devItem.style.display = "block";
-
-          // Inject into loaded bottom navigation bar if available
-          const checkBottomNav = setInterval(() => {
-            const bottomNav = document.getElementById("bottom-nav-container");
-            if (bottomNav && bottomNav.children.length > 0) {
-              const devMobile = document.getElementById("devMobileNavItem");
-              if (devMobile) devMobile.style.display = "flex";
-              clearInterval(checkBottomNav);
-            }
-          }, 200);
-        }
-
-        // Sync Avatars across UI
-        try {
-          const userDoc = await getDoc(doc(db, "users", user.uid));
-          if (userDoc.exists()) {
-            const data = userDoc.data();
-            const avatarUrl = data.photo || "assets/svg/user.svg";
-            
-            const mobilePic = document.getElementById("mobileProfilePic");
-            const desktopPic = document.getElementById("desktopProfilePic");
-            const publishPic = document.getElementById("publishAvatar");
-
-            if (mobilePic) mobilePic.src = avatarUrl;
-            if (desktopPic) desktopPic.src = avatarUrl;
-            if (publishPic) publishPic.src = avatarUrl;
-          }
-        } catch (e) {
-          console.error("Profile load error:", e);
-        }
-      }
-    });
-
-    // Logout Functionality
-    const handleLogout = async () => {
-      try {
-        await signOut(auth);
-        window.location.href = "login.html";
-      } catch (e) {
-        console.error("Logout error:", e);
-      }
-    };
-
-    document.getElementById("logoutBtnDesktop")?.addEventListener("click", handleLogout);
-    document.getElementById("logoutBtnMobile")?.addEventListener("click", handleLogout);
-  </script>
-
-  <!-- External Script Link -->
+  <!-- Main Engine Import -->
   <script type="module" src="script.js"></script>
 </body>
 </html>
