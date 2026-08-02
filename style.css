@@ -567,47 +567,44 @@ nav {
 }
 
 /* =========================================
-   BOOKS SECTIONS & FEED GRID
+   COMPACT MINI BOOK GRID (ICON-ONLY BUTTON)
 ========================================= */
-.books-feed,
-.popular-books {
+.books-feed {
   max-width: 1100px;
-  margin: 40px auto;
+  margin: 30px auto;
   padding: 0 20px;
   position: relative;
   z-index: 10;
 }
 
-.feed-header,
-.popular-books h2 {
+.feed-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   border-left: 4px solid var(--green);
-  padding-left: 12px;
+  padding-left: 10px;
 }
 
-.feed-header h2,
-.popular-books h2 {
-  font-size: 1.5rem;
+.feed-header h2 {
+  font-size: 1.2rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-#booksContainer,
-#popularBooks {
+/* Ultra-compact Grid Layout */
+#booksContainer {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
 }
 
-/* Book Card Component */
+/* Minimal Book Card */
 .book-card {
-  background: var(--card-bg);
+  background: #0d0d0d;
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: 8px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -618,123 +615,115 @@ nav {
 }
 
 .book-card:hover {
-  transform: translate3d(0, -6px, 0);
+  transform: translate3d(0, -3px, 0);
   border-color: rgba(92, 255, 114, 0.4);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(92, 255, 114, 0.15);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.9), 0 0 12px rgba(92, 255, 114, 0.15);
 }
 
-/* Delete Trash Button Styling */
+/* Mini Trash Delete Button */
 .delete-post-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 4px;
+  right: 4px;
   z-index: 20;
-  width: 34px;
-  height: 34px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.75);
-  border: 1px solid rgba(255, 77, 77, 0.4);
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(255, 77, 77, 0.5);
   color: var(--red);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  backdrop-filter: blur(8px);
-  transition: all 0.25s var(--transition-smooth);
+  backdrop-filter: blur(6px);
+  transition: all 0.2s var(--transition-smooth);
 }
 
 .delete-post-btn:hover {
   background: var(--red);
   color: #ffffff;
   border-color: var(--red);
-  transform: scale(1.12);
-  box-shadow: 0 0 15px rgba(255, 77, 77, 0.6);
+  transform: scale(1.1);
 }
 
 .delete-post-btn svg {
   pointer-events: none;
+  width: 12px;
+  height: 12px;
 }
 
+/* Aspect Ratio 2:3 Cover Image with object-fit: contain */
 .book-cover-wrapper {
   width: 100%;
-  height: 260px;
-  overflow: hidden;
+  aspect-ratio: 2 / 3;
   position: relative;
-  background: #141414;
+  background: #050505;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .book-cover {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s var(--transition-smooth);
+  object-fit: contain;
+  transition: transform 0.3s var(--transition-smooth);
 }
 
 .book-card:hover .book-cover {
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
+/* Hide all descriptions/text entirely */
+.book-caption,
+.book-meta-row,
+.book-date,
+.download-count {
+  display: none !important;
+}
+
+/* Icon-Only Download Button Strip */
 .book-info {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-}
-
-.book-meta-row {
+  padding: 4px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  color: #a0a0a0;
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-
-.book-date {
-  color: var(--orange);
-  text-transform: uppercase;
-}
-
-.download-count {
-  color: #888;
-}
-
-.book-caption {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 12px;
-  line-height: 1.35;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  justify-content: center;
+  background: #0a0a0a;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .download-btn {
-  margin-top: auto;
-  display: inline-flex;
+  width: 100%;
+  height: 28px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 700;
+  background: var(--green);
+  border: none;
+  color: #000000;
+  border-radius: 5px;
   text-decoration: none;
-  transition: all 0.3s var(--transition-smooth);
+  font-size: 0; /* Ensures no text renders */
+  transition: all 0.2s var(--transition-smooth);
+}
+
+/* Download Icon SVG Injection */
+.download-btn::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  background-color: #000000;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'%3E%3C/path%3E%3Cpolyline points='7 10 12 15 17 10'%3E%3C/polyline%3E%3Cline x1='12' y1='15' x2='12' y2='3'%3E%3C/line%3E%3C/svg%3E") no-repeat center;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'%3E%3C/path%3E%3Cpolyline points='7 10 12 15 17 10'%3E%3C/polyline%3E%3Cline x1='12' y1='15' x2='12' y2='3'%3E%3C/line%3E%3C/svg%3E") no-repeat center;
+  mask-size: contain;
+  -webkit-mask-size: contain;
 }
 
 .download-btn:hover {
-  background: var(--green);
-  color: #000000;
-  border-color: var(--green);
-  box-shadow: 0 0 15px rgba(92, 255, 114, 0.3);
+  background: #77ff8a;
+  box-shadow: 0 0 10px rgba(92, 255, 114, 0.4);
 }
 
 /* Mobile Bottom Navigation Bar */
@@ -791,7 +780,7 @@ nav {
 
 @keyframes slideUp {
   from { transform: translate3d(0, 100%, 0); }
-  to { transform: translate3d(0, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 /* Responsive Queries */
@@ -811,13 +800,8 @@ nav {
   .hero { margin-top: -70px; margin-bottom: 30px; }
   .hero-buttons { flex-direction: column; }
   
-  #booksContainer,
-  #popularBooks {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-  
-  .book-cover-wrapper {
-    height: 190px;
+  #booksContainer {
+    grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+    gap: 8px;
   }
 }
