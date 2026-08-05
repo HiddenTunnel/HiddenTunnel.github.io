@@ -31,12 +31,39 @@
       border-radius: 8px; color: #fff; padding: 12px; font-family: 'Outfit', sans-serif; box-sizing: border-box;
     }
     .form-group textarea:focus { outline: none; border-color: #FF7A00; }
+    
+    /* Input ও Select এর জন্য CSS */
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      background: #0a0a0a;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, .15);
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #FF7A00;
+    }
+
+    /* File Input Wrapper ও Text Overflow Fix */
     .file-input-wrapper {
       position: relative; background: #0a0a0a; border: 2px dashed rgba(255, 255, 255, 0.2);
       border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s ease;
     }
+    .file-input-wrapper span {
+      display: block;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
     .file-input-wrapper:hover { border-color: #FF7A00; background: rgba(255, 122, 0, 0.05); }
     .file-input-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    
     .preview-box { margin-top: 10px; max-height: 200px; display: none; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); }
     .preview-box img { width: 100%; height: 100%; object-fit: cover; }
     .btn-submit {
@@ -76,7 +103,7 @@
       <div class="form-group">
         <label>Cover Photo (Optional)</label>
         <div class="file-input-wrapper">
-          <span id="photoLabelText">📷 Click or Drag Cover Image Here</span>
+          <span id="photoLabelText"> Click or Drag Cover Image Here</span>
           <input type="file" id="photoInput" accept="image/*">
         </div>
         <div class="preview-box" id="photoPreview"><img src="" alt="Preview"></div>
@@ -90,8 +117,35 @@
         </div>
       </div>
 
+      <!-- Author Name -->
       <div class="form-group">
-        <label for="captionInput">Caption / Description</label>
+        <label for="authorInput">Author Name</label>
+        <input type="text" id="authorInput" placeholder="Author Name">
+      </div>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label for="categoryInput">Category</label>
+        <select id="categoryInput">
+          <option value="">Select Category</option>
+          <option>Novel</option>
+          <option>Programming</option>
+          <option>Science</option>
+          <option>Engineering</option>
+          <option>History</option>
+          <option>Religion</option>
+          <option>Others</option>
+        </select>
+      </div>
+
+      <!-- Tags -->
+      <div class="form-group">
+        <label for="tagsInput">Tags</label>
+        <input type="text" id="tagsInput" placeholder="example: javascript, html, css">
+      </div>
+
+      <div class="form-group">
+        <label for="captionInput">Book title</label>
         <textarea id="captionInput" rows="4" placeholder="Write something underground..."></textarea>
       </div>
 
@@ -152,7 +206,10 @@
 
     docInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
-      if (file) docLabelText.textContent = `Selected: ${file.name}`;
+      if (file) {
+        const shortName = file.name.length > 35 ? file.name.substring(0, 35) + "..." : file.name;
+        docLabelText.textContent = `📄 ${shortName}`;
+      }
     });
 
     publishForm.addEventListener("submit", async (e) => {
@@ -160,6 +217,10 @@
       const photoFile = photoInput.files[0];
       const docFile = docInput.files[0];
       const captionText = document.getElementById("captionInput").value.trim();
+      
+      const author = document.getElementById("authorInput").value.trim();
+      const category = document.getElementById("categoryInput").value;
+      const tags = document.getElementById("tagsInput").value.trim();
 
       if (!photoFile && !docFile && !captionText) {
         showStatus("Please attach a photo, document, or enter a caption.", "error");
@@ -174,6 +235,9 @@
       if (photoFile) formData.append("photo", photoFile);
       if (docFile) formData.append("document", docFile);
       if (captionText) formData.append("caption", captionText);
+      if (author) formData.append("author", author);
+      if (category) formData.append("category", category);
+      if (tags) formData.append("tags", tags);
       if (currentUser) formData.append("publisher_uid", currentUser.uid);
 
       try {

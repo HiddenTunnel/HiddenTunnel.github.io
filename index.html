@@ -148,25 +148,19 @@
 
   <!-- BOOKS FEEDS -->
   <section class="books-feed">
-    <div class="feed-header"><h2>Latest Books</h2></div>
-    <div id="booksContainer">
-      <!-- script.js dynamically creates cards with this structure:
-      <div class="book-card">
-        <button class="delete-post-btn" title="Delete Post">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
-        </button>
-        <div class="book-cover-wrapper">
-          <img src="COVER_IMAGE_URL" class="book-cover" alt="Cover">
-        </div>
-        <div class="book-info">
-          <a href="FILE_URL" class="download-btn" download title="Download"></a>
-        </div>
+    <div class="feed-header">
+      <h2>Latest Books</h2>
+      <!-- Search Bar UI Container -->
+      <div class="search-box-container">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="bookSearchInput" placeholder="Search by tags, title or author..." autocomplete="off">
+        <button type="button" id="clearSearchBtn" class="clear-search-btn" title="Clear search">&times;</button>
       </div>
-      -->
     </div>
+    <div id="booksContainer"></div>
   </section>
 
   <!-- Smooth Preloader Script -->

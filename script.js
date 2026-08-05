@@ -32,6 +32,7 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 let currentFirebaseUser = null;
+let allFetchedPosts = []; // Local cache to store all loaded posts for instant filtering
 let mouseX = 0, mouseY = 0;
 let windowWidth = window.innerWidth;
 let windowHeight = window.innerHeight;
@@ -41,7 +42,8 @@ const glow = document.getElementById('mouse-glow');
 const graffitiBg = document.getElementById('graffiti-bg');
 const interactiveCard = document.getElementById('interactiveCard');
 const booksContainer = document.getElementById('booksContainer');
-const popularBooksContainer = document.getElementById('popularBooks');
+const searchInput = document.getElementById('bookSearchInput');
+const clearSearchBtn = document.getElementById('clearSearchBtn');
 
 /*========================================
     INSTANT PROFILE PHOTO SYSTEM
@@ -96,7 +98,6 @@ onAuthStateChanged(auth, async (user) => {
     console.error("Error fetching Firestore photo:", e);
   }
   
-  // Reload feeds to ensure delete button permissions evaluate properly
   loadBookFeeds();
 });
 
@@ -139,14 +140,11 @@ function createBookCardHTML(post) {
     const docDownloadUrl = `${API_URL}/document?doc_id=${post.doc_id}&filename=${encodeURIComponent(fileName)}`;
 
     docBtnHtml = `
-      <div class="book-footer">
-        <h3 class="book-title">${escapeHTML(post.caption || "Untitled Book")}</h3>
-        <a href="${docDownloadUrl}"
-           class="download-btn doc-download-btn"
-           data-post-id="${post.id}"
-           title="Download">
-        </a>
-      </div>
+      <a href="${docDownloadUrl}"
+         class="download-btn doc-download-btn"
+         data-post-id="${post.id}"
+         title="Download">
+      </a>
     `;
   }
 
@@ -156,27 +154,48 @@ function createBookCardHTML(post) {
     const isDeveloper = currentFirebaseUser.uid === DEVELOPER_UID;
     if (isOwner || isDeveloper) {
       deleteBtnHtml = `
-        <button type="button" class="btn-delete-post" data-post-id="${post.id}" style="position: absolute; top: 10px; right: 10px; background: rgba(255, 0, 0, 0.8); color: #fff; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; z-index: 10;">
-           Delete Book
+        <button type="button" class="delete-post-btn" data-post-id="${post.id}" title="Delete Post">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
         </button>
       `;
     }
   }
 
-  const formattedDate = post.date ?
-    new Date(post.date * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) :
-    "Just Now";
+  const authorHtml = post.author ? `<div class="book-author">By: ${escapeHTML(post.author)}</div>` : "";
+  const categoryHtml = post.category ? `<div class="book-category">${escapeHTML(post.category)}</div>` : "";
+  const tagsHtml = post.tags ? `<div class="book-tags">#${escapeHTML(post.tags)}</div>` : "";
 
   return `
-    <article class="book-card" style="position: relative;">
+    <article class="book-card">
       ${deleteBtnHtml}
       ${mediaHtml}
       <div class="book-info">
-        <span class="book-date" style="font-size: 0.75rem; color: var(--orange); text-transform: uppercase;">${formattedDate}</span>
+        <h3 class="book-title" title="${escapeHTML(post.caption || "Untitled")}">${escapeHTML(post.caption || "Untitled")}</h3>
+        ${authorHtml}
+        ${categoryHtml}
+        ${tagsHtml}
         ${docBtnHtml}
       </div>
     </article>
   `;
+}
+
+function renderPosts(posts) {
+  if (!booksContainer) return;
+  if (!posts || posts.length === 0) {
+    booksContainer.innerHTML = `<p style="color: #666; font-size: 0.9rem; grid-column: 1 / -1; text-align: center; padding: 20px 0;">No matching publications found.</p>`;
+    return;
+  }
+
+  let latestHTML = "";
+  posts.forEach((post) => {
+    latestHTML += createBookCardHTML(post);
+  });
+  booksContainer.innerHTML = latestHTML;
+  attachFeedEventListeners();
 }
 
 async function loadBookFeeds() {
@@ -188,38 +207,11 @@ async function loadBookFeeds() {
 
     if (!data.success || !data.posts || data.posts.length === 0) {
       booksContainer.innerHTML = `<p style="color: #666; font-size: 0.9rem;">No publications found yet.</p>`;
-      if (popularBooksContainer) {
-        popularBooksContainer.innerHTML = `<p style="color: #666; font-size: 0.9rem;">No trending publications right now.</p>`;
-      }
       return;
     }
 
-    // 1. Latest Books Feed ( Chronological Order )
-    let latestHTML = "";
-    data.posts.forEach((post) => {
-      latestHTML += createBookCardHTML(post);
-    });
-    booksContainer.innerHTML = latestHTML;
-
-    // 2. Trending Books Feed ( Ranked strictly by maximum downloads )
-    if (popularBooksContainer) {
-      const sortedByDownloads = [...data.posts]
-        .filter(p => (p.downloads || 0) > 0)
-        .sort((a, b) => (b.downloads || 0) - (a.downloads || 0))
-        .slice(0, 3);
-
-      if (sortedByDownloads.length > 0) {
-        let popularHTML = "";
-        sortedByDownloads.forEach((post) => {
-          popularHTML += createBookCardHTML(post);
-        });
-        popularBooksContainer.innerHTML = popularHTML;
-      } else {
-        popularBooksContainer.innerHTML = `<p style="color: #666; font-size: 0.9rem;">No downloaded trends yet.</p>`;
-      }
-    }
-
-    attachFeedEventListeners();
+    allFetchedPosts = data.posts;
+    renderPosts(allFetchedPosts);
 
   } catch (error) {
     console.error("Error fetching feed from Worker:", error);
@@ -227,8 +219,55 @@ async function loadBookFeeds() {
   }
 }
 
+/*========================================
+    SEARCH & FILTER ENGINE (TAGS / TITLE / AUTHOR)
+========================================*/
+
+function handleSearchFilter() {
+  if (!searchInput) return;
+  const query = searchInput.value.toLowerCase().trim();
+
+  if (clearSearchBtn) {
+    if (query.length > 0) {
+      clearSearchBtn.classList.add("active");
+    } else {
+      clearSearchBtn.classList.remove("active");
+    }
+  }
+
+  if (!query) {
+    renderPosts(allFetchedPosts);
+    return;
+  }
+
+  const filtered = allFetchedPosts.filter((post) => {
+    const tags = (post.tags || "").toLowerCase();
+    const title = (post.caption || "").toLowerCase();
+    const author = (post.author || "").toLowerCase();
+    const category = (post.category || "").toLowerCase();
+
+    return (
+      tags.includes(query) ||
+      title.includes(query) ||
+      author.includes(query) ||
+      category.includes(query)
+    );
+  });
+
+  renderPosts(filtered);
+}
+
+searchInput?.addEventListener("input", handleSearchFilter);
+
+clearSearchBtn?.addEventListener("click", () => {
+  if (searchInput) {
+    searchInput.value = "";
+    handleSearchFilter();
+    searchInput.focus();
+  }
+});
+
 function attachFeedEventListeners() {
-  // Handle PDF/EPUB Download Counts
   document.querySelectorAll(".doc-download-btn").forEach((btn) => {
     btn.addEventListener("click", async (e) => {
       const postId = e.currentTarget.getAttribute("data-post-id");
@@ -246,8 +285,7 @@ function attachFeedEventListeners() {
     });
   });
 
-  // Handle Owner/Developer Deletions
-  document.querySelectorAll(".btn-delete-post").forEach((btn) => {
+  document.querySelectorAll(".delete-post-btn").forEach((btn) => {
     btn.addEventListener("click", async (e) => {
       const postId = e.currentTarget.getAttribute("data-post-id");
       if (!confirm("Are you sure you want to delete this signal?")) return;
