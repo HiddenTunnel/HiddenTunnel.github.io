@@ -676,24 +676,43 @@ nav {
   transform: scale(1.03);
 }
 
-/* Hide all descriptions/text entirely */
-.book-caption,
+/* Hide unused metadata elements */
 .book-meta-row,
 .book-date,
 .download-count {
   display: none !important;
 }
 
-/* Icon-Only Download Button Strip */
+/* Book Information Box */
 .book-info {
-  padding: 4px;
+  padding: 8px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
   background: #0a0a0a;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* Book Title Text */
+.book-title {
+  font-size: .8rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Book Footer Wrapper */
+.book-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Download Button Container */
 .download-btn {
   width: 100%;
   height: 28px;
@@ -705,11 +724,28 @@ nav {
   color: #000000;
   border-radius: 5px;
   text-decoration: none;
-  font-size: 0; /* Ensures no text renders */
+  font-size: 0;
+  transition: all 0.2s var(--transition-smooth);
+}
+
+/* Document Download Button Customization */
+.doc-download-btn {
+  width: 100%;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0;
+  color: transparent;
+  background: #FF731E;
+  border-radius: 5px;
+  text-decoration: none;
+  overflow: hidden;
   transition: all 0.2s var(--transition-smooth);
 }
 
 /* Download Icon SVG Injection */
+.doc-download-btn::before,
 .download-btn::before {
   content: '';
   width: 14px;
@@ -721,6 +757,7 @@ nav {
   -webkit-mask-size: contain;
 }
 
+.doc-download-btn:hover,
 .download-btn:hover {
   background: #77ff8a;
   box-shadow: 0 0 10px rgba(92, 255, 114, 0.4);

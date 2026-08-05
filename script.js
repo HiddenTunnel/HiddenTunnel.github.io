@@ -135,12 +135,18 @@ function createBookCardHTML(post) {
 
   let docBtnHtml = "";
   if (post.doc_id) {
-    const fileName = post.doc_name || "Download Document";
+    const fileName = post.doc_name || "Download";
     const docDownloadUrl = `${API_URL}/document?doc_id=${post.doc_id}&filename=${encodeURIComponent(fileName)}`;
+
     docBtnHtml = `
-      <a href="${docDownloadUrl}" class="doc-download-btn" data-post-id="${post.id}" style="display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 14px; background: #FF7A00; color: #000; font-weight: bold; border-radius: 6px; text-decoration: none; font-size: 0.85rem;">
-        <span>📄 Download ${escapeHTML(fileName)}</span>
-      </a>
+      <div class="book-footer">
+        <h3 class="book-title">${escapeHTML(post.caption || "Untitled Book")}</h3>
+        <a href="${docDownloadUrl}"
+           class="download-btn doc-download-btn"
+           data-post-id="${post.id}"
+           title="Download">
+        </a>
+      </div>
     `;
   }
 
@@ -167,7 +173,6 @@ function createBookCardHTML(post) {
       ${mediaHtml}
       <div class="book-info">
         <span class="book-date" style="font-size: 0.75rem; color: var(--orange); text-transform: uppercase;">${formattedDate}</span>
-        <p class="book-caption" style="margin: 8px 0; color: #e0e0e0; font-size: 0.95rem;">${escapeHTML(post.caption || "Untitled Signal")}</p>
         ${docBtnHtml}
       </div>
     </article>
