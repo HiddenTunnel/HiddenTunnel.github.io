@@ -6,171 +6,83 @@
   <title>Developer Control Panel | Urban Noir</title>
   <meta name="theme-color" content="#050505">
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="style.css">
 
   <style>
-    .dev-container {
-      max-width: 900px;
-      margin: 100px auto 40px auto;
-      padding: 0 20px;
-      position: relative;
-      z-index: 10;
-    }
-
-    .dev-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-      border-left: 4px solid var(--orange);
-      padding-left: 14px;
-    }
-
-    .dev-header h1 {
-      font-size: 1.8rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      color: #fff;
-    }
-
-    .dev-badge {
-      background: rgba(255, 122, 0, 0.15);
-      color: var(--orange);
-      border: 1px solid var(--orange);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .pending-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 20px;
-    }
-
-    .dev-card {
-      background: var(--card-bg, #0a0a0a);
-      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-      border-radius: 16px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .dev-card img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 10px;
-      background: #141414;
-    }
-
-    .dev-card-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-    }
-
-    .dev-card-meta {
-      font-size: 0.82rem;
-      color: #aaa;
-    }
-
-    .dev-card-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: auto;
-    }
-
-    .btn-approve {
-      flex: 1;
-      background: var(--green);
-      color: #000;
-      font-weight: 800;
-      padding: 10px;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    .btn-approve:hover {
-      transform: scale(1.03);
-    }
-
-    .btn-reject {
-      background: rgba(255, 77, 77, 0.15);
-      color: var(--red);
-      border: 1px solid rgba(255, 77, 77, 0.3);
-      font-weight: 700;
-      padding: 10px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-    }
-
-    #accessDenied {
-      display: none;
-      text-align: center;
-      padding: 60px 20px;
-      background: rgba(255, 77, 77, 0.05);
-      border: 1px solid var(--red);
-      border-radius: 20px;
-    }
-
-    #accessDenied h2 {
-      color: var(--red);
-      font-size: 1.8rem;
-      margin-bottom: 10px;
-    }
+    .dev-container { max-width: 1000px; margin: 100px auto 40px auto; padding: 0 20px; position: relative; z-index: 10; }
+    .dev-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; border-left: 4px solid var(--orange, #FF7A00); padding-left: 14px; }
+    .dev-header h1 { font-size: 1.8rem; font-weight: 900; text-transform: uppercase; color: #fff; }
+    .dev-section { background: #0a0a0a; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; margin-bottom: 30px; }
+    .dev-section h2 { color: var(--orange, #FF7A00); font-size: 1.3rem; margin-bottom: 16px; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
+    .grid-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .item-card { background: #141414; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; position: relative; }
+    .item-card img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; }
+    .card-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 10px; }
+    .btn-edit { flex: 1; background: #FFB800; color: #000; font-weight: 700; border: none; padding: 8px; border-radius: 8px; cursor: pointer; }
+    .btn-del { background: rgba(255,77,77,0.2); color: #ff4d4d; border: 1px solid #ff4d4d; font-weight: 700; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+    .banner-inputs { display: flex; flex-direction: column; gap: 12px; }
+    .banner-row { display: flex; gap: 10px; align-items: center; }
+    .banner-row input { flex: 1; background: #181818; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px; border-radius: 8px; }
+    .btn-save { background: var(--green, #5CFF72); color: #000; font-weight: 800; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; }
+    #accessDenied { display: none; text-align: center; padding: 60px 20px; background: rgba(255, 77, 77, 0.05); border: 1px solid var(--red, #FF4D4D); border-radius: 20px; }
   </style>
 </head>
 <body>
-
-  <div id="graffiti-bg"></div>
-  <div id="mouse-glow"></div>
-
   <main class="dev-container">
-    
-    <!-- DENIED ACCESS NOTICE -->
     <div id="accessDenied">
       <h2>🛑 Access Denied</h2>
-      <p style="color: #aaa; margin-bottom: 20px;">You are not authorized to view the developer terminal.</p>
-      <a href="index.html" class="btn-primary" style="display: inline-block; padding: 10px 24px; text-decoration: none;">Return Home</a>
+      <p style="color: #aaa; margin-bottom: 20px;">Unauthorized terminal access.</p>
+      <a href="index.html" class="btn-primary">Return Home</a>
     </div>
 
-    <!-- AUTHORIZED DEVELOPER PANEL -->
     <div id="devPanel" style="display: none;">
       <div class="dev-header">
-        <h1>Pending Permissions</h1>
-        <span class="dev-badge">Dev Access Granted</span>
+        <h1>Master Control Terminal</h1>
+        <span class="dev-badge">Lead Operator</span>
       </div>
 
-      <div id="pendingContainer" class="pending-grid">
-        <!-- Pending books loaded via Firebase -->
-      </div>
+      <!-- 1. INDEX CARD BANNER CONTROL -->
+      <section class="dev-section">
+        <h2>1. Change Index Card Banners (1, 2, 3)</h2>
+        <div class="banner-inputs">
+          <div class="banner-row">
+            <label style="width: 80px;">Banner 1:</label>
+            <input type="text" id="banner1Url" placeholder="Image URL (e.g. assets/pic/banner1.jpg)">
+            <button class="btn-save" onclick="updateBanner(1)">Save 1</button>
+          </div>
+          <div class="banner-row">
+            <label style="width: 80px;">Banner 2:</label>
+            <input type="text" id="banner2Url" placeholder="Image URL (e.g. assets/pic/banner2.jpg)">
+            <button class="btn-save" onclick="updateBanner(2)">Save 2</button>
+          </div>
+          <div class="banner-row">
+            <label style="width: 80px;">Banner 3:</label>
+            <input type="text" id="banner3Url" placeholder="Image URL (e.g. assets/pic/banner3.jpg)">
+            <button class="btn-save" onclick="updateBanner(3)">Save 3</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. POST CONTROL (EDIT/DELETE) -->
+      <section class="dev-section">
+        <h2>2. Manage All Posts (Edit / Delete)</h2>
+        <div id="postsList" class="grid-list">Loading posts...</div>
+      </section>
+
+      <!-- 3. USER ID CONTROL (EDIT/DELETE ID) -->
+      <section class="dev-section">
+        <h2>3. Manage Users & IDs</h2>
+        <div id="usersList" class="grid-list">Loading users...</div>
+      </section>
     </div>
-
   </main>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { 
-      getFirestore, 
-      collection, 
-      query, 
-      where, 
-      getDocs, 
-      doc, 
-      updateDoc, 
-      deleteDoc 
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -182,89 +94,151 @@
       appId: "1:1059246827383:web:caa91c40c408d46e3b6372"
     };
 
+    const API_URL = "https://urbannoir-api.mushfiquemonowarnamir2006.workers.dev";
+    const DEV_EMAIL = "mushfiquemonowarnamir2006@gmail.com";
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-
-    const DEV_EMAIL = "mushfiquemonowarnamir2006@gmail.com";
+    let currentUser = null;
 
     onAuthStateChanged(auth, async (user) => {
-      // Access Guard: Strict email check
       if (!user || user.email.toLowerCase() !== DEV_EMAIL.toLowerCase()) {
-        document.getElementById("accessDenied").style.display = "block";
         document.getElementById("devPanel").style.display = "none";
-        return;
+        document.getElementById("accessDenied").style.display = "block";
+      } else {
+        currentUser = user;
+        document.getElementById("accessDenied").style.display = "none";
+        document.getElementById("devPanel").style.display = "block";
+        loadBanners();
+        loadAllPosts();
+        loadAllUsers();
       }
-
-      // Developer Authorized
-      document.getElementById("accessDenied").style.display = "none";
-      document.getElementById("devPanel").style.display = "block";
-      loadPendingBooks();
     });
 
-    async function loadPendingBooks() {
-      const container = document.getElementById("pendingContainer");
-      container.innerHTML = `<p style="color: #888;">Loading pending approvals...</p>`;
-
+    // --- BANNER MANAGEMENT ---
+    async function loadBanners() {
       try {
-        const q = query(collection(db, "books"), where("status", "==", "pending"));
-        const snapshot = await getDocs(q);
+        const docRef = doc(db, "settings", "banners");
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data.banner1) document.getElementById("banner1Url").value = data.banner1;
+          if (data.banner2) document.getElementById("banner2Url").value = data.banner2;
+          if (data.banner3) document.getElementById("banner3Url").value = data.banner3;
+        }
+      } catch (err) { console.error("Error loading banners:", err); }
+    }
 
-        if (snapshot.empty) {
-          container.innerHTML = `<p style="color: #666;">No pending books waiting for approval.</p>`;
+    window.updateBanner = async (index) => {
+      const url = document.getElementById(`banner${index}Url`).value.trim();
+      try {
+        await setDoc(doc(db, "settings", "banners"), { [`banner${index}`]: url }, { merge: true });
+        alert(`Banner ${index} updated successfully!`);
+      } catch (err) { alert("Failed to update banner: " + err.message); }
+    };
+
+    // --- POST MANAGEMENT ---
+    async function loadAllPosts() {
+      const container = document.getElementById("postsList");
+      try {
+        const res = await fetch(`${API_URL}/posts?limit=50`);
+        const data = await res.json();
+        if (!data.success || !data.posts.length) {
+          container.innerHTML = "<p>No posts found.</p>";
           return;
         }
 
-        let html = "";
-        snapshot.forEach((docSnap) => {
-          const book = docSnap.data();
-          const id = docSnap.id;
+        container.innerHTML = data.posts.map(post => `
+          <div class="item-card" id="post-${post.id}">
+            <p><strong>Caption:</strong> ${post.caption || 'No caption'}</p>
+            <p style="font-size:0.8rem; color:#888;">Author: ${post.author || 'N/A'} | ID: ${post.id}</p>
+            <div class="card-actions">
+              <button class="btn-edit" onclick="editPost('${post.id}', '${escape(post.caption || '')}', '${escape(post.author || '')}')">Edit</button>
+              <button class="btn-del" onclick="deletePost('${post.id}')">Delete</button>
+            </div>
+          </div>
+        `).join("");
+      } catch (err) { container.innerHTML = "Failed to load posts."; }
+    }
 
+    window.editPost = async (postId, oldCaption, oldAuthor) => {
+      const caption = prompt("Update caption:", unescape(oldCaption));
+      if (caption === null) return;
+      const author = prompt("Update author:", unescape(oldAuthor));
+      if (author === null) return;
+
+      try {
+        const res = await fetch(`${API_URL}/posts/edit`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ postId, caption, author, requestingUid: currentUser.uid })
+        });
+        const result = await res.json();
+        if (result.success) { alert("Post updated!"); loadAllPosts(); }
+        else alert("Edit failed: " + result.error);
+      } catch (e) { alert("Server error"); }
+    };
+
+    window.deletePost = async (postId) => {
+      if (!confirm("Delete this post permanently?")) return;
+      try {
+        const res = await fetch(`${API_URL}/posts`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ postId, requestingUid: currentUser.uid })
+        });
+        if (res.ok) { document.getElementById(`post-${postId}`)?.remove(); }
+        else alert("Failed to delete post.");
+      } catch (e) { alert("Server error"); }
+    };
+
+    // --- USER ID MANAGEMENT ---
+    async function loadAllUsers() {
+      const container = document.getElementById("usersList");
+      try {
+        const snap = await getDocs(collection(db, "users"));
+        if (snap.empty) { container.innerHTML = "<p>No users found.</p>"; return; }
+
+        let html = "";
+        snap.forEach(docSnap => {
+          const u = docSnap.data();
+          const uid = docSnap.id;
           html += `
-            <div class="dev-card" id="card-${id}">
-              <img src="${book.cover || 'assets/pic/banner.png'}" alt="Cover">
-              <div class="dev-card-title">${book.title || 'Untitled'}</div>
-              <div class="dev-card-meta">By: ${book.uploader || 'Unknown'}</div>
-              <div class="dev-card-meta">Type: ${book.paid ? 'Paid (৳' + book.price + ')' : 'Free'}</div>
-              <p style="font-size: 0.8rem; color: #777;">${book.description || ''}</p>
-              
-              <div class="dev-card-actions">
-                <button class="btn-approve" onclick="approveBook('${id}')">Approve</button>
-                <button class="btn-reject" onclick="rejectBook('${id}')">Reject</button>
+            <div class="item-card" id="user-${uid}">
+              <p><strong>Name:</strong> ${u.fullName || 'N/A'}</p>
+              <p><strong>Versity ID:</strong> ${u.versityId || 'N/A'}</p>
+              <p style="font-size:0.8rem; color:#888;">${u.email || ''}</p>
+              <div class="card-actions">
+                <button class="btn-edit" onclick="editUser('${uid}', '${escape(u.fullName || '')}', '${u.versityId || ''}')">Edit ID</button>
+                <button class="btn-del" onclick="deleteUser('${uid}')">Delete ID</button>
               </div>
             </div>
           `;
         });
-
         container.innerHTML = html;
-
-      } catch (err) {
-        console.error("Error fetching pending books:", err);
-        container.innerHTML = `<p style="color: var(--red);">Error loading pending list.</p>`;
-      }
+      } catch (err) { container.innerHTML = "Failed to load users."; }
     }
 
-    // Global Functions for Approval Actions
-    window.approveBook = async (bookId) => {
+    window.editUser = async (uid, oldName, oldVersityId) => {
+      const fullName = prompt("Update Full Name:", unescape(oldName));
+      if (fullName === null) return;
+      const versityId = prompt("Update Versity ID:", oldVersityId);
+      if (versityId === null) return;
+
       try {
-        const bookRef = doc(db, "books", bookId);
-        await updateDoc(bookRef, { status: "approved" });
-        document.getElementById(`card-${bookId}`)?.remove();
-        alert("Book approved and published to feed!");
-      } catch (err) {
-        console.error("Approve failed:", err);
-        alert("Action failed.");
-      }
+        await updateDoc(doc(db, "users", uid), { fullName, versityId });
+        alert("User ID updated successfully!");
+        loadAllUsers();
+      } catch (e) { alert("Failed to update user: " + e.message); }
     };
 
-    window.rejectBook = async (bookId) => {
-      if (!confirm("Are you sure you want to reject and delete this submission?")) return;
+    window.deleteUser = async (uid) => {
+      if (!confirm("Delete this User ID and Profile permanently?")) return;
       try {
-        await deleteDoc(doc(db, "books", bookId));
-        document.getElementById(`card-${bookId}`)?.remove();
-      } catch (err) {
-        console.error("Delete failed:", err);
-      }
+        await deleteDoc(doc(db, "users", uid));
+        document.getElementById(`user-${uid}`)?.remove();
+      } catch (e) { alert("Failed to delete user."); }
     };
   </script>
 </body>

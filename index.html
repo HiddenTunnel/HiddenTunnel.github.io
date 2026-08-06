@@ -54,9 +54,55 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+
+    /* In-App Browser Notice Banner */
+    #iab-banner {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: #111;
+      color: #fff;
+      padding: 12px 16px;
+      text-align: center;
+      z-index: 99999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+      border-bottom: 1px solid #333;
+      box-sizing: border-box;
+    }
+    #iab-banner p {
+      margin: 0 0 8px 0;
+      font-size: 13px;
+      line-height: 1.4;
+      color: #ccc;
+    }
+    #iab-banner strong {
+      color: #fff;
+    }
+    #iab-banner a.iab-btn {
+      display: inline-block;
+      background: #ffffff;
+      color: #000000;
+      padding: 6px 14px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
   </style>
 </head>
 <body>
+  <!-- In-App Browser Escaper Banner -->
+  <div id="iab-banner">
+    <p id="iab-message">
+      ⚠️ <strong>App Browser Detected:</strong> For full features and standard browser experience, open this page in Chrome or your main browser.
+    </p>
+    <a id="iab-action-btn" class="iab-btn" href="#">Open in Chrome</a>
+  </div>
+
   <!-- Smooth Preloader -->
   <div id="preloader">
     <div class="preloader-spinner"></div>

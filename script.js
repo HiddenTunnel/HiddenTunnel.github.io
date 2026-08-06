@@ -46,6 +46,43 @@ const searchInput = document.getElementById('bookSearchInput');
 const clearSearchBtn = document.getElementById('clearSearchBtn');
 
 /*========================================
+    IN-APP BROWSER (MESSENGER / WHATSAPP) DETECTOR
+========================================*/
+
+(function checkInAppBrowser() {
+  const ua = navigator.userAgent || navigator.vendor || window.opera;
+  
+  // Detect Messenger, Facebook, Instagram, or WhatsApp user agents
+  const isInApp = (ua.indexOf("FBAN") > -1) || 
+                  (ua.indexOf("FBAV") > -1) || 
+                  (ua.indexOf("Instagram") > -1) || 
+                  (ua.indexOf("WhatsApp") > -1);
+
+  if (isInApp) {
+    const banner = document.getElementById("iab-banner");
+    const actionBtn = document.getElementById("iab-action-btn");
+    const message = document.getElementById("iab-message");
+
+    if (!banner) return;
+
+    banner.style.display = "block";
+
+    // If on Android, force opening Chrome via Android Intent
+    if (/android/i.test(ua)) {
+      if (actionBtn) {
+        actionBtn.href = "intent://urbannoir.github.io#Intent;scheme=https;package=com.android.chrome;end;";
+      }
+    } else {
+      // iOS doesn't allow direct URI schemes to open external browsers natively
+      if (actionBtn) actionBtn.style.display = "none";
+      if (message) {
+        message.innerHTML = '⚠️ <strong>App Browser Detected:</strong> Tap the <strong>three dots (••• or ⋮)</strong> in the corner and select <strong>"Open in Safari / Browser"</strong>.';
+      }
+    }
+  }
+})();
+
+/*========================================
     INSTANT PROFILE PHOTO SYSTEM
 ========================================*/
 
