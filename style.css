@@ -30,7 +30,7 @@ body {
   padding-bottom: 90px;
 }
 
-/* Ambient FX & Backgrounds (GPU Accelerated) */
+/* Ambient FX & Backgrounds */
 #graffiti-bg {
   position: fixed;
   top: 0;
@@ -80,7 +80,6 @@ body {
   pointer-events: auto;
 }
 
-/* Mobile Profile Pic (Top Left) */
 .mobile-profile-btn {
   width: 42px;
   height: 42px;
@@ -107,7 +106,6 @@ body {
   transform: translate3d(0, 0, 0) scale(0.92);
 }
 
-/* Mobile Logout Button (Top Right) */
 .mobile-logout-btn {
   width: 42px;
   height: 42px;
@@ -165,7 +163,6 @@ nav {
   gap: 14px;
 }
 
-/* Desktop Profile Avatar (Top Left) */
 .desktop-profile-btn {
   width: 40px;
   height: 40px;
@@ -209,7 +206,6 @@ nav {
   color: var(--green);
 }
 
-/* Desktop Nav Links */
 .desktop-nav {
   display: flex;
   gap: 12px;
@@ -251,7 +247,6 @@ nav {
   transform: translate3d(0, -2px, 0);
 }
 
-/* Desktop Right Actions */
 .header-actions {
   display: flex;
   align-items: center;
@@ -302,7 +297,7 @@ nav {
   box-shadow: 0 0 15px rgba(255, 77, 77, 0.4);
 }
 
-/* Hero Section */
+/* HERO SECTION */
 .hero {
   max-width: 1100px;
   margin: 140px auto 40px auto;
@@ -445,9 +440,7 @@ nav {
   transform: translate3d(0, -4px, 0) scale(1.02);
 }
 
-/* =========================================
-   PUBLISH A BOOK COMPOSER CARD
-========================================= */
+/* PUBLISH A BOOK CARD */
 .publish-book-card {
   width: 100%;
   max-width: 400px;
@@ -486,32 +479,60 @@ nav {
   object-fit: cover;
 }
 
-/* Chat Mockup Card (GPU Accelerated) */
-.chat-mockup {
+/* =========================================
+   AUTO IMAGE SLIDER (Replaces Chat Mockup)
+========================================= */
+.image-slider-container {
   width: 100%;
   max-width: 400px;
+  height: 200px;
   background: #0a0a0a;
   border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
-  padding: 18px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9), 0 0 25px rgba(92, 255, 114, 0.1);
   position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9), 0 0 25px rgba(92, 255, 114, 0.1);
   transition: transform 0.4s var(--transition-smooth), border-color 0.3s ease, box-shadow 0.3s ease;
   will-change: transform;
 }
 
-.chat-mockup:hover {
+.image-slider-container:hover {
   transform: translate3d(0, -6px, 0) scale(1.02);
   border-color: rgba(92, 255, 114, 0.4);
   box-shadow: 0 25px 50px rgba(0, 0, 0, 1), 0 0 35px rgba(92, 255, 114, 0.25);
 }
 
+.slider-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.slides {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.slide {
+  min-width: 100%;
+  height: 100%;
+}
+
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 18px;
+}
+
 .crown-badge {
   position: absolute;
-  top: -18px;
-  right: 20px;
-  width: 38px;
-  height: 38px;
+  top: 10px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
   background: #000000;
   border: 2px solid var(--green);
   border-radius: 50%;
@@ -519,55 +540,47 @@ nav {
   align-items: center;
   justify-content: center;
   box-shadow: 0 0 15px rgba(92, 255, 114, 0.4);
+  z-index: 15;
   transition: transform 0.3s ease;
-  will-change: transform;
 }
 
-.chat-mockup:hover .crown-badge {
+.image-slider-container:hover .crown-badge {
   transform: rotate(15deg) scale(1.1);
 }
 
 .crown-badge img {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
-.chat-messages {
+.slider-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  text-align: left;
+  gap: 8px;
+  z-index: 15;
 }
 
-.msg {
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-size: 0.88rem;
-  max-width: 85%;
-  position: relative;
-  transition: transform 0.2s ease;
-  will-change: transform;
+.dot {
+  width: 8px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.msg:hover { transform: scale(1.02); }
-
-.msg-incoming {
-  background: #121212;
-  color: #ddd;
-  align-self: flex-start;
-  border-bottom-left-radius: 4px;
-}
-
-.msg-outgoing {
+.dot.active {
   background: var(--green);
-  color: #000000;
-  font-weight: 700;
-  align-self: flex-end;
-  border-bottom-right-radius: 4px;
+  width: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(92, 255, 114, 0.6);
 }
 
 /* =========================================
-   COMPACT MINI BOOK GRID & SEARCH BAR
+   BOOKS GRID & SEARCH BAR
 ========================================= */
 .books-feed {
   max-width: 1100px;
@@ -595,7 +608,6 @@ nav {
   letter-spacing: 0.5px;
 }
 
-/* Search Bar Styles */
 .search-box-container {
   position: relative;
   display: flex;
@@ -657,14 +669,12 @@ nav {
   display: block;
 }
 
-/* Dynamic Grid Layout for Cards */
 #booksContainer {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 12px;
 }
 
-/* Minimal Book Card */
 .book-card {
   background: #0d0d0d;
   border: 1px solid var(--border-color);
@@ -684,7 +694,6 @@ nav {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.9), 0 0 12px rgba(92, 255, 114, 0.15);
 }
 
-/* Delete Button */
 .delete-post-btn {
   position: absolute;
   top: 4px;
@@ -717,7 +726,6 @@ nav {
   height: 12px;
 }
 
-/* Aspect Ratio Cover Image */
 .book-cover-wrapper {
   width: 100%;
   aspect-ratio: 2 / 3;
@@ -740,7 +748,6 @@ nav {
   transform: scale(1.03);
 }
 
-/* Metadata Text Elements */
 .book-author,
 .book-category,
 .book-tags {
@@ -766,7 +773,6 @@ nav {
   font-style: italic;
 }
 
-/* Book Information Box */
 .book-info {
   padding: 8px;
   display: flex;
@@ -776,7 +782,6 @@ nav {
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Book Title Text */
 .book-title {
   font-size: .8rem;
   font-weight: 700;
@@ -788,7 +793,6 @@ nav {
   text-overflow: ellipsis;
 }
 
-/* Download Button Container */
 .download-btn {
   width: 100%;
   height: 28px;
@@ -809,7 +813,6 @@ nav {
   background: #FF731E;
 }
 
-/* Download Icon SVG Injection */
 .doc-download-btn::before,
 .download-btn::before {
   content: '';
@@ -828,7 +831,6 @@ nav {
   box-shadow: 0 0 10px rgba(92, 255, 114, 0.4);
 }
 
-/* Mobile Bottom Navigation Bar */
 .mobile-bottom-nav {
   display: none;
   position: fixed;
@@ -874,7 +876,6 @@ nav {
   transform: translate3d(0, -3px, 0) scale(1.1);
 }
 
-/* Keyframes */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translate3d(0, 20px, 0); }
   to { opacity: 1; transform: translate3d(0, 0, 0); }
@@ -885,11 +886,8 @@ nav {
   to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-/* Responsive Queries */
 @media (max-width: 768px) {
-  .mobile-top-bar {
-    top: 28px !important;
-  }
+  .mobile-top-bar { top: 28px !important; }
   header { display: none !important; }
   .mobile-top-bar { display: flex; }
   .hero-title .desktop-title { display: none; }
@@ -907,9 +905,7 @@ nav {
     align-items: flex-start;
   }
   
-  .search-box-container {
-    max-width: 100%;
-  }
+  .search-box-container { max-width: 100%; }
 
   #booksContainer {
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));

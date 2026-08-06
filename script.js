@@ -15,7 +15,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const API_URL = "https://urbannoir-api.mushfiquemonowarnamir2006.workers.dev";
-const DEVELOPER_UID = "YOUR_DEVELOPER_FIREBASE_UID_HERE"; // Update with developer UID
+const DEVELOPER_UID = "YOUR_DEVELOPER_FIREBASE_UID_HERE";
 
 const firebaseConfig = {
   apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
@@ -32,7 +32,7 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 let currentFirebaseUser = null;
-let allFetchedPosts = []; // Local cache to store all loaded posts for instant filtering
+let allFetchedPosts = [];
 let mouseX = 0, mouseY = 0;
 let windowWidth = window.innerWidth;
 let windowHeight = window.innerHeight;
@@ -220,7 +220,7 @@ async function loadBookFeeds() {
 }
 
 /*========================================
-    SEARCH & FILTER ENGINE (TAGS / TITLE / AUTHOR)
+    SEARCH & FILTER ENGINE
 ========================================*/
 
 function handleSearchFilter() {
@@ -319,6 +319,52 @@ if (document.readyState === "loading") {
 } else {
   loadBookFeeds();
 }
+
+/*========================================
+    AUTO IMAGE SLIDER ENGINE
+========================================*/
+(function initAutoSlider() {
+  const slidesContainer = document.getElementById('imageSlides');
+  const dots = document.querySelectorAll('.slider-dots .dot');
+  if (!slidesContainer || dots.length === 0) return;
+
+  let currentSlide = 0;
+  const totalSlides = dots.length;
+  const slideInterval = 3500;
+
+  function goToSlide(index) {
+    currentSlide = index;
+    slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+    
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentSlide);
+    });
+  }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    goToSlide(currentSlide);
+  }
+
+  let autoSlideTimer = setInterval(nextSlide, slideInterval);
+
+  dots.forEach((dot) => {
+    dot.addEventListener('click', (e) => {
+      const index = parseInt(e.target.getAttribute('data-index'), 10);
+      goToSlide(index);
+      clearInterval(autoSlideTimer);
+      autoSlideTimer = setInterval(nextSlide, slideInterval);
+    });
+  });
+
+  const sliderContainer = document.getElementById('interactiveCard');
+  if (sliderContainer) {
+    sliderContainer.addEventListener('mouseenter', () => clearInterval(autoSlideTimer));
+    sliderContainer.addEventListener('mouseleave', () => {
+      autoSlideTimer = setInterval(nextSlide, slideInterval);
+    });
+  }
+})();
 
 /*========================================
         PARALLAX & MOUSE ENGINE

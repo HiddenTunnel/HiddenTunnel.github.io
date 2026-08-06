@@ -101,7 +101,7 @@
     </nav>
   </header>
 
-  <!-- Bottom Nav -->
+  <!-- Bottom Nav Container -->
   <div id="bottom-nav-container"></div>
   <script>
     fetch("bottom-nav.html")
@@ -136,21 +136,37 @@
       </a>
     </div>
 
-    <div class="chat-mockup" id="interactiveCard">
+    <!-- Auto-Sliding Image Carousel Container -->
+    <div class="image-slider-container" id="interactiveCard">
       <div class="crown-badge"><img src="assets/svg/graffiti-crown.svg" alt="Crown"></div>
-      <div class="chat-messages">
-        <div class="msg msg-incoming">Yo, you active in the tunnel?</div>
-        <div class="msg msg-outgoing">Always. Just dropped a new tag on the wall.</div>
-        <div class="msg msg-incoming">Catch you underground at 00:00.</div>
+      <div class="slider-wrapper">
+        <div class="slides" id="imageSlides">
+          <div class="slide active">
+            <img src="assets/pic/banner1.jpg" alt="Featured Image 1">
+          </div>
+          <div class="slide">
+            <img src="assets/pic/banner2.jpg" alt="Featured Image 2">
+          </div>
+          <div class="slide">
+            <img src="assets/pic/banner3.jpg" alt="Featured Image 3">
+          </div>
+        </div>
+      </div>
+      
+      <!-- Dots Indicator -->
+      <div class="slider-dots" id="sliderDots">
+        <span class="dot active" data-index="0"></span>
+        <span class="dot" data-index="1"></span>
+        <span class="dot" data-index="2"></span>
       </div>
     </div>
   </main>
 
-  <!-- BOOKS FEEDS -->
+  <!-- BOOKS FEED SECTION -->
   <section class="books-feed">
     <div class="feed-header">
       <h2>Latest Books</h2>
-      <!-- Search Bar UI Container -->
+      <!-- Search Input Container -->
       <div class="search-box-container">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"></circle>
@@ -163,7 +179,7 @@
     <div id="booksContainer"></div>
   </section>
 
-  <!-- Smooth Preloader Script -->
+  <!-- Preloader Script -->
   <script>
     window.addEventListener('load', () => {
       const preloader = document.getElementById('preloader');
