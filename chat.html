@@ -142,14 +142,14 @@
             background: var(--green);
             color: #000;
             font-weight: 500;
-            border-bottom-right-radius: 2px;
+            border-bottom-right-radius: 4px;
         }
 
         .message-bubble.received {
             align-self: flex-start;
             background: #222;
             color: #eee;
-            border-bottom-left-radius: 2px;
+            border-bottom-left-radius: 4px;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
@@ -215,6 +215,11 @@
 
         .send-btn:active {
             transform: scale(0.92);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .send-btn svg {
@@ -368,7 +373,7 @@
         <div class="chat-input-wrapper">
             <form class="chat-input-form" id="chatForm">
                 <input type="text" id="messageInput" placeholder="Write a message..." autocomplete="off" required>
-                <button type="submit" class="send-btn">
+                <button type="submit" class="send-btn" id="sendBtn">
                     <svg viewBox="0 0 24 24">
                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                     </svg>
@@ -433,6 +438,7 @@
         const chatMessages = document.getElementById('chatMessages');
         const chatForm = document.getElementById('chatForm');
         const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
         const peerName = document.getElementById('peerName');
         const peerAvatar = document.getElementById('peerAvatar');
         const backBtn = document.getElementById('backBtn');
@@ -446,6 +452,11 @@
         const viewIdBtn = document.getElementById('viewIdBtn');
 
         let currentUserId = null;
+        let currentSenderProfile = null;
+        let isPeerDeleted = false;
+        let lastSenderId = null;
+        let unsubscribeSnapshot = null;
+        let isSending = false;
 
         backBtn.onclick = () => window.location.href = "user.html";
 
@@ -475,12 +486,28 @@
                     window.location.href = "user.html";
                     return;
                 }
+                await fetchCurrentUserProfile();
                 await loadPeerInfo();
                 listenMessages();
             } else {
                 window.location.href = "login.html";
             }
         });
+
+        async function fetchCurrentUserProfile() {
+            try {
+                const mySnap = await getDoc(doc(db, "users", currentUserId));
+                if (mySnap.exists()) {
+                    const data = mySnap.data();
+                    currentSenderProfile = {
+                        senderName: data.fullName || data.name || "User",
+                        senderPhoto: data.photo || data.photoURL || data.avatar || ""
+                    };
+                }
+            } catch (e) {
+                console.error("User profile fetch error:", e);
+            }
+        }
 
         async function loadPeerInfo() {
             try {
@@ -489,8 +516,8 @@
                 if (userSnap.exists()) {
                     const data = userSnap.data();
 
-                    // 1. deleted === true চেক
                     if (data.deleted === true) {
+                        isPeerDeleted = true;
                         peerName.textContent = "Deleted Account";
                         peerAvatar.src = "assets/img/deleted-user.png";
                         modalName.textContent = "Deleted Account";
@@ -506,11 +533,11 @@
                     peerName.textContent = name;
                     peerAvatar.src = photo;
 
-                    // 5. Modal UID / Versity ID Display
                     modalName.textContent = name;
                     modalAvatar.src = photo;
                     modalSub.textContent = data.versityId ? `ID: ${data.versityId}` : `UID: ${peerUid.slice(0, 8)}`;
                 } else {
+                    isPeerDeleted = true;
                     peerName.textContent = "Deleted Account";
                     peerAvatar.src = "assets/img/deleted-user.png";
                     modalName.textContent = "Deleted Account";
@@ -523,9 +550,9 @@
             }
         }
 
-        async function listenMessages() {
+        function listenMessages() {
             try {
-                await updateDoc(doc(db, "chats", chatId), {
+                updateDoc(doc(db, "chats", chatId), {
                     unreadBy: arrayRemove(currentUserId)
                 });
             } catch (err) {
@@ -535,61 +562,74 @@
             const msgsRef = collection(db, "chats", chatId, "messages");
             const q = query(msgsRef, orderBy("timestamp", "asc"));
 
-            let firstLoad = true;
+            let initialLoad = true;
 
-            onSnapshot(q, (snapshot) => {
-                chatMessages.innerHTML = "";
-                snapshot.forEach((docSnap) => {
-                    const msg = docSnap.data();
-                    renderMessage(msg);
+            unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    const msg = change.doc.data();
 
-                    if (!firstLoad && msg.senderId !== currentUserId) {
-                        messageSound.currentTime = 0;
-                        messageSound.play().catch(()=>{});
+                    if (change.type === "added") {
+                        renderMessage(msg);
+
+                        if (
+                            !initialLoad &&
+                            !change.doc.metadata.hasPendingWrites &&
+                            msg.senderId !== currentUserId
+                        ) {
+                            messageSound.currentTime = 0;
+                            messageSound.play().catch(() => {});
+                        }
                     }
                 });
 
-                firstLoad = false;
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                const atBottom = chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight < 120;
+                if (atBottom || chatMessages.children.length <= 1) {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+
+                initialLoad = false;
             });
         }
 
-        async function renderMessage(msg) {
+        function renderMessage(msg) {
             const bubble = document.createElement("div");
             const isSent = msg.senderId === currentUserId;
-            bubble.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
             
-            const timeStr = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...';
+            const sameSender = lastSenderId === msg.senderId;
+            lastSenderId = msg.senderId;
+
+            bubble.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
+
+            if (sameSender) {
+                bubble.style.marginTop = "-6px";
+            } else {
+                bubble.style.marginTop = "10px";
+            }
+            
+            const timeStr = msg.timestamp?.toDate 
+                ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+                : '';
 
             let senderNameHTML = "";
-
-            // 3. renderMessage-এ sender name সাপোর্ট
-            if (!isSent) {
-                try {
-                    const senderSnap = await getDoc(doc(db, "users", msg.senderId));
-                    if (senderSnap.exists() && senderSnap.data().deleted === true) {
-                        senderNameHTML = `<span class="sender-title">Deleted Account</span>`;
-                    }
-                } catch (e) {
-                    senderNameHTML = `<span class="sender-title">Deleted Account</span>`;
-                }
+            if (!isSent && !sameSender && msg.senderName) {
+                senderNameHTML = `<span class="sender-title">${escapeHTML(msg.senderName)}</span>`;
             }
 
             bubble.innerHTML = `
                 ${senderNameHTML}
-                ${escapeHTML(msg.text)}
+                ${escapeHTML(msg.text || '')}
                 <span class="msg-time">${timeStr}</span>
             `;
 
             chatMessages.appendChild(bubble);
         }
 
-        // 2. Message Send Guard Check
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const peerSnap = await getDoc(doc(db, "users", peerUid));
-            if (!peerSnap.exists() || peerSnap.data().deleted === true) {
+            if (isSending) return;
+
+            if (isPeerDeleted) {
                 alert("This account has been deleted.");
                 return;
             }
@@ -597,14 +637,23 @@
             const text = messageInput.value.trim();
             if (!text || !currentUserId) return;
 
+            isSending = true;
+            sendBtn.disabled = true;
             messageInput.value = "";
 
             try {
-                await addDoc(collection(db, "chats", chatId, "messages"), {
+                const payload = {
                     senderId: currentUserId,
                     text: text,
                     timestamp: serverTimestamp()
-                });
+                };
+
+                if (currentSenderProfile) {
+                    payload.senderName = currentSenderProfile.senderName;
+                    payload.senderPhoto = currentSenderProfile.senderPhoto;
+                }
+
+                await addDoc(collection(db, "chats", chatId, "messages"), payload);
 
                 await setDoc(doc(db, "chats", chatId), {
                     members: [currentUserId, peerUid],
@@ -616,6 +665,16 @@
 
             } catch (err) {
                 console.error("Failed to send message:", err);
+            } finally {
+                isSending = false;
+                sendBtn.disabled = false;
+                messageInput.focus();
+            }
+        });
+
+        window.addEventListener("beforeunload", () => {
+            if (unsubscribeSnapshot) {
+                unsubscribeSnapshot();
             }
         });
 
