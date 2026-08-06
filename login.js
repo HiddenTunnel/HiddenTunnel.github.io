@@ -2,7 +2,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import {
     getAuth,
     GoogleAuthProvider,
-    signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult,
     setPersistence,
     browserLocalPersistence,
     onAuthStateChanged
@@ -28,6 +29,35 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
+getRedirectResult(auth)
+.then(async (result) => {
+
+    if (result) {
+
+        const user = result.user;
+
+        localStorage.setItem(
+            "ug_current_user_id",
+            user.uid
+        );
+
+        const snap = await getDoc(
+            doc(db, "users", user.uid)
+        );
+
+        if (snap.exists()) {
+            window.location.href = "index.html";
+        } else {
+            window.location.href = "createaccount.html";
+        }
+    }
+
+})
+.catch((error)=>{
+    console.error(error);
+});
+
+
 
 const googleLoginBtn = document.getElementById("googleLoginBtn");
 let isLoginLocked = false;
@@ -87,7 +117,7 @@ googleLoginBtn.addEventListener("click", async () => {
         googleLoginBtn.textContent = "Connecting to tunnel...";
         await setPersistence(auth, browserLocalPersistence);
         
-        const result = await signInWithPopup(auth, provider);
+     await signInWithRedirect(auth, provider);
         const user = result.user;
 
         localStorage.setItem("ug_current_user_id", user.uid);
