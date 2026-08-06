@@ -13,8 +13,8 @@
     <link rel="stylesheet" href="style.css">
     <style>
         :root {
-            --green: #5CFF72;
-            --orange: #FF7A00;
+            --green: #3FA9A9;
+            --orange: #FFB09C;
             --red: #FF4D4D;
             --bg: #050505;
             --surface: #111111;
@@ -55,7 +55,7 @@
             width: 450px;
             height: 450px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(92, 255, 114, 0.08) 0%, rgba(255, 122, 0, 0.03) 45%, transparent 70%);
+            background: radial-gradient(circle, rgba(63, 169, 169, 0.1) 0%, rgba(255, 176, 156, 0.03) 45%, transparent 70%);
             pointer-events: none;
             z-index: 2;
             transform: translate(-50%, -50%);
@@ -133,7 +133,7 @@
         .desktop-nav li a:hover,
         .desktop-nav li a.active {
             color: var(--green);
-            background: rgba(92, 255, 114, 0.08);
+            background: rgba(63, 169, 169, 0.1);
         }
 
         .logout-btn {
@@ -267,7 +267,7 @@
         }
 
         .notif-tab.active {
-            background: rgba(92, 255, 114, 0.12);
+            background: rgba(63, 169, 169, 0.15);
             color: var(--green);
             border-color: var(--green);
         }
@@ -317,7 +317,7 @@
         .notif-content { flex: 1; }
         .notif-title { color: #fff; font-size: 0.98rem; font-weight: 700; margin: 0 0 3px 0; }
         .notif-desc { color: #aaa; font-size: 0.86rem; margin: 0 0 10px 0; }
-        .notif-time { color: #666; font-size: 0.75rem; font-weight: 600; }
+        .notif-time { color: var(--orange); font-size: 0.75rem; font-weight: 600; }
 
         .notif-actions {
             display: flex; 
@@ -339,7 +339,7 @@
 
         .btn-notif:hover { transform: translateY(-1px); }
 
-        .btn-notif-primary { background: var(--green); color: #000; box-shadow: 0 0 15px rgba(92,255,114,0.2); }
+        .btn-notif-primary { background: var(--green); color: #000; box-shadow: 0 0 15px rgba(63,169,169,0.25); }
         .btn-notif-secondary { background: rgba(255, 255, 255, 0.05); color: #ccc; border: 1px solid var(--border); }
 
         .empty-notif {

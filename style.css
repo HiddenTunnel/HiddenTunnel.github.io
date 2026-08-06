@@ -4,13 +4,13 @@
 
 /* Base Resets & Theme Colors */
 :root {
-  --green: #5CFF72;
-  --orange: #FF7A00;
+  --green: #3fa9a9;
+  --orange: #FF6138;
   --red: #FF4D4D;
   --bg: #000000;
   --nav-bg: rgba(0, 0, 0, 0.85);
-  --card-bg: #0a0a0a;
-  --border-color: rgba(255, 255, 255, 0.1);
+  --card-bg: #0d0d0d;
+  --border-color: rgba(63, 169, 169, 0.15);
   --transition-smooth: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
@@ -20,8 +20,85 @@
   padding: 0;
 }
 
+/* ====================================================
+   FIXED MOBILE BACKGROUND & TARGETED FLICKER (ENHANCED)
+==================================================== */
+html::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
+  background: var(--bg) url('/assets/pic/mobile_background.jpg') no-repeat center center;
+  background-size: cover;
+  pointer-events: none;
+  transition: opacity 0.05s ease, filter 0.05s ease;
+  will-change: opacity, filter;
+}
+
+@media (min-width: 769px) or (orientation: landscape) {
+  html::before {
+    background-image: url('desktop_background.jpg');
+  }
+}
+
+/* JavaScript Triggered Targeted Light Flicker Class (Faster & Brighter) */
+body.power-flicker .flicker-light {
+  animation: elementFlicker 0.15s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite alternate;
+}
+
+@keyframes elementFlicker {
+  0% { 
+    opacity: 1; 
+    filter: brightness(1.6) drop-shadow(0 0 18px var(--green)); 
+  }
+  15% { 
+    opacity: 0.05; 
+    filter: brightness(0.05) drop-shadow(0 0 0px transparent); 
+  }
+  30% { 
+    opacity: 0.95; 
+    filter: brightness(2) drop-shadow(0 0 25px var(--green)); 
+  }
+  45% { 
+    opacity: 0.1; 
+    filter: brightness(0.1); 
+  }
+  65% { 
+    opacity: 0.85; 
+    filter: brightness(1.5) drop-shadow(0 0 20px var(--green)); 
+  }
+  80% { 
+    opacity: 0.02; 
+    filter: brightness(0); 
+  }
+  100% { 
+    opacity: 1; 
+    filter: brightness(1.8) drop-shadow(0 0 30px var(--green)); 
+  }
+}
+
+/* Dark Shadow Static Class (Remains Dark & Steady) */
+.dark-shadow {
+  background: #030303 !important;
+  box-shadow: 
+    10px 15px 30px rgba(0, 0, 0, 0.95), 
+    inset 0 0 20px rgba(0, 0, 0, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.03) !important;
+  color: #777 !important;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.9);
+  transition: all 0.3s var(--transition-smooth);
+}
+
+.dark-shadow:hover {
+  box-shadow: 10px 15px 40px rgba(0, 0, 0, 1), inset 0 0 15px rgba(0, 0, 0, 0.6) !important;
+  color: #999 !important;
+}
+
 body {
-  background-color: var(--bg);
+  background: transparent;
   color: #ffffff;
   font-family: 'Outfit', sans-serif;
   overflow-x: hidden;
@@ -43,8 +120,7 @@ body {
   opacity: 0.18;
   pointer-events: none;
   z-index: 0;
-  transition: transform 0.2s var(--transition-smooth);
-  will-change: transform;
+  transform: none !important;
 }
 
 #mouse-glow {
@@ -54,7 +130,7 @@ body {
   width: 450px;
   height: 450px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(92, 255, 114, 0.12) 0%, rgba(255, 122, 0, 0.05) 45%, transparent 70%);
+  background: radial-gradient(circle, rgba(63, 169, 169, 0.12) 0%, rgba(255, 176, 156, 0.05) 45%, transparent 70%);
   pointer-events: none;
   z-index: 2;
   transform: translate(-50%, -50%);
@@ -90,10 +166,9 @@ body {
   align-items: center;
   justify-content: center;
   background: #000;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-  transition: transform 0.3s var(--transition-smooth);
+  box-shadow: 0 4px 15px rgba(16, 68, 78, 0.69);
+  transition: background-color 0.3s var(--transition-smooth);
   text-decoration: none;
-  will-change: transform;
 }
 
 .mobile-profile-btn img {
@@ -102,16 +177,12 @@ body {
   object-fit: cover;
 }
 
-.mobile-profile-btn:active {
-  transform: translate3d(0, 0, 0) scale(0.92);
-}
-
 .mobile-logout-btn {
   width: 42px;
   height: 42px;
   border-radius: 50%;
   background: rgba(18, 18, 18, 0.85);
-  border: 1px solid rgba(255, 77, 77, 0.3);
+  border: 1px solid rgba(255, 176, 156, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -127,8 +198,7 @@ body {
 }
 
 .mobile-logout-btn:active {
-  transform: translate3d(0, 0, 0) scale(0.92);
-  background: rgba(255, 77, 77, 0.25);
+  background: rgba(255, 176, 156, 0.25);
 }
 
 /* 💻 DESKTOP NAVIGATION HEADER */
@@ -173,8 +243,7 @@ nav {
   align-items: center;
   justify-content: center;
   background: #000;
-  transition: transform 0.3s var(--transition-smooth), box-shadow 0.3s ease;
-  will-change: transform;
+  transition: box-shadow 0.3s ease;
 }
 
 .desktop-profile-btn img {
@@ -184,8 +253,7 @@ nav {
 }
 
 .desktop-profile-btn:hover {
-  transform: translate3d(0, 0, 0) scale(1.08);
-  box-shadow: 0 0 15px rgba(92, 255, 114, 0.4);
+  box-shadow: 0 0 15px rgba(63, 169, 169, 0.4);
 }
 
 .logo {
@@ -194,12 +262,6 @@ nav {
   color: #fff;
   text-decoration: none;
   letter-spacing: 1px;
-  transition: transform 0.3s var(--transition-smooth);
-  will-change: transform;
-}
-
-.logo:hover {
-  transform: translate3d(0, 0, 0) scale(1.05) rotate(-1deg);
 }
 
 .logo span {
@@ -224,27 +286,24 @@ nav {
   padding: 8px 16px;
   border-radius: 20px;
   transition: all 0.3s var(--transition-smooth);
-  will-change: transform;
 }
 
 .desktop-nav li a .nav-icon {
   width: 18px;
   height: 18px;
   opacity: 0.7;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity 0.3s ease;
 }
 
 .desktop-nav li a:hover .nav-icon,
 .desktop-nav li a.active .nav-icon {
   opacity: 1;
-  transform: scale(1.1);
 }
 
 .desktop-nav li a:hover,
 .desktop-nav li a.active {
   color: var(--green);
-  background: rgba(92, 255, 114, 0.08);
-  transform: translate3d(0, -2px, 0);
+  background: rgba(63, 169, 169, 0.08);
 }
 
 .header-actions {
@@ -261,28 +320,25 @@ nav {
   font-weight: 800;
   text-decoration: none;
   transition: all 0.3s var(--transition-smooth);
-  box-shadow: 0 0 15px rgba(92, 255, 114, 0.3);
+  box-shadow: 0 0 15px rgba(63, 169, 169, 0.3);
   display: inline-block;
-  will-change: transform;
 }
 
 .nav-btn .join:hover {
-  transform: translate3d(0, -3px, 0) scale(1.03);
-  box-shadow: 0 0 25px rgba(92, 255, 114, 0.6);
+  box-shadow: 0 0 25px rgba(63, 169, 169, 0.6);
 }
 
 .desktop-logout-btn {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255, 77, 77, 0.1);
-  border: 1px solid rgba(255, 77, 77, 0.2);
+  background: rgba(255, 176, 156, 0.1);
+  border: 1px solid rgba(255, 176, 156, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s var(--transition-smooth);
-  will-change: transform;
 }
 
 .desktop-logout-btn img {
@@ -291,10 +347,9 @@ nav {
 }
 
 .desktop-logout-btn:hover {
-  background: rgba(255, 77, 77, 0.25);
-  border-color: var(--red);
-  transform: translate3d(0, 0, 0) scale(1.08);
-  box-shadow: 0 0 15px rgba(255, 77, 77, 0.4);
+  background: rgba(255, 176, 156, 0.25);
+  border-color: var(--orange);
+  box-shadow: 0 0 15px rgba(255, 176, 156, 0.4);
 }
 
 /* HERO SECTION */
@@ -309,7 +364,6 @@ nav {
   position: relative;
   z-index: 10;
   animation: fadeInUp 0.8s var(--transition-smooth);
-  will-change: transform, opacity;
 }
 
 .badge-wrapper {
@@ -328,14 +382,12 @@ nav {
   border-radius: 20px;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  background: rgba(255, 122, 0, 0.08);
+  background: rgba(255, 176, 156, 0.08);
   transition: all 0.3s ease;
-  will-change: transform;
 }
 
 .badge:hover {
-  background: rgba(255, 122, 0, 0.2);
-  transform: scale(1.05);
+  background: rgba(255, 176, 156, 0.2);
 }
 
 .rating-box {
@@ -349,12 +401,10 @@ nav {
   font-size: 0.8rem;
   font-weight: 700;
   transition: all 0.3s ease;
-  will-change: transform;
 }
 
 .rating-box:hover {
   border-color: rgba(255, 255, 255, 0.3);
-  transform: translate3d(0, -2px, 0);
 }
 
 .rating-stars { color: #FFD400; }
@@ -375,14 +425,8 @@ nav {
 .hero-title .highlight {
   font-family: 'Permanent Marker', cursive;
   color: var(--green);
-  text-shadow: 0 0 20px rgba(92, 255, 114, 0.4);
+  text-shadow: 0 0 20px rgba(63, 169, 169, 0.4);
   display: inline-block;
-  transition: transform 0.3s var(--transition-smooth);
-  will-change: transform;
-}
-
-.hero-title .highlight:hover {
-  transform: translate3d(0, 0, 0) scale(1.08) rotate(-2deg);
 }
 
 .hero-description {
@@ -410,14 +454,12 @@ nav {
   font-weight: 800;
   border-radius: 40px;
   text-decoration: none;
-  box-shadow: 0 0 25px rgba(92, 255, 114, 0.35);
+  box-shadow: 0 0 25px rgba(63, 169, 169, 0.35);
   transition: all 0.3s var(--transition-smooth);
-  will-change: transform;
 }
 
 .btn-primary:hover {
-  transform: translate3d(0, -4px, 0) scale(1.02);
-  box-shadow: 0 0 35px rgba(92, 255, 114, 0.65);
+  box-shadow: 0 0 35px rgba(63, 169, 169, 0.65);
 }
 
 .btn-secondary {
@@ -431,13 +473,11 @@ nav {
   border-radius: 40px;
   text-decoration: none;
   transition: all 0.3s var(--transition-smooth);
-  will-change: transform;
 }
 
 .btn-secondary:hover {
   border-color: #fff;
   background: rgba(255, 255, 255, 0.05);
-  transform: translate3d(0, -4px, 0) scale(1.02);
 }
 
 /* PUBLISH A BOOK CARD */
@@ -467,8 +507,7 @@ nav {
   border-color: var(--green);
   color: #fff;
   background: rgba(25, 25, 25, 0.95);
-  transform: translate3d(0, -2px, 0);
-  box-shadow: 0 0 20px rgba(92, 255, 114, 0.15);
+  box-shadow: 0 0 20px rgba(63, 169, 169, 0.15);
 }
 
 .publish-avatar {
@@ -479,9 +518,7 @@ nav {
   object-fit: cover;
 }
 
-/* =========================================
-   AUTO IMAGE SLIDER (Replaces Chat Mockup)
-========================================= */
+/* AUTO IMAGE SLIDER */
 .image-slider-container {
   width: 100%;
   max-width: 400px;
@@ -491,15 +528,13 @@ nav {
   border-radius: 20px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9), 0 0 25px rgba(92, 255, 114, 0.1);
-  transition: transform 0.4s var(--transition-smooth), border-color 0.3s ease, box-shadow 0.3s ease;
-  will-change: transform;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9), 0 0 25px rgba(63, 169, 169, 0.1);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .image-slider-container:hover {
-  transform: translate3d(0, -6px, 0) scale(1.02);
-  border-color: rgba(92, 255, 114, 0.4);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 1), 0 0 35px rgba(92, 255, 114, 0.25);
+  border-color: rgba(63, 169, 169, 0.4);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 1), 0 0 35px rgba(63, 169, 169, 0.25);
 }
 
 .slider-wrapper {
@@ -539,13 +574,8 @@ nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 15px rgba(92, 255, 114, 0.4);
+  box-shadow: 0 0 15px rgba(63, 169, 169, 0.4);
   z-index: 15;
-  transition: transform 0.3s ease;
-}
-
-.image-slider-container:hover .crown-badge {
-  transform: rotate(15deg) scale(1.1);
 }
 
 .crown-badge img {
@@ -576,12 +606,10 @@ nav {
   background: var(--green);
   width: 20px;
   border-radius: 10px;
-  box-shadow: 0 0 8px rgba(92, 255, 114, 0.6);
+  box-shadow: 0 0 8px rgba(63, 169, 169, 0.6);
 }
 
-/* =========================================
-   BOOKS GRID & SEARCH BAR
-========================================= */
+/* BOOKS GRID & SEARCH BAR */
 .books-feed {
   max-width: 1100px;
   margin: 30px auto;
@@ -623,7 +651,7 @@ nav {
 
 .search-box-container:focus-within {
   border-color: var(--green);
-  box-shadow: 0 0 12px rgba(92, 255, 114, 0.2);
+  box-shadow: 0 0 12px rgba(63, 169, 169, 0.2);
   background: rgba(25, 25, 25, 0.95);
 }
 
@@ -676,22 +704,21 @@ nav {
 }
 
 .book-card {
-  background: #0d0d0d;
+  background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s var(--transition-smooth);
+  transition: border-color 0.3s var(--transition-smooth), box-shadow 0.3s var(--transition-smooth);
   text-decoration: none;
   color: #fff;
   position: relative;
 }
 
 .book-card:hover {
-  transform: translate3d(0, -3px, 0);
-  border-color: rgba(92, 255, 114, 0.4);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.9), 0 0 12px rgba(92, 255, 114, 0.15);
+  border-color: rgba(63, 169, 169, 0.4);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.9), 0 0 12px rgba(63, 169, 169, 0.15);
 }
 
 .delete-post-btn {
@@ -717,7 +744,6 @@ nav {
   background: var(--red);
   color: #ffffff;
   border-color: var(--red);
-  transform: scale(1.1);
 }
 
 .delete-post-btn svg {
@@ -741,11 +767,6 @@ nav {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s var(--transition-smooth);
-}
-
-.book-card:hover .book-cover {
-  transform: scale(1.03);
 }
 
 .book-author,
@@ -778,7 +799,7 @@ nav {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  background: #0a0a0a;
+  background: var(--card-bg);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -793,44 +814,50 @@ nav {
   text-overflow: ellipsis;
 }
 
+/* DOWNLOAD BUTTONS */
 .download-btn {
   width: 100%;
-  height: 28px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--green);
+  background-color: var(--green);
   border: none;
   color: #000000;
-  border-radius: 5px;
+  border-radius: 6px;
   text-decoration: none;
-  font-size: 0;
-  transition: all 0.2s var(--transition-smooth);
+  cursor: pointer;
   margin-top: 4px;
+  transition: all 0.2s var(--transition-smooth);
 }
 
 .doc-download-btn {
-  background: #FF731E;
+  background-color: #FF731E;
 }
 
-.doc-download-btn::before,
-.download-btn::before {
+.download-btn::before,
+.doc-download-btn::before {
   content: '';
-  width: 14px;
-  height: 14px;
-  background-color: #000000;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'%3E%3C/path%3E%3Cpolyline points='7 10 12 15 17 10'%3E%3C/polyline%3E%3Cline x1='12' y1='15' x2='12' y2='3'%3E%3C/line%3E%3C/svg%3E") no-repeat center;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'%3E%3C/path%3E%3Cpolyline points='7 10 12 15 17 10'%3E%3C/polyline%3E%3Cline x1='12' y1='15' x2='12' y2='3'%3E%3C/line%3E%3C/svg%3E") no-repeat center;
-  mask-size: contain;
-  -webkit-mask-size: contain;
+  display: block;
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpolyline points='7 10 12 15 17 10'/%3E%3Cline x1='12' y1='15' x2='12' y2='3'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
-.doc-download-btn:hover,
 .download-btn:hover {
-  background: #77ff8a;
-  box-shadow: 0 0 10px rgba(92, 255, 114, 0.4);
+  background-color: #51caca;
+  box-shadow: 0 0 12px rgba(63, 169, 169, 0.5);
 }
 
+.doc-download-btn:hover {
+  background-color: #ff883d;
+  box-shadow: 0 0 12px rgba(255, 115, 30, 0.5);
+}
+
+/* MOBILE BOTTOM NAV */
 .mobile-bottom-nav {
   display: none;
   position: fixed;
@@ -845,7 +872,6 @@ nav {
   padding: 10px 0;
   z-index: 1000;
   animation: slideUp 0.5s var(--transition-smooth);
-  will-change: transform;
 }
 
 .mobile-bottom-nav a {
@@ -863,17 +889,11 @@ nav {
 .mobile-bottom-nav a .nav-icon {
   width: 22px;
   height: 22px;
-  transition: transform 0.3s var(--transition-smooth);
 }
 
 .mobile-bottom-nav a:hover,
 .mobile-bottom-nav a.active {
   color: var(--green);
-}
-
-.mobile-bottom-nav a:hover .nav-icon,
-.mobile-bottom-nav a.active .nav-icon {
-  transform: translate3d(0, -3px, 0) scale(1.1);
 }
 
 @keyframes fadeInUp {
@@ -911,4 +931,83 @@ nav {
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
     gap: 8px;
   }
+}
+
+/* ====================================================
+   OLD CRT TV SCANLINES & GLITCH EFFECT (PERMANENT/PERIODIC)
+==================================================== */
+
+/* CRT Overlay Lines & Noise Gradient */
+body::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: 
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  z-index: 99998;
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* TV Glitch Trigger Layer */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(63, 169, 169, 0.05);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 99999;
+}
+
+/* CSS Glitch Animation Triggered by JavaScript */
+body.tv-glitch::after {
+  animation: tvGlitchPulse 0.2s steps(2) infinite;
+}
+
+body.tv-glitch {
+  animation: crtShift 0.2s ease infinite;
+}
+
+@keyframes tvGlitchPulse {
+  0% {
+    opacity: 0.8;
+    background: rgba(255, 0, 80, 0.12);
+    clip-path: inset(40% 0 30% 0);
+  }
+  20% {
+    opacity: 0.4;
+    background: rgba(0, 255, 200, 0.12);
+    clip-path: inset(10% 0 80% 0);
+  }
+  40% {
+    opacity: 0.9;
+    background: rgba(255, 255, 255, 0.15);
+    clip-path: inset(70% 0 10% 0);
+  }
+  60% {
+    opacity: 0.3;
+    background: rgba(0, 0, 0, 0.4);
+    clip-path: inset(25% 0 58% 0);
+  }
+  80% {
+    opacity: 0.7;
+    background: rgba(63, 169, 169, 0.15);
+    clip-path: inset(5% 0 85% 0);
+  }
+  100% {
+    opacity: 0;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes crtShift {
+  0% { transform: translate(0, 0); filter: blur(0px); }
+  25% { transform: translate(-2px, 1px); filter: contrast(130%); }
+  50% { transform: translate(2px, -1px); filter: opacity(0.9); }
+  75% { transform: translate(-1px, -1px); filter: brightness(120%); }
+  100% { transform: translate(0, 0); filter: blur(0px); }
 }

@@ -34,8 +34,6 @@ const auth = getAuth(app);
 let currentFirebaseUser = null;
 let allFetchedPosts = [];
 let mouseX = 0, mouseY = 0;
-let windowWidth = window.innerWidth;
-let windowHeight = window.innerHeight;
 let ticking = false;
 
 const glow = document.getElementById('mouse-glow');
@@ -45,6 +43,11 @@ const booksContainer = document.getElementById('booksContainer');
 const searchInput = document.getElementById('bookSearchInput');
 const clearSearchBtn = document.getElementById('clearSearchBtn');
 
+// Ensure background stays completely static without zoom or transform overrides
+if (graffitiBg) {
+  graffitiBg.style.transform = 'none';
+}
+
 /*========================================
     IN-APP BROWSER (MESSENGER / WHATSAPP) DETECTOR
 ========================================*/
@@ -52,7 +55,6 @@ const clearSearchBtn = document.getElementById('clearSearchBtn');
 (function checkInAppBrowser() {
   const ua = navigator.userAgent || navigator.vendor || window.opera;
   
-  // Detect Messenger, Facebook, Instagram, or WhatsApp user agents
   const isInApp = (ua.indexOf("FBAN") > -1) || 
                   (ua.indexOf("FBAV") > -1) || 
                   (ua.indexOf("Instagram") > -1) || 
@@ -67,13 +69,11 @@ const clearSearchBtn = document.getElementById('clearSearchBtn');
 
     banner.style.display = "block";
 
-    // If on Android, force opening Chrome via Android Intent
     if (/android/i.test(ua)) {
       if (actionBtn) {
         actionBtn.href = "intent://urbannoir.github.io#Intent;scheme=https;package=com.android.chrome;end;";
       }
     } else {
-      // iOS doesn't allow direct URI schemes to open external browsers natively
       if (actionBtn) actionBtn.style.display = "none";
       if (message) {
         message.innerHTML = '⚠️ <strong>App Browser Detected:</strong> Tap the <strong>three dots (••• or ⋮)</strong> in the corner and select <strong>"Open in Safari / Browser"</strong>.';
@@ -404,17 +404,14 @@ if (document.readyState === "loading") {
 })();
 
 /*========================================
-        PARALLAX & MOUSE ENGINE
+    MOUSE GLOW & CARD PARALLAX (NO BG ZOOM)
 ========================================*/
 
-function updateParallax() {
+function updateMouseEffects() {
+  // Glow moves with the mouse pointer
   if (glow) glow.style.transform = `translate3d(${mouseX - 225}px, ${mouseY - 225}px, 0)`;
 
-  const moveX = (mouseX / windowWidth - 0.5) * -25;
-  const moveY = (mouseY / windowHeight - 0.5) * -25;
-
-  if (graffitiBg) graffitiBg.style.transform = `translate3d(${moveX}px, ${moveY}px, 0) scale(1.02)`;
-
+  // Interactive Card Tilt
   if (interactiveCard) {
     const rect = interactiveCard.getBoundingClientRect();
     const cardCenterX = rect.left + rect.width / 2;
@@ -439,12 +436,49 @@ window.addEventListener('mousemove', (e) => {
   mouseX = e.clientX;
   mouseY = e.clientY;
   if (!ticking) {
-    requestAnimationFrame(updateParallax);
+    requestAnimationFrame(updateMouseEffects);
     ticking = true;
   }
 }, { passive: true });
 
-window.addEventListener('resize', () => {
-  windowWidth = window.innerWidth;
-  windowHeight = window.innerHeight;
-}, { passive: true });
+/*========================================
+        POWER FLICKER ENGINE
+========================================*/
+
+(function powerFlickerEngine() {
+  function flicker() {
+    document.body.classList.add("power-flicker");
+
+    setTimeout(() => {
+      document.body.classList.remove("power-flicker");
+    }, 180);
+
+    const next = 8000 + Math.random() * 4000;
+    setTimeout(flicker, next);
+  }
+
+  setTimeout(flicker, 10000);
+})();
+
+/*========================================
+        GLITCH DISTORTION ENGINE
+========================================*/
+
+(function glitchEngine() {
+  const glitchTargets = [graffitiBg, document.querySelector('.hero-title')].filter(Boolean);
+
+  function triggerGlitch() {
+    if (glitchTargets.length === 0) return;
+
+    glitchTargets.forEach(el => el.classList.add('glitch-active'));
+
+    setTimeout(() => {
+      glitchTargets.forEach(el => el.classList.remove('glitch-active'));
+    }, 120 + Math.random() * 130);
+
+    const nextGlitch = 5000 + Math.random() * 7000;
+    setTimeout(triggerGlitch, nextGlitch);
+  }
+
+  setTimeout(triggerGlitch, 4000);
+})();

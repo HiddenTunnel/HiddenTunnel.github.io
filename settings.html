@@ -13,8 +13,8 @@
     <link rel="stylesheet" href="style.css">
     <style>
         :root {
-            --green: #5CFF72;
-            --orange: #FF7A00;
+            --green: #3FA9A9;
+            --orange: #FF9E24;
             --red: #FF4D4D;
             --bg: #050505;
             --surface: #111111;
@@ -55,7 +55,7 @@
             width: 450px;
             height: 450px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(92, 255, 114, 0.08) 0%, rgba(255, 122, 0, 0.03) 45%, transparent 70%);
+            background: radial-gradient(circle, rgba(63, 169, 169, 0.1) 0%, rgba(255, 176, 156, 0.03) 45%, transparent 70%);
             pointer-events: none;
             z-index: 2;
             transform: translate(-50%, -50%);
@@ -133,17 +133,17 @@
         .desktop-nav li a:hover,
         .desktop-nav li a.active {
             color: var(--green);
-            background: rgba(92, 255, 114, 0.08);
+            background: rgba(63, 169, 169, 0.1);
         }
 
         /* Developer Link Highlight */
         .dev-nav-btn {
             color: var(--orange) !important;
-            border: 1px solid rgba(255, 122, 0, 0.4);
+            border: 1px solid rgba(255, 176, 156, 0.4);
         }
 
         .dev-nav-btn:hover {
-            background: rgba(255, 122, 0, 0.15) !important;
+            background: rgba(255, 176, 156, 0.15) !important;
         }
 
         .logout-btn {
@@ -264,7 +264,7 @@
             border-radius: 20px;
             padding: 28px;
             margin-bottom: 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(92, 255, 114, 0.03);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(63, 169, 169, 0.03);
         }
 
         .settings-card.danger-zone {
@@ -346,7 +346,7 @@
         .form-group input:focus, 
         .form-group textarea:focus {
             border-color: var(--green);
-            box-shadow: 0 0 12px rgba(92, 255, 114, 0.15);
+            box-shadow: 0 0 12px rgba(63, 169, 169, 0.15);
         }
 
         .form-group textarea {
@@ -418,13 +418,13 @@
             font-size: 0.92rem;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 0 20px rgba(92, 255, 114, 0.2);
+            box-shadow: 0 0 20px rgba(63, 169, 169, 0.2);
             margin-top: 6px;
         }
 
         .save-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(92, 255, 114, 0.4);
+            box-shadow: 0 0 30px rgba(63, 169, 169, 0.4);
         }
 
         .btn-danger {

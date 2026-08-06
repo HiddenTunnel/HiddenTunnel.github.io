@@ -9,9 +9,9 @@ ROOT & RESET
   --white: #f4f4f4;
   --gray: #888888;
 
-  --green: #5CFF72;
-  --cyan: #00D9FF;
-  --orange: #FF7A00;
+  --green: #3FA9A9;
+  --cyan: #3FA9A9;
+  --orange: #FFB09C;
   --red: #FF4D4D;
   
   --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
@@ -76,7 +76,7 @@ body::before {
   position: fixed;
   width: 350px;
   height: 350px;
-  background: radial-gradient(circle, rgba(92, 255, 114, 0.12) 0%, rgba(0,0,0,0) 70%);
+  background: radial-gradient(circle, rgba(63, 169, 169, 0.15) 0%, rgba(0,0,0,0) 70%);
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 1;
@@ -98,7 +98,7 @@ LOGIN CARD COMPONENTS
   border-radius: 24px;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(92, 255, 114, 0.06);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(63, 169, 169, 0.08);
   text-align: center;
   animation: popup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
@@ -134,7 +134,7 @@ LOGIN CARD COMPONENTS
   border-radius: 30px;
   cursor: pointer;
   margin-top: 10px;
-  box-shadow: 0 0 20px rgba(92, 255, 114, 0.25);
+  box-shadow: 0 0 20px rgba(63, 169, 169, 0.3);
   transition: all 0.3s var(--transition-smooth);
 }
 
@@ -151,7 +151,7 @@ LOGIN CARD COMPONENTS
 
 .btn-submit:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 0 30px rgba(92, 255, 114, 0.55);
+  box-shadow: 0 0 30px rgba(63, 169, 169, 0.6);
 }
 
 .btn-submit:disabled, .btn-submit.loading {
