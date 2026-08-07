@@ -416,13 +416,17 @@ nav {
 }
 
 .hero-title-img {
-  width: 100%;
-  max-width: 550px; /* Adjust as needed */
-  height: auto;
   display: block;
+  width: min(95%, 550px);
+  height: auto;
   margin: 0 auto;
+  user-select: none;
+  pointer-events: none;
+  
+  /* Makes PNG glow nicely */
+  filter: drop-shadow(0 0 12px rgba(63, 169, 169, .45));
+  transition: filter .3s ease;
 }
-
 .hero-title .desktop-title { display: inline; }
 .hero-title .mobile-title { display: none; }
 
