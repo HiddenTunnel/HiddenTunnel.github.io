@@ -40,7 +40,7 @@ html::before {
 
 @media (min-width: 769px) or (orientation: landscape) {
   html::before {
-    background-image: url('desktop_background.jpg');
+    background-image: url('assets/pic/desktop_background.jpg');
   }
 }
 
