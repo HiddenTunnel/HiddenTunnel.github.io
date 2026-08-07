@@ -71,7 +71,7 @@ if (graffitiBg) {
 
     if (/android/i.test(ua)) {
       if (actionBtn) {
-        actionBtn.href = "intent://urbannoir.github.io#Intent;scheme=https;package=com.android.chrome;end;";
+        actionBtn.href = "intent://hiddentunnel.guthub.io#Intent;scheme=https;package=com.android.chrome;end;";
       }
     } else {
       if (actionBtn) actionBtn.style.display = "none";

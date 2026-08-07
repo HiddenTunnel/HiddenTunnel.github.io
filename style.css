@@ -411,12 +411,16 @@ nav {
 .rating-score { color: #fff; }
 
 .hero-title {
-  font-size: clamp(2.2rem, 7vw, 5.2rem);
-  font-weight: 900;
-  line-height: 1.05;
-  margin-bottom: 14px;
-  text-transform: uppercase;
-  letter-spacing: -1px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.hero-title-img {
+  width: 100%;
+  max-width: 550px; /* Adjust as needed */
+  height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 .hero-title .desktop-title { display: inline; }

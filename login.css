@@ -103,20 +103,44 @@ LOGIN CARD COMPONENTS
   animation: popup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-.brand-logo {
+.brand-logo{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-bottom:18px;
+    text-decoration:none;
+}
+
+.logo-title{
+    width:100%;
+    max-width:320px;   /* Desktop size */
+    height:auto;
+    display:block;
+    filter:drop-shadow(0 0 12px rgba(63,169,169,.25));
+    user-select:none;
+    pointer-events:none;
+}
+
+.logo-img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 0 18px rgba(63, 169, 169, .35));
+}
+
+.brand-logo h1 {
+  margin: 0;
   font-family: 'Permanent Marker', cursive;
   font-size: 1.8rem;
+  font-weight: normal;
   color: var(--white);
-  text-decoration: none;
-  display: inline-block;
-  margin-bottom: 6px;
-  letter-spacing: 0.5px;
+  letter-spacing: .5px;
 }
 
-.brand-logo span {
+.brand-logo h1 span {
   color: var(--green);
 }
-
 .subtitle {
   color: var(--gray);
   font-size: 0.88rem;
