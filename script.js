@@ -446,18 +446,34 @@ window.addEventListener('mousemove', (e) => {
 ========================================*/
 
 (function powerFlickerEngine() {
+  
   function flicker() {
-    document.body.classList.add("power-flicker");
-
-    setTimeout(() => {
-      document.body.classList.remove("power-flicker");
-    }, 180);
-
-    const next = 8000 + Math.random() * 4000;
+    const flashes = Math.random() < 0.6 ? 2 : 3; // কখনও 2, কখনও 3 বার
+    
+    let count = 0;
+    
+    function flash() {
+      document.body.classList.add("power-flicker");
+      
+      setTimeout(() => {
+        document.body.classList.remove("power-flicker");
+        
+        count++;
+        if (count < flashes) {
+          setTimeout(flash, 40 + Math.random() * 100); // blink-এর মাঝে random gap
+        }
+      }, 60 + Math.random() * 100); // blink-এর duration random
+    }
+    
+    flash();
+    
+    // পরের flicker ৩–৬ সেকেন্ড পরে
+    const next = 3000 + Math.random() * 3000;
     setTimeout(flicker, next);
   }
-
-  setTimeout(flicker, 10000);
+  
+  setTimeout(flicker, 3000);
+  
 })();
 
 /*========================================
