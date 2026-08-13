@@ -6,23 +6,6 @@
   <title>Underground Chat - Login</title>
   <meta name="theme-color" content="#000000">
 
-  <!-- iOS Safari Auto-Redirection Script -->
-  <script>
-    (function() {
-      // Detect iOS (iPhone, iPad, iPod)
-      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || 
-                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-      // Detect Safari Browser
-      const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
-
-      // Redirect if iOS Safari is detected
-      if (isIOS && isSafari) {
-        window.location.replace("iuser.html");
-      }
-    })();
-  </script>
-
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -138,17 +121,33 @@
     </button>
 
     <div class="register-prompt">
-      Don't have an operator tag? <a href="createaccount.html">Register Terminal</a>
+      Don't have an operator tag? <a href="createaccount.html" id="registerBtn">Register Terminal</a>
     </div>
   </main>
 
-  <!-- Mouse Tracking Glow Effect -->
+  <!-- Mouse Tracking Glow Effect & Registration Link Logic -->
   <script>
+    // Mouse Glow
     const glow = document.getElementById('mouse-glow');
     if (glow) {
       window.addEventListener('mousemove', (e) => {
         glow.style.left = `${e.clientX}px`;
         glow.style.top = `${e.clientY}px`;
+      });
+    }
+
+    // iOS Safari Detection on Register Link Click
+    const registerBtn = document.getElementById('registerBtn');
+    if (registerBtn) {
+      registerBtn.addEventListener('click', (e) => {
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || 
+                      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
+
+        if (isIOS && isSafari) {
+          e.preventDefault();
+          window.location.href = "iuser.html";
+        }
       });
     }
   </script>
