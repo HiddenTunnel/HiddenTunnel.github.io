@@ -3,158 +3,225 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Underground Chat - Login</title>
-  <meta name="theme-color" content="#000000">
-
-  <!-- iOS Safari Auto-Redirection Script -->
-  <script>
-    (function() {
-      // Detect iOS (iPhone, iPad, iPod)
-      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || 
-                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-      // Detect Safari Browser
-      const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
-
-      // Redirect if iOS Safari is detected
-      if (isIOS && isSafari) {
-        window.location.replace("iuser.html");
-      }
-    })();
-  </script>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
-
-  <!-- External Stylesheet -->
-  <link rel="stylesheet" href="login.css">
+  <title>Login</title>
   <style>
-    #idLoginForm {
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+      min-height: 320px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      justify-content: center;
+    }
+
+    .login-card h2 {
+      margin-bottom: 24px;
+      color: #1a1a1a;
+      text-align: center;
+    }
+
+    /* Loading Overlay for Recognizing User */
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #0066cc;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 16px;
+      color: #555;
+      font-weight: 500;
+    }
+
+    /* Form Styles */
+    .form-content {
+      display: none; /* Hidden during recognition check */
+    }
+
+    .form-group {
       margin-bottom: 20px;
     }
 
-    #idLoginForm input {
-      width: 100%;
-      padding: 13px 16px;
-      background: #151515;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 12px;
-      color: #fff;
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.92rem;
-      outline: none;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    #idLoginForm input:focus {
-      border-color: var(--green, #3FA9A9);
-      box-shadow: 0 0 10px rgba(63, 169, 169, 0.25);
-    }
-
-    .login-divider {
-      display: flex;
-      align-items: center;
-      text-align: center;
-      margin: 18px 0;
-      color: #888;
-      font-size: 0.78rem;
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
       font-weight: 600;
+      color: #333;
     }
 
-    .login-divider::before,
-    .login-divider::after {
-      content: '';
-      flex: 1;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+      transition: border-color 0.2s;
     }
 
-    .login-divider span {
-      padding: 0 12px;
-      letter-spacing: 1px;
+    .form-group input:focus {
+      outline: none;
+      border-color: #0066cc;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #0066cc;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .submit-btn:hover {
+      background-color: #0052a3;
+    }
+
+    /* Dashboard View after Auto-Login */
+    .welcome-container {
+      display: none;
+      text-align: center;
+    }
+
+    .logout-btn {
+      margin-top: 20px;
+      padding: 10px 18px;
+      background-color: #e53e3e;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
 
-  <!-- Background Layers -->
-  <div class="graffiti-bg"></div>
-  <div id="mouse-glow"></div>
-
-  <!-- Login Main Container -->
-  <main class="login-card">
+  <div class="login-card">
     
-    <a href="index.html" class="brand-logo">
-      <img src="assets/pic/title.png" alt="Hidden Tunnel" class="logo-title">
-    </a>
-
-    <p class="subtitle">Authenticate access keys to enter the frequency</p>
-
-    <!-- Versity ID + Password Login Form -->
-    <form id="idLoginForm">
-      <input
-        type="text"
-        id="versityId"
-        placeholder="Versity ID (8 Digits)"
-        maxlength="8"
-        minlength="8"
-        pattern="[0-9]{8}"
-        title="Versity ID must be exactly 8 digits"
-        autocomplete="username"
-        required
-      >
-
-      <input
-        type="password"
-        id="password"
-        placeholder="Password"
-        minlength="6"
-        autocomplete="current-password"
-        required
-      >
-
-      <button type="submit" id="idLoginBtn" class="btn-submit">
-        LOGIN WITH ID
-      </button>
-    </form>
-
-    <div class="login-divider">
-      <span>OR</span>
+    <!-- 1. Loading State (Recognizing User) -->
+    <div id="loading-state" class="loading-container">
+      <div class="spinner"></div>
+      <p class="loading-text">Recognizing user...</p>
     </div>
 
-    <!-- Google Authentication Button -->
-    <button id="googleLoginBtn" class="btn-submit btn-google">
-      <svg class="google-icon" width="18" height="18" viewBox="0 0 24 24">
-        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-      </svg>
-      <span id="btnText">Continue with Google</span>
-    </button>
+    <!-- 2. Standard Login Form -->
+    <div id="form-state" class="form-content">
+      <h2>Account Login</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="userId">User ID or Email</label>
+          <input type="text" id="userId" name="userId" placeholder="Enter ID or Email" required>
+        </div>
 
-    <div class="register-prompt">
-      Don't have an operator tag? <a href="createaccount.html">Register Terminal</a>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="submit-btn">Sign In</button>
+      </form>
     </div>
-  </main>
 
-  <!-- Mouse Tracking Glow Effect -->
+    <!-- 3. Logged-in State -->
+    <div id="welcome-state" class="welcome-container">
+      <h2>Welcome Back!</h2>
+      <p id="user-display-id" style="margin-top: 8px; color: #666;"></p>
+      <button class="logout-btn" onclick="logout()">Log Out</button>
+    </div>
+
+  </div>
+
   <script>
-    const glow = document.getElementById('mouse-glow');
-    if (glow) {
-      window.addEventListener('mousemove', (e) => {
-        glow.style.left = `${e.clientX}px`;
-        glow.style.top = `${e.clientY}px`;
-      });
+    const loadingState = document.getElementById('loading-state');
+    const formState = document.getElementById('form-state');
+    const welcomeState = document.getElementById('welcome-state');
+    const userDisplay = document.getElementById('user-display-id');
+    const loginForm = document.getElementById('login-form');
+
+    // Simulate checking saved session on load
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const savedUser = localStorage.getItem('saved_user_id');
+
+        loadingState.style.display = 'none';
+
+        if (savedUser) {
+          // Auto-login: Old user recognized
+          userDisplay.textContent = `Logged in as: ${savedUser}`;
+          welcomeState.style.display = 'block';
+        } else {
+          // New user or logged out: Show ID & Password form
+          formState.style.display = 'block';
+        }
+      }, 1500); // 1.5 seconds delay to simulate user recognition
+    });
+
+    // Handle Manual Login
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const userId = document.getElementById('userId').value;
+
+      // Save user details to localStorage so they are recognized next time
+      localStorage.setItem('saved_user_id', userId);
+
+      // Hide Form & Show Logged-in View
+      formState.style.display = 'none';
+      userDisplay.textContent = `Logged in as: ${userId}`;
+      welcomeState.style.display = 'block';
+    });
+
+    // Handle Logout
+    function logout() {
+      // Clear saved user data
+      localStorage.removeItem('saved_user_id');
+
+      // Reset views
+      welcomeState.style.display = 'none';
+      formState.style.display = 'block';
+      loginForm.reset();
     }
   </script>
-
-  <!-- External Firebase Auth Module -->
-  <script type="module" src="login.js"></script>
-
 </body>
 </html>
