@@ -19,7 +19,7 @@
             background: #111111;
             border: 2px solid rgba(255, 255, 255, 0.1);
             border-radius: 28px;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(92, 255, 114, 0.15);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(63, 169, 169, 0.15);
             position: relative;
             z-index: 10;
         }
@@ -33,7 +33,7 @@
         }
 
         .form-container h1 span {
-            color: var(--green, #5CFF72);
+            color: var(--green, #3FA9A9);
         }
 
         .form-container p {
@@ -58,6 +58,7 @@
 
         .input-group input[type="text"],
         .input-group input[type="email"],
+        .input-group input[type="password"],
         .input-group input[type="tel"] {
             width: 100%;
             background: #181818;
@@ -71,7 +72,6 @@
             transition: border-color 0.3s;
         }
 
-        /* Readonly input styling */
         .input-group input[readonly] {
             background: #121212;
             color: #888;
@@ -80,7 +80,7 @@
         }
 
         .input-group input:focus:not([readonly]) {
-            border-color: var(--green, #5CFF72);
+            border-color: var(--green, #3FA9A9);
         }
 
         .photo-upload-wrapper {
@@ -96,7 +96,7 @@
             height: 100px;
             border-radius: 50%;
             background: #1e1e1e;
-            border: 2px dashed var(--green, #5CFF72);
+            border: 2px dashed var(--green, #3FA9A9);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -136,14 +136,14 @@
         }
 
         .upload-btn-label:hover {
-            background: var(--green, #5CFF72);
+            background: var(--green, #3FA9A9);
             color: #000;
         }
 
         .submit-btn {
             width: 100%;
             padding: 14px;
-            background: var(--green, #5CFF72);
+            background: var(--green, #3FA9A9);
             color: #000;
             border: none;
             border-radius: 50px;
@@ -151,14 +151,14 @@
             font-weight: 800;
             font-size: 1rem;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(92, 255, 114, 0.3);
+            box-shadow: 0 0 20px rgba(63, 169, 169, 0.3);
             transition: all 0.3s;
             margin-top: 10px;
         }
 
         .submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 35px rgba(92, 255, 114, 0.6);
+            box-shadow: 0 0 35px rgba(63, 169, 169, 0.6);
         }
     </style>
 </head>
@@ -195,12 +195,17 @@
 
             <div class="input-group">
                 <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" readonly>
+                <input type="text" id="fullName" placeholder="Enter Full Name" required>
             </div>
 
             <div class="input-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" readonly>
+                <input type="email" id="email" placeholder="name@example.com" required>
+            </div>
+
+            <div class="input-group" id="passwordGroup">
+                <label for="password">Password</label>
+                <input type="password" id="password" minlength="6" placeholder="At least 6 characters">
             </div>
 
             <div class="input-group">
@@ -210,7 +215,7 @@
 
             <div class="input-group">
                 <label for="versityId">Put Your IUBAT VERSITY ID</label>
-                <input type="text" id="versityId" placeholder="e.g. 262060**" maxlength="8" minlength="8" pattern="262060[0-9]{2}" title="ID must start with 262060 followed by 2 digits (e.g. 262060**)" required>
+                <input type="text" id="versityId" placeholder="e.g. 26206012" maxlength="8" minlength="8" pattern="[0-9]{8}" title="ID must be exactly 8 digits" required>
             </div>
 
             <button type="submit" id="submitBtn" class="submit-btn">GENERATE ID CARD</button>
@@ -229,7 +234,11 @@
             where, 
             getDocs 
         } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged,
+            createUserWithEmailAndPassword 
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
@@ -245,27 +254,43 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        let isGoogleUser = false;
         let uploadedPhotoURL = "";
         const CLOUD_NAME = "z1vtvdmj";
         const UPLOAD_PRESET = "urbaun_chat";
+        
         const photoInput = document.getElementById('photoInput');
         const imagePreview = document.getElementById('imagePreview');
         const previewPlaceholder = document.getElementById('previewPlaceholder');
+        const fullNameInput = document.getElementById('fullName');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const passwordGroup = document.getElementById('passwordGroup');
 
         onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                window.location.href = "login.html";
-                return;
-            }
+            if (user) {
+                isGoogleUser = true;
+                fullNameInput.value = user.displayName || "";
+                fullNameInput.readOnly = true;
 
-            document.getElementById("fullName").value = user.displayName || "";
-            document.getElementById("email").value = user.email || "";
+                emailInput.value = user.email || "";
+                emailInput.readOnly = true;
 
-            if (user.photoURL) {
-                imagePreview.src = user.photoURL;
-                imagePreview.style.display = "block";
-                previewPlaceholder.style.display = "none";
-                uploadedPhotoURL = user.photoURL;
+                passwordGroup.style.display = "none";
+                passwordInput.removeAttribute("required");
+
+                if (user.photoURL) {
+                    imagePreview.src = user.photoURL;
+                    imagePreview.style.display = "block";
+                    previewPlaceholder.style.display = "none";
+                    uploadedPhotoURL = user.photoURL;
+                }
+            } else {
+                isGoogleUser = false;
+                fullNameInput.readOnly = false;
+                emailInput.readOnly = false;
+                passwordGroup.style.display = "flex";
+                passwordInput.setAttribute("required", "true");
             }
         });
 
@@ -295,7 +320,6 @@
                 }
 
                 uploadedPhotoURL = data.secure_url;
-
                 imagePreview.src = uploadedPhotoURL;
                 imagePreview.style.display = "block";
                 previewPlaceholder.style.display = "none";
@@ -312,17 +336,9 @@
             const submitBtn = document.getElementById('submitBtn');
             const versityId = document.getElementById('versityId').value.trim();
 
-            // 🔴 1. 262060 Prefixed ID Check Logic (Must start with 262060 and end with 2 digits)
-            const isValidIubatFormat = /^262060\d{2}$/.test(versityId);
+            const isValidIubatFormat = /^\d{8}$/.test(versityId);
             if (!isValidIubatFormat) {
-                alert("Invalid ID! Versity ID must start with 262060 followed by 2 digits (e.g. 262060**).");
-                return;
-            }
-
-            const user = auth.currentUser;
-            if (!user) {
-                alert("Please login first.");
-                window.location.href = "login.html";
+                alert("Invalid ID! Versity ID must be exactly 8 digits.");
                 return;
             }
 
@@ -330,15 +346,15 @@
             submitBtn.disabled = true;
 
             try {
-                // 🔴 2. Check if the Versity ID is already used by another user in Firestore
+                let currentUser = auth.currentUser;
+
                 const q = query(
                     collection(db, "users"), 
                     where("versityId", "==", versityId)
                 );
                 const querySnapshot = await getDocs(q);
 
-                // Filter out current user's document if updating profile
-                const isDuplicate = querySnapshot.docs.some(doc => doc.id !== user.uid);
+                const isDuplicate = querySnapshot.docs.some(doc => doc.id !== (currentUser ? currentUser.uid : ""));
 
                 if (isDuplicate) {
                     alert("This Versity ID is already registered by another account! Please enter a unique ID.");
@@ -347,25 +363,31 @@
                     return;
                 }
 
+                if (!isGoogleUser && !currentUser) {
+                    submitBtn.textContent = "CREATING AUTH ACCOUNT...";
+                    const internalEmail = `${versityId}@hiddentunnel.local`;
+                    const password = passwordInput.value;
+                    
+                    const userCredential = await createUserWithEmailAndPassword(auth, internalEmail, password);
+                    currentUser = userCredential.user;
+                }
+
                 submitBtn.textContent = "SAVING TO CLOUD...";
 
                 const profileData = {
-                    fullName: document.getElementById('fullName').value.trim(),
-                    email: document.getElementById('email').value.trim(),
+                    fullName: fullNameInput.value.trim(),
+                    email: emailInput.value.trim(),
                     phone: document.getElementById('phone').value.trim() || "",
                     versityId: versityId,
                     photo: uploadedPhotoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80"
                 };
 
-                // Save profile to Cloud Firestore database
-                await setDoc(doc(db, "users", user.uid), {
+                await setDoc(doc(db, "users", currentUser.uid), {
                     ...profileData,
-                    uid: user.uid,
-                    email: user.email
+                    uid: currentUser.uid
                 });
 
-                // Save user ID to localStorage session
-                localStorage.setItem("ug_current_user_id", user.uid);
+                localStorage.setItem("ug_current_user_id", currentUser.uid);
                 window.location.href = 'id.html';
 
             } catch (error) {

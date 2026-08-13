@@ -6,6 +6,23 @@
   <title>Underground Chat - Login</title>
   <meta name="theme-color" content="#000000">
 
+  <!-- iOS Safari Auto-Redirection Script -->
+  <script>
+    (function() {
+      // Detect iOS (iPhone, iPad, iPod)
+      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || 
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+      // Detect Safari Browser
+      const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
+
+      // Redirect if iOS Safari is detected
+      if (isIOS && isSafari) {
+        window.location.replace("iuser.html");
+      }
+    })();
+  </script>
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +30,54 @@
 
   <!-- External Stylesheet -->
   <link rel="stylesheet" href="login.css">
+  <style>
+    #idLoginForm {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    #idLoginForm input {
+      width: 100%;
+      padding: 13px 16px;
+      background: #151515;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #idLoginForm input:focus {
+      border-color: var(--green, #3FA9A9);
+      box-shadow: 0 0 10px rgba(63, 169, 169, 0.25);
+    }
+
+    .login-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 18px 0;
+      color: #888;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .login-divider::before,
+    .login-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .login-divider span {
+      padding: 0 12px;
+      letter-spacing: 1px;
+    }
+  </style>
 </head>
 <body>
 
@@ -20,14 +85,46 @@
   <div class="graffiti-bg"></div>
   <div id="mouse-glow"></div>
 
-  <!-- Login Modal Card -->
+  <!-- Login Main Container -->
   <main class="login-card">
     
-<a href="index.html" class="brand-logo">
-  <img src="assets/pic/title.png" alt="Hidden Tunnel" class="logo-title">
-</a>
+    <a href="index.html" class="brand-logo">
+      <img src="assets/pic/title.png" alt="Hidden Tunnel" class="logo-title">
+    </a>
 
     <p class="subtitle">Authenticate access keys to enter the frequency</p>
+
+    <!-- Versity ID + Password Login Form -->
+    <form id="idLoginForm">
+      <input
+        type="text"
+        id="versityId"
+        placeholder="Versity ID (8 Digits)"
+        maxlength="8"
+        minlength="8"
+        pattern="[0-9]{8}"
+        title="Versity ID must be exactly 8 digits"
+        autocomplete="username"
+        required
+      >
+
+      <input
+        type="password"
+        id="password"
+        placeholder="Password"
+        minlength="6"
+        autocomplete="current-password"
+        required
+      >
+
+      <button type="submit" id="idLoginBtn" class="btn-submit">
+        LOGIN WITH ID
+      </button>
+    </form>
+
+    <div class="login-divider">
+      <span>OR</span>
+    </div>
 
     <!-- Google Authentication Button -->
     <button id="googleLoginBtn" class="btn-submit btn-google">
@@ -45,7 +142,7 @@
     </div>
   </main>
 
-  <!-- Mouse Tracking Effect -->
+  <!-- Mouse Tracking Glow Effect -->
   <script>
     const glow = document.getElementById('mouse-glow');
     if (glow) {
@@ -56,7 +153,7 @@
     }
   </script>
 
-  <!-- Fast Auth Module Script -->
+  <!-- External Firebase Auth Module -->
   <script type="module" src="login.js"></script>
 
 </body>

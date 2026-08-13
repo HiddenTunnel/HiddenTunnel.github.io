@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Underground Chat - Apple Terminal Access</title>
+  <meta name="theme-color" content="#000000">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background: #050505;
+      color: #fff;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .ios-container {
+      width: 88%;
+      max-width: 420px;
+      margin: 40px auto;
+      padding: 30px 24px;
+      background: rgba(18, 18, 18, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(63, 169, 169, 0.15);
+      box-sizing: border-box;
+    }
+
+    .ios-badge {
+      display: inline-block;
+      background: rgba(63, 169, 169, 0.15);
+      color: var(--green, #3FA9A9);
+      border: 1px solid rgba(63, 169, 169, 0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .ios-container h1 {
+      font-family: 'Permanent Marker', cursive;
+      font-size: 1.8rem;
+      color: #fff;
+      margin: 0 0 8px 0;
+      text-align: center;
+    }
+
+    .ios-container h1 span {
+      color: var(--green, #3FA9A9);
+    }
+
+    .ios-container p {
+      color: #a5a5a5;
+      font-size: 0.88rem;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .photo-upload-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .photo-preview {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: #181818;
+      border: 2px dashed var(--green, #3FA9A9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .photo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .photo-preview span {
+      font-size: 0.7rem;
+      color: #888;
+      text-align: center;
+      padding: 0 8px;
+    }
+
+    #photoInput {
+      display: none;
+    }
+
+    .upload-btn-label {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .input-group {
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .input-group label {
+      color: #ccc;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .input-group input {
+      width: 100%;
+      background: #151515;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      -webkit-appearance: none;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+
+    .input-group input:focus {
+      border-color: var(--green, #3FA9A9);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--green, #3FA9A9);
+      color: #000;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 0 20px rgba(63, 169, 169, 0.3);
+      -webkit-appearance: none;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    .login-link a {
+      color: var(--green, #3FA9A9);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* Access Block Overlay */
+    #blockedOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 9999;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 30px;
+    }
+
+    #blockedOverlay h2 {
+      font-family: 'Permanent Marker', cursive;
+      color: #ff4d4d;
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    #blockedOverlay p {
+      color: #aaa;
+      font-size: 0.95rem;
+      max-width: 320px;
+      line-height: 1.5;
+    }
+
+    .redirect-btn {
+      margin-top: 20px;
+      padding: 10px 24px;
+      background: #ff4d4d;
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Apple Device Detection Script (iOS / macOS) -->
+  <script>
+    (function() {
+      // Check for iPhone, iPad, iPod, or Mac platforms
+      const isAppleDevice = /iPhone|iPad|iPod|Macintosh|MacIntel|MacPPC|Mac68K/i.test(navigator.userAgent) || 
+                            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 0);
+
+      // Block access if device is NOT from Apple ecosystem
+      if (!isAppleDevice) {
+        window.addEventListener('DOMContentLoaded', () => {
+          document.getElementById('blockedOverlay').style.display = 'flex';
+          document.getElementById('mainContent').style.display = 'none';
+        });
+      }
+    })();
+  </script>
+
+  <!-- Access Blocked Screen -->
+  <div id="blockedOverlay">
+    <h2>ACCESS DENIED</h2>
+    <p>This terminal gate is strictly restricted to <strong>Apple Devices (iOS / Mac)</strong> only.</p>
+    <a href="login.html" class="redirect-btn">Go to Standard Login</a>
+  </div>
+
+  <!-- Main Registration Form Container -->
+  <main class="ios-container" id="mainContent">
+    <div style="text-align: center;">
+      <span class="ios-badge">Apple Terminal Access</span>
+    </div>
+    <h1>REGISTER <span>ID</span></h1>
+    <p>Create your credentials for Apple frequency access</p>
+
+    <form id="iosRegisterForm">
+      <div class="photo-upload-wrapper">
+        <div class="photo-preview" onclick="document.getElementById('photoInput').click()">
+          <span id="previewPlaceholder">Tap to upload photo</span>
+          <img id="imagePreview" alt="Profile Preview">
+        </div>
+        <label for="photoInput" class="upload-btn-label">Choose Avatar</label>
+        <input type="file" id="photoInput" accept="image/jpeg, image/png">
+      </div>
+
+      <div class="input-group">
+        <label for="versityId">Versity ID (8 Digits)</label>
+        <input 
+          type="text" 
+          id="versityId" 
+          placeholder="e.g. 26206012" 
+          maxlength="8" 
+          minlength="8" 
+          pattern="[0-9]{8}" 
+          inputmode="numeric" 
+          required
+        >
+      </div>
+
+      <div class="input-group">
+        <label for="password">Security Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          placeholder="Min. 6 characters" 
+          minlength="6" 
+          required
+        >
+      </div>
+
+      <div class="input-group">
+        <label for="fullName">Full Name</label>
+        <input type="text" id="fullName" placeholder="Enter Full Name" required>
+      </div>
+
+      <div class="input-group">
+        <label for="email">Personal Email</label>
+        <input type="email" id="email" placeholder="name@example.com" required>
+      </div>
+
+      <div class="input-group">
+        <label for="phone">Phone Number (Optional)</label>
+        <input type="tel" id="phone" placeholder="Optional">
+      </div>
+
+      <button type="submit" id="submitBtn" class="submit-btn">CREATE ACCOUNT</button>
+    </form>
+
+    <div class="login-link">
+      Already registered? <a href="login.html">Login via Terminal</a>
+    </div>
+  </main>
+
+  <!-- FIREBASE & CLOUDINARY LOGIC -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { 
+      getFirestore, 
+      doc, 
+      setDoc, 
+      collection, 
+      query, 
+      where, 
+      getDocs 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyARFZiBsFAtgKAtWtMnyka52PORQFolijI",
+      authDomain: "urbannoir-13ce8.firebaseapp.com",
+      projectId: "urbannoir-13ce8",
+      storageBucket: "urbannoir-13ce8.firebasestorage.app",
+      messagingSenderId: "1059246827383",
+      appId: "1:1059246827383:web:caa91c40c408d46e3b6372",
+      measurementId: "G-CEPWKZXQVF"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let uploadedPhotoURL = "";
+    const CLOUD_NAME = "z1vtvdmj";
+    const UPLOAD_PRESET = "urbaun_chat";
+
+    const photoInput = document.getElementById('photoInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewPlaceholder = document.getElementById('previewPlaceholder');
+
+    photoInput.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      previewPlaceholder.textContent = "Uploading...";
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", UPLOAD_PRESET);
+
+      try {
+        const response = await fetch(
+          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+          { method: "POST", body: formData }
+        );
+
+        const data = await response.json();
+        if (!data.secure_url) throw new Error("Cloudinary upload failed");
+
+        uploadedPhotoURL = data.secure_url;
+        imagePreview.src = uploadedPhotoURL;
+        imagePreview.style.display = "block";
+        previewPlaceholder.style.display = "none";
+
+      } catch (error) {
+        console.error(error);
+        alert("Image upload failed: " + error.message);
+        previewPlaceholder.textContent = "Tap to upload photo";
+      }
+    });
+
+    document.getElementById('iosRegisterForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submitBtn');
+      const versityId = document.getElementById('versityId').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!/^\d{8}$/.test(versityId)) {
+        alert("Versity ID must be exactly 8 digits!");
+        return;
+      }
+
+      submitBtn.textContent = "CHECKING ID AVAILABILITY...";
+      submitBtn.disabled = true;
+
+      try {
+        const q = query(
+          collection(db, "users"), 
+          where("versityId", "==", versityId)
+        );
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          alert("This Versity ID is already registered! Please log in.");
+          submitBtn.textContent = "CREATE ACCOUNT";
+          submitBtn.disabled = false;
+          return;
+        }
+
+        submitBtn.textContent = "REGISTERING TERMINAL...";
+
+        const internalEmail = `${versityId}@hiddentunnel.local`;
+
+        const userCredential = await createUserWithEmailAndPassword(auth, internalEmail, password);
+        const user = userCredential.user;
+
+        submitBtn.textContent = "SAVING IDENTITY...";
+
+        const profileData = {
+          uid: user.uid,
+          versityId: versityId,
+          fullName: document.getElementById('fullName').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          phone: document.getElementById('phone').value.trim() || "",
+          photo: uploadedPhotoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80"
+        };
+
+        await setDoc(doc(db, "users", user.uid), profileData);
+
+        localStorage.setItem("ug_current_user_id", user.uid);
+        window.location.href = 'id.html';
+
+      } catch (error) {
+        console.error("Firebase Registration Error:", error);
+        alert("Registration Failed: " + error.message);
+        submitBtn.textContent = "CREATE ACCOUNT";
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
