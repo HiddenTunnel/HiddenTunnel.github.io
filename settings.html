@@ -563,7 +563,7 @@
                 <li><a href="friends.html">Friends</a></li>
                 <li><a href="notification.html">Alerts</a></li>
                 <li><a href="settings.html" class="active">Settings</a></li>
-                <!-- DEVELOPER MODE LINK (Revealed dynamically for mushfiquemonowarnamir2006@gmail.com) -->
+                <!-- DEVELOPER MODE LINK -->
                 <li id="devModeNavItem" style="display: none;">
                     <a href="developer.html" class="dev-nav-btn">Developer Mode</a>
                 </li>
@@ -601,8 +601,7 @@
                     <label for="photoUpload">Profile Photo</label>
                     <input type="file" id="photoUpload" accept="image/*">
                     <small style="color:#888; display: block; margin-top: 6px;">
-                        Default photo is your Google account photo.
-                        Uploading a new image will replace it everywhere.
+                        Uploading a new image will update profile photo everywhere.
                     </small>
                 </div>
 
@@ -708,7 +707,7 @@
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             Settings
         </a>
-        <!-- MOBILE DEVELOPER LINK (Appears dynamically) -->
+        <!-- MOBILE DEVELOPER LINK -->
         <a href="developer.html" id="devMobileNavItem" class="dev-mobile-link" style="display: none;">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"></path></svg>
             Dev
@@ -767,6 +766,8 @@
         const passwordDeleteSection = document.getElementById('passwordDeleteSection');
 
         let currentUser = null;
+        let activeUid = null;
+        let userDocData = null;
 
         onAuthStateChanged(auth, async (user) => {
             const fallbackId = localStorage.getItem("ug_current_user_id");
@@ -776,8 +777,9 @@
             }
 
             currentUser = user;
+            activeUid = user ? user.uid : fallbackId;
 
-            // Check for Developer Access
+            // Check Developer Access
             if (user && user.email && user.email.toLowerCase() === DEV_EMAIL.toLowerCase()) {
                 const devDesktop = document.getElementById('devModeNavItem');
                 const devMobile = document.getElementById('devMobileNavItem');
@@ -785,7 +787,6 @@
                 if (devMobile) devMobile.style.display = 'flex';
             }
 
-            const activeUid = user ? user.uid : fallbackId;
             await loadUserData(activeUid);
         });
 
@@ -794,11 +795,11 @@
                 const docRef = doc(db, "users", uid);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    const name = data.fullName || data.username || data.name || "Operator";
-                    const tag = data.versityId || uid.slice(0, 8);
-                    const photo = data.photo || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
-                    const bio = data.bio || data.status || "";
+                    userDocData = docSnap.data();
+                    const name = userDocData.fullName || userDocData.username || userDocData.name || "Operator";
+                    const tag = userDocData.versityId || uid.slice(0, 8);
+                    const photo = userDocData.photo || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80";
+                    const bio = userDocData.bio || userDocData.status || "";
 
                     settingsDisplayName.textContent = name;
                     settingsDisplayTag.textContent = `ID: ${tag}`;
@@ -810,13 +811,12 @@
                     fullNameInput.value = name;
                     bioInput.value = bio;
 
-                    // Load preferences from local storage or database
                     if (notificationsToggle) {
                         const notifSetting = localStorage.getItem('ug_notifications_enabled');
                         notificationsToggle.checked = notifSetting !== 'false';
                     }
                     if (stealthToggle) {
-                        stealthToggle.checked = data.stealthMode || false;
+                        stealthToggle.checked = userDocData.stealthMode || false;
                     }
                 }
             } catch (err) {
@@ -824,18 +824,18 @@
             }
         }
 
-        // Photo Upload Listener
+        // Photo Upload Handler
         photoUpload.addEventListener("change", async (e) => {
             const file = e.target.files[0];
-            if (!file || !currentUser) return;
+            if (!file || !activeUid) return;
 
             statusMessage.textContent = "Uploading new image...";
             try {
-                const storageRef = ref(storage, "avatars/" + currentUser.uid);
+                const storageRef = ref(storage, "avatars/" + activeUid);
                 await uploadBytes(storageRef, file);
                 const url = await getDownloadURL(storageRef);
 
-                await updateDoc(doc(db, "users", currentUser.uid), {
+                await updateDoc(doc(db, "users", activeUid), {
                     photo: url
                 });
 
@@ -851,15 +851,14 @@
             }
         });
 
-        // Handle preference toggles
         notificationsToggle?.addEventListener('change', () => {
             localStorage.setItem('ug_notifications_enabled', notificationsToggle.checked);
         });
 
         stealthToggle?.addEventListener('change', async () => {
-            if (!currentUser) return;
+            if (!activeUid) return;
             try {
-                const userRef = doc(db, "users", currentUser.uid);
+                const userRef = doc(db, "users", activeUid);
                 await updateDoc(userRef, { stealthMode: stealthToggle.checked });
             } catch (err) {
                 console.error("Error updating stealth mode:", err);
@@ -869,11 +868,11 @@
         // Save Profile Updates
         settingsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!currentUser) return;
+            if (!activeUid) return;
 
             statusMessage.textContent = "Updating signal...";
             try {
-                const userRef = doc(db, "users", currentUser.uid);
+                const userRef = doc(db, "users", activeUid);
                 const newName = fullNameInput.value.trim();
                 const newBio = bioInput.value.trim();
 
@@ -895,11 +894,16 @@
             }
         });
 
-        // Helper function to execute complete user deletion
+        // Purge User Record Execution
         async function purgeUserAccount() {
             try {
-                await deleteDoc(doc(db, "users", currentUser.uid));
-                await deleteUser(currentUser);
+                if (activeUid) {
+                    await deleteDoc(doc(db, "users", activeUid));
+                }
+
+                if (auth.currentUser) {
+                    await deleteUser(auth.currentUser);
+                }
 
                 localStorage.removeItem("ug_current_user_id");
                 localStorage.removeItem("ug_username");
@@ -911,12 +915,9 @@
             }
         }
 
-        // Account Purge Modal Control
+        // Open Modal
         openDeleteModalBtn.addEventListener('click', () => {
-            if (!currentUser) return;
-
-            // Check provider type to render correct UI
-            const isGoogleUser = currentUser.providerData.some(p => p.providerId === 'google.com');
+            const isGoogleUser = currentUser && currentUser.providerData.some(p => p.providerId === 'google.com');
 
             if (isGoogleUser) {
                 deleteModalDesc.textContent = "Please sign in with Google to confirm permanent identity purge.";
@@ -942,7 +943,9 @@
         googleDeleteBtn.addEventListener('click', async () => {
             try {
                 const provider = new GoogleAuthProvider();
-                await reauthenticateWithPopup(currentUser, provider);
+                if (currentUser) {
+                    await reauthenticateWithPopup(currentUser, provider);
+                }
                 await purgeUserAccount();
             } catch (err) {
                 console.error("Google Re-auth Error:", err);
@@ -950,7 +953,7 @@
             }
         });
 
-        // Password Re-authentication & Deletion
+        // Password / Versity ID Re-authentication & Deletion
         confirmDeleteBtn.addEventListener('click', async () => {
             const password = deletePasswordInput.value;
             if (!password) {
@@ -959,12 +962,22 @@
             }
 
             try {
-                const credential = EmailAuthProvider.credential(currentUser.email, password);
-                await reauthenticateWithCredential(currentUser, credential);
+                if (currentUser) {
+                    // Compute email format for Versity ID or regular auth email
+                    let authEmail = currentUser.email;
+                    if (!authEmail && userDocData && userDocData.versityId) {
+                        authEmail = `${userDocData.versityId}@hiddentunnel.local`;
+                    }
+
+                    if (authEmail) {
+                        const credential = EmailAuthProvider.credential(authEmail, password);
+                        await reauthenticateWithCredential(currentUser, credential);
+                    }
+                }
                 await purgeUserAccount();
             } catch (err) {
                 console.error("Account Purge Error:", err);
-                alert("Authentication failed. " + err.message);
+                alert("Authentication failed: " + err.message);
             }
         });
 
@@ -985,8 +998,10 @@
         // Mouse Glow Tracking
         const glow = document.getElementById('mouse-glow');
         window.addEventListener('mousemove', (e) => {
-            glow.style.left = e.clientX + 'px';
-            glow.style.top = e.clientY + 'px';
+            if (glow) {
+                glow.style.left = e.clientX + 'px';
+                glow.style.top = e.clientY + 'px';
+            }
         });
     </script>
 </body>
